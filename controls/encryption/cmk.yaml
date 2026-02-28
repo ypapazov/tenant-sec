@@ -1,0 +1,41 @@
+---
+id: enc.cmk
+domain: encryption
+name: "Customer-Managed Keys (CMK)"
+description: >
+  Ability to use tenant-controlled encryption keys (stored in the provider's KMS)
+  for data at rest. Covers KMS integration breadth per service, key policies
+  (who can use the key), access controls, usage logging, and whether the tenant
+  can revoke key access to effectively lock the provider out of their data.
+
+criteria:
+  L0: >
+    CMK is not available for any service. All data at rest uses
+    provider-managed keys only. Tenants have no control over key material,
+    rotation schedule, or the ability to revoke data access.
+  L1: >
+    CMK-like behavior is achievable through client-side encryption before data
+    is sent to the provider (tenant manages keys externally, encrypts data in
+    the application layer before storing). This imposes significant application
+    complexity and breaks many managed service features.
+  L2: >
+    CMK is supported for some major services (e.g., object storage, block
+    storage) but not for others (databases, AI/ML, messaging). KMS integration
+    exists but key policies have limited expressiveness, usage logging is
+    not available per-key, or CMK support is not available in all regions.
+  L3: >
+    CMK is available across all major services in scope. Key policies allow
+    fine-grained control (per-operation, per-principal). Key usage is logged
+    (every encryption/decryption call creates an audit event). Tenants can
+    disable a key and effectively revoke data access. Available in all
+    supported regions.
+
+framework_mappings:
+  ccm: ["EKM-03", "EKM-04"]
+  nist_800_53_r5: ["SC-28", "SC-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

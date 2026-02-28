@@ -1,0 +1,41 @@
+---
+id: compute.image-management
+domain: compute
+name: "Image & Artifact Management"
+description: >
+  Private container/VM image registries, image vulnerability scanning,
+  signed image enforcement (only signed images from approved registries can
+  be deployed), and approved image policies at the org level. Assessed across
+  compute surfaces (VMs, containers, serverless) since capabilities vary.
+
+criteria:
+  L0: >
+    No private image registry. No image scanning. Images are pulled from
+    public registries without validation. No mechanism to enforce that only
+    approved images can be deployed.
+  L1: >
+    Private image management is achievable through self-managed solutions:
+    deploying Harbor, JFrog Artifactory, or similar on cloud infrastructure.
+    Tenants build their own scanning pipeline and admission control. The
+    provider offers no managed registry or scanning service.
+  L2: >
+    A managed private container registry exists with integrated vulnerability
+    scanning. Signed image enforcement (admission controller / container
+    policy) exists for Kubernetes workloads but not for serverless or VMs.
+    Org-level policy to mandate registry source is not available.
+  L3: >
+    Full managed artifact management: private registries for containers and
+    VM images, integrated continuous scanning with severity-based blocking,
+    image signing and signature verification (Sigstore or equivalent), org-level
+    policy that prevents deployment of images from unapproved registries or
+    with critical unpatched vulnerabilities.
+
+framework_mappings:
+  ccm: ["IVS-01", "CCC-01"]
+  nist_800_53_r5: ["CM-7", "SI-3", "SA-10"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1525"]
+
+service_scoped: true

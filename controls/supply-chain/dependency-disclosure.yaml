@@ -1,0 +1,40 @@
+---
+id: supply-chain.dependency-disclosure
+domain: supply-chain
+name: "Dependency Disclosure"
+description: >
+  Provider's disclosure of third-party dependencies, sub-processors, and
+  infrastructure partners that have access to tenant data or influence service
+  availability. Covers GDPR sub-processor lists, hardware vendors, network
+  providers, and whether updates to the dependency list trigger tenant notification.
+
+criteria:
+  L0: >
+    No disclosure of sub-processors or infrastructure dependencies. Tenants
+    have no visibility into which third parties have access to their data
+    or infrastructure.
+  L1: >
+    Sub-processor list exists as required by GDPR but is generic (lists
+    categories of sub-processors, not specific named entities), or the list
+    is maintained only for GDPR-subject data and not for all tenant data.
+  L2: >
+    Named sub-processor list published and kept current. Tenants are notified
+    of material changes (new sub-processors) with a 30-day advance notice period.
+    However, the list covers data processing sub-processors only, not infrastructure
+    dependencies (hardware vendors, network providers, facility operators).
+  L3: >
+    Comprehensive dependency disclosure: named sub-processor list with data
+    access scope per entity, named infrastructure partners (hardware, network,
+    facilities), update notification with opt-out right (GDPR), advance notice
+    for new sub-processors, and a published process for tenants to object to
+    specific sub-processors.
+
+framework_mappings:
+  ccm: ["STA-04", "STA-05"]
+  nist_800_53_r5: ["SA-9", "SA-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

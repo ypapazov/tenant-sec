@@ -1,0 +1,42 @@
+---
+id: log.export-integration
+domain: logging
+name: "Log Export & SIEM Integration"
+description: >
+  Native log export to external SIEM, S3-compatible storage, or event streaming
+  platforms. Covers supported output formats (JSON, CEF, OCSF), whether export
+  is real-time/streaming or batch-only, and whether all log types (control plane,
+  data plane, network flow) are exportable.
+
+criteria:
+  L0: >
+    Logs are only accessible through the provider's proprietary console or API.
+    No export to external systems is available. Log retention is fixed by the
+    provider and cannot be extended by exporting to tenant-controlled storage.
+  L1: >
+    Log export is achievable through custom scripting: tenant writes scripts
+    to pull logs via API and forward to an external destination. No native
+    streaming or push-based export. Scripts must poll periodically, introducing
+    latency and operational overhead.
+  L2: >
+    Native log export exists to at least one destination (S3-compatible storage
+    or a specific SIEM via a native connector). However, export is batch-only
+    (no streaming), coverage is partial (only control plane logs exported, not
+    network flow logs), format is proprietary (not JSON/CEF/OCSF), or only
+    specific log types are exportable.
+  L3: >
+    Full log export and integration: streaming export to customer-controlled
+    destinations (S3-compatible, Kafka-compatible, or major SIEM vendors via
+    native connectors), logs delivered in a standard format (JSON, CEF, or OCSF),
+    low latency (near real-time), all log types exportable, and export
+    configuration manageable at the org level as a policy.
+
+framework_mappings:
+  ccm: ["LOG-06", "LOG-07"]
+  nist_800_53_r5: ["AU-4", "AU-9", "SI-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

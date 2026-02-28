@@ -1,0 +1,41 @@
+---
+id: incident.notification-sla
+domain: incident
+name: "Incident Notification SLA"
+description: >
+  Contractual commitments on provider-side security incident notification
+  timeline. Covers both infrastructure-level security incidents affecting
+  tenant data and platform vulnerabilities that require tenant action.
+  Includes transparency of incident communication and historical track record.
+
+criteria:
+  L0: >
+    No contractual incident notification commitment. Tenants are not guaranteed
+    to be notified of security incidents affecting their data or the provider
+    infrastructure. Notifications, when they occur, have no defined timeline.
+  L1: >
+    Incident notification exists on a best-effort basis: the provider communicates
+    incidents through a public status page or blog, but there is no contractual
+    SLA, no direct notification to affected tenants, and no private advance
+    notice for critical vulnerabilities.
+  L2: >
+    Contractual incident notification exists (e.g., 72 hours for GDPR Article 33
+    compliance) but only covers data breaches, not security incidents without
+    confirmed data exposure. Provider uses general notification (announcement to
+    all customers), not targeted notification to affected tenants.
+  L3: >
+    Strong notification commitment: targeted notification to directly affected
+    tenants within 24-72 hours of incident confirmation, contractual SLA,
+    advance notification for vulnerabilities requiring tenant action (with
+    embargo if needed), dedicated incident response channel, and published
+    transparency reports with post-incident analyses.
+
+framework_mappings:
+  ccm: ["SEF-04", "SEF-05"]
+  nist_800_53_r5: ["IR-6", "IR-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

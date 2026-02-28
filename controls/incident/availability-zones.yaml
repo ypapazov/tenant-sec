@@ -1,0 +1,40 @@
+---
+id: incident.availability-zones
+domain: incident
+name: "Availability Zones & Regions"
+description: >
+  Blast radius architecture for resilience against infrastructure failures.
+  Covers AZ independence guarantees, number of AZs per region, cross-region
+  failover capabilities, and the operational complexity of deploying
+  multi-AZ and multi-region architectures.
+
+criteria:
+  L0: >
+    Single-datacenter deployment only. No AZ concept. A datacenter failure
+    would cause complete service outage. No cross-region option.
+  L1: >
+    Multiple availability zones exist but AZ independence is not formally
+    guaranteed — zones may share power or cooling infrastructure. Multi-AZ
+    deployment is supported but requires significant tenant configuration
+    for each service type.
+  L2: >
+    Two AZs available per region with documented independence guarantees.
+    Multi-AZ deployment is supported and documented for major services.
+    Cross-region deployment is possible but complex. Three AZs are available
+    in some regions but not universally.
+  L3: >
+    Three or more physically independent AZs per region with formal independence
+    guarantees (separate power, cooling, networking). Multi-AZ is the default
+    or strongly guided configuration for all managed services. Cross-region
+    active-active or active-passive architectures are supported with managed
+    failover services. Blast radius analysis documentation available.
+
+framework_mappings:
+  ccm: ["BCR-06", "BCR-07", "BCR-11"]
+  nist_800_53_r5: ["CP-7", "CP-8", "CP-9"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

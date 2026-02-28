@@ -1,0 +1,40 @@
+---
+id: net.firewall
+domain: network
+name: "Firewall & Security Groups"
+description: >
+  Stateful and stateless firewall capabilities for controlling traffic to and
+  from cloud resources. Covers security group rule expressiveness, managed rule
+  sets, ability to enforce security group configuration via org-level policy,
+  and whether managed firewall services (beyond basic security groups) are available.
+
+criteria:
+  L0: >
+    No firewall capability. All inbound and outbound traffic is unrestricted.
+    No security groups, NACLs, or equivalent traffic filtering mechanism.
+  L1: >
+    Basic security groups exist (allow rules only, no explicit deny at the
+    security group level). No managed firewall service. Org-level enforcement
+    of security group rules is not available; tenants must manually ensure
+    each resource has appropriate rules.
+  L2: >
+    Security groups with allow and deny rules exist. A managed firewall service
+    may exist for specific use cases (e.g., VPC-level firewall) but org-level
+    policy enforcement is not available, or the managed firewall service covers
+    only some service types and not others.
+  L3: >
+    Full security group and firewall capabilities: stateful rules with allow/deny,
+    managed centralized firewall service (next-generation firewall, URL filtering,
+    IDS/IPS integration), org-level policy that mandates baseline security group
+    rules on all resources (prevent creation of overly permissive rules), and
+    flow logging for all traffic.
+
+framework_mappings:
+  ccm: ["IVS-09", "IVS-10"]
+  nist_800_53_r5: ["SC-7", "SC-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1046", "T1133"]
+
+service_scoped: true

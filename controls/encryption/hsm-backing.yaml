@@ -1,0 +1,40 @@
+---
+id: enc.hsm-backing
+domain: encryption
+name: "HSM Backing"
+description: >
+  Whether the KMS is backed by hardware security modules (HSMs). Covers FIPS
+  140-2/3 validation levels, whether tenants share HSM partitions with other
+  tenants (multi-tenant HSM), and whether tenant-exclusive (single-tenant)
+  dedicated HSM options are available.
+
+criteria:
+  L0: >
+    The KMS is implemented in software only with no HSM backing. Key material
+    resides in software, making it potentially accessible to provider personnel
+    with privileged access to the key management infrastructure.
+  L1: >
+    HSM-backed key storage is achievable by tenants who deploy and manage their
+    own HSM appliances (physical or cloud HSM-as-a-service from a third party)
+    outside the provider's platform. The provider's native KMS has no HSM backing.
+  L2: >
+    The standard KMS is backed by FIPS 140-2 Level 2 or Level 3 HSMs, but
+    tenants share HSM partitions with other tenants (multi-tenant HSM). A
+    single-tenant dedicated HSM product exists but at significant additional
+    cost and is not available in all regions.
+  L3: >
+    The default KMS uses multi-tenant FIPS 140-2 Level 3 HSMs, and a managed
+    single-tenant dedicated HSM service is available in all production regions
+    at reasonable cost. Dedicated HSM attestation is available (tenants can
+    verify their key material is on their exclusive partition). CloudHSM-class
+    capability.
+
+framework_mappings:
+  ccm: ["EKM-05"]
+  nist_800_53_r5: ["SC-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

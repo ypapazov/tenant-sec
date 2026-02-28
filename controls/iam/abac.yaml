@@ -1,0 +1,44 @@
+---
+id: iam.abac
+domain: iam
+name: "Attribute-Based Access Control (ABAC)"
+description: >
+  Support for access control beyond basic RBAC, using resource tags/labels,
+  dynamic context attributes (time-of-day, source IP, device posture), and
+  conditional access policies. Assesses whether permission decisions can
+  incorporate resource attributes at evaluation time rather than requiring
+  separate role assignments per resource.
+
+criteria:
+  L0: >
+    Only role-based access control is supported. Permissions are granted at
+    the service or account level with no ability to condition access on
+    resource attributes, tags, or request context. Fine-grained resource-level
+    policies do not exist.
+  L1: >
+    ABAC is achievable through tenant-built policy logic: custom authorizers,
+    external policy engines (OPA), or Lambda authorizers that inspect context
+    attributes before granting access. The cloud IAM itself does not evaluate
+    attributes natively.
+  L2: >
+    Native tag-based or attribute-based conditions exist in IAM policies but
+    with limitations: only a predefined set of condition keys (not arbitrary
+    resource attributes), limited to specific services, no device posture
+    integration, or conditions cannot reference tenant-defined resource tags
+    created outside a fixed schema.
+  L3: >
+    Rich ABAC with tenant-defined resource tags, arbitrary condition keys
+    covering request context (IP, time, MFA state, device), resource attributes,
+    and principal tags. Conditions can be composed with logical operators (AND,
+    OR, NOT). Supported consistently across all major services in scope. Session
+    context and principal tags flow through delegation chains.
+
+framework_mappings:
+  ccm: ["IAM-06"]
+  nist_800_53_r5: ["AC-3", "AC-16"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078"]
+
+service_scoped: true

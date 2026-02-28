@@ -1,0 +1,40 @@
+---
+id: supply-chain.transparency-reports
+domain: supply-chain
+name: "Transparency Reports"
+description: >
+  Publication of government data requests, law enforcement interactions, and
+  national security orders. Covers canary statements, frequency of reporting,
+  granularity of disclosure (per-country request counts), and timeliness
+  of publication.
+
+criteria:
+  L0: >
+    No transparency reports published. No disclosure of government data requests.
+    No canary statement. Tenants have no visibility into how often or under
+    what circumstances the provider shares tenant data with authorities.
+  L1: >
+    Minimal transparency: a public statement exists that the provider may receive
+    and respond to government requests, but no quantitative data is published.
+    No canary statement. No breakdown by jurisdiction.
+  L2: >
+    Annual transparency reports published with aggregate request counts by
+    jurisdiction. No per-service or per-region breakdown. Canary statement
+    exists (or has existed and has been removed — which is itself informative).
+    Reports are published within 12 months of the period covered.
+  L3: >
+    Comprehensive transparency: semi-annual or more frequent reports, quantitative
+    breakdown by jurisdiction and request type (criminal requests, national security),
+    legal challenge process documented (the provider commits to challenging
+    overbroad requests), notification to affected tenants when legally permitted,
+    and canary statement with clear update procedure.
+
+framework_mappings:
+  ccm: ["GRM-11"]
+  nist_800_53_r5: ["AC-23"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

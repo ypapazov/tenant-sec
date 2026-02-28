@@ -1,0 +1,215 @@
+---
+# Canonical service category taxonomy with provider aliases.
+# Provider profiles reference services by their provider-local alias.
+# The tooling resolves aliases to canonical categories for cross-provider comparison.
+#
+# Format:
+#   categories:
+#     {canonical-id}:
+#       name: Human-readable category name
+#       aliases:
+#         {provider}: [list of service aliases]
+
+version: "0.1.0"
+
+categories:
+
+  # ── Compute ───────────────────────────────────────────────────────────────
+  compute.vm:
+    name: "Virtual Machines"
+    aliases:
+      aws: ["ec2"]
+      azure: ["virtual-machines"]
+      gcp: ["compute-engine"]
+      scaleway: ["instances"]
+
+  compute.containers:
+    name: "Container Orchestration"
+    aliases:
+      aws: ["eks", "ecs"]
+      azure: ["aks"]
+      gcp: ["gke"]
+      scaleway: ["kapsule"]
+
+  compute.serverless:
+    name: "Serverless Functions"
+    aliases:
+      aws: ["lambda"]
+      azure: ["functions"]
+      gcp: ["cloud-functions", "cloud-run"]
+      scaleway: ["functions", "containers"]
+
+  compute.batch:
+    name: "Batch / HPC Compute"
+    aliases:
+      aws: ["batch"]
+      azure: ["batch"]
+      gcp: ["batch"]
+      scaleway: []
+
+  # ── Storage ───────────────────────────────────────────────────────────────
+  storage.object:
+    name: "Object Storage"
+    aliases:
+      aws: ["s3"]
+      azure: ["blob-storage"]
+      gcp: ["cloud-storage"]
+      scaleway: ["object-storage"]
+
+  storage.block:
+    name: "Block Storage"
+    aliases:
+      aws: ["ebs"]
+      azure: ["managed-disks"]
+      gcp: ["persistent-disk"]
+      scaleway: ["block-storage"]
+
+  storage.file:
+    name: "Managed File Storage"
+    aliases:
+      aws: ["efs", "fsx"]
+      azure: ["files"]
+      gcp: ["filestore"]
+      scaleway: []
+
+  storage.archive:
+    name: "Archive / Cold Storage"
+    aliases:
+      aws: ["s3-glacier"]
+      azure: ["archive-storage"]
+      gcp: ["cloud-storage-archive"]
+      scaleway: ["glacier"]
+
+  # ── Database ──────────────────────────────────────────────────────────────
+  database.relational:
+    name: "Managed Relational Database"
+    aliases:
+      aws: ["rds", "aurora"]
+      azure: ["sql-database", "postgresql", "mysql"]
+      gcp: ["cloud-sql", "alloydb"]
+      scaleway: ["rdb"]
+
+  database.nosql:
+    name: "Managed NoSQL / Document Database"
+    aliases:
+      aws: ["dynamodb"]
+      azure: ["cosmos-db"]
+      gcp: ["firestore", "bigtable"]
+      scaleway: ["document-db"]
+
+  database.cache:
+    name: "Managed Cache / In-Memory Store"
+    aliases:
+      aws: ["elasticache"]
+      azure: ["cache-for-redis"]
+      gcp: ["memorystore"]
+      scaleway: []
+
+  database.warehouse:
+    name: "Data Warehouse / Analytics"
+    aliases:
+      aws: ["redshift"]
+      azure: ["synapse"]
+      gcp: ["bigquery"]
+      scaleway: []
+
+  # ── Networking ────────────────────────────────────────────────────────────
+  network.vpc:
+    name: "Virtual Private Cloud / VNet"
+    aliases:
+      aws: ["vpc"]
+      azure: ["virtual-network"]
+      gcp: ["vpc"]
+      scaleway: ["vpc"]
+
+  network.loadbalancer:
+    name: "Load Balancer"
+    aliases:
+      aws: ["alb", "nlb", "elb"]
+      azure: ["load-balancer", "application-gateway"]
+      gcp: ["cloud-load-balancing"]
+      scaleway: ["load-balancer"]
+
+  network.cdn:
+    name: "Content Delivery Network"
+    aliases:
+      aws: ["cloudfront"]
+      azure: ["cdn", "front-door"]
+      gcp: ["cloud-cdn"]
+      scaleway: ["edge-services"]
+
+  network.dns:
+    name: "Managed DNS"
+    aliases:
+      aws: ["route53"]
+      azure: ["dns", "private-dns"]
+      gcp: ["cloud-dns"]
+      scaleway: ["dns"]
+
+  network.vpn:
+    name: "VPN / Private Connectivity"
+    aliases:
+      aws: ["client-vpn", "site-to-site-vpn", "direct-connect"]
+      azure: ["vpn-gateway", "expressroute"]
+      gcp: ["cloud-vpn", "interconnect"]
+      scaleway: ["vpn"]
+
+  # ── Messaging / Eventing ──────────────────────────────────────────────────
+  messaging.queue:
+    name: "Managed Message Queue"
+    aliases:
+      aws: ["sqs"]
+      azure: ["service-bus", "storage-queues"]
+      gcp: ["pub-sub"]
+      scaleway: ["mnq-sqs"]
+
+  messaging.streaming:
+    name: "Data Streaming"
+    aliases:
+      aws: ["kinesis", "msk"]
+      azure: ["event-hubs"]
+      gcp: ["pub-sub", "dataflow"]
+      scaleway: ["mnq-nats"]
+
+  # ── Security Services ─────────────────────────────────────────────────────
+  security.kms:
+    name: "Key Management Service"
+    aliases:
+      aws: ["kms"]
+      azure: ["key-vault"]
+      gcp: ["cloud-kms"]
+      scaleway: ["secret-manager"]
+
+  security.secrets:
+    name: "Secrets Manager"
+    aliases:
+      aws: ["secrets-manager"]
+      azure: ["key-vault"]
+      gcp: ["secret-manager"]
+      scaleway: ["secret-manager"]
+
+  security.waf:
+    name: "Web Application Firewall"
+    aliases:
+      aws: ["waf"]
+      azure: ["web-application-firewall"]
+      gcp: ["cloud-armor"]
+      scaleway: []
+
+  # ── AI / ML ───────────────────────────────────────────────────────────────
+  ai.platform:
+    name: "AI / ML Platform"
+    aliases:
+      aws: ["sagemaker"]
+      azure: ["machine-learning"]
+      gcp: ["vertex-ai"]
+      scaleway: []
+
+  # ── Identity ──────────────────────────────────────────────────────────────
+  identity.iam:
+    name: "Identity & Access Management"
+    aliases:
+      aws: ["iam"]
+      azure: ["entra-id", "active-directory"]
+      gcp: ["iam"]
+      scaleway: ["iam"]

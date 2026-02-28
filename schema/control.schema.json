@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tenant-sec.dev/schema/control.schema.json",
+  "title": "Control Definition Schema",
+  "description": "Validates files in controls/{domain}/",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]+(\\.[a-z][a-z0-9-]+)?$",
+      "description": "Stable control identifier, e.g. iam.abac or gov.preventive-policy.scp"
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["iam", "governance", "encryption", "network", "logging", "data", "compute", "incident", "supply-chain"],
+      "description": "Domain slug"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "criteria": {
+      "type": "object",
+      "properties": {
+        "L0": { "type": "string", "minLength": 1 },
+        "L1": { "type": "string", "minLength": 1 },
+        "L2": { "type": "string", "minLength": 1 },
+        "L3": { "type": "string", "minLength": 1 }
+      },
+      "required": ["L0", "L1", "L2", "L3"],
+      "additionalProperties": false
+    },
+    "framework_mappings": {
+      "type": "object",
+      "properties": {
+        "ccm": { "type": "array", "items": { "type": "string" } },
+        "nist_800_53_r5": { "type": "array", "items": { "type": "string" } },
+        "cis_aws_v5": { "type": "array", "items": { "type": "string" } },
+        "cis_azure_v5": { "type": "array", "items": { "type": "string" } },
+        "cis_gcp_v4": { "type": "array", "items": { "type": "string" } },
+        "mitre_attack": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "service_scoped": {
+      "type": "boolean",
+      "default": false,
+      "description": "True if this control is expected to produce mixed per-service scores"
+    },
+    "parent": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]+$",
+      "description": "Parent control ID for sub-controls"
+    },
+    "sub_control_aggregation": {
+      "type": "string",
+      "enum": ["min", "max", "mean", "worst"],
+      "description": "How children aggregate to parent score; only valid when control has sub-controls"
+    }
+  },
+  "required": ["id", "domain", "name", "description", "criteria", "framework_mappings"],
+  "additionalProperties": false
+}

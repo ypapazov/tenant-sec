@@ -1,0 +1,44 @@
+---
+id: gov.preventive-policy
+domain: governance
+name: "Preventive Policy Engine"
+description: >
+  Organization-wide policies that deny non-compliant actions before they execute —
+  as opposed to detective controls that alert after the fact. Covers expressiveness
+  of the policy language, custom rule authoring, service coverage, and hierarchical
+  inheritance (organization → folder/OU → account/project). Examples: AWS Service
+  Control Policies (SCPs), Azure Policy deny effects, GCP Org Policy constraints.
+
+criteria:
+  L0: >
+    No preventive policy mechanism exists for tenants. IAM permissions are the
+    only control boundary. No mechanism can deny actions at the organizational
+    level regardless of what individual IAM policies grant.
+  L1: >
+    Preventive policy effects are achievable through tenant-built automation:
+    event-driven remediation that reverts non-compliant changes, CI/CD pipeline
+    guardrails (IaC policy-as-code with OPA/Sentinel), or external policy
+    enforcement proxies. These approaches cover IaC-deployed resources but
+    generally not console or direct API actions taken outside the pipeline.
+  L2: >
+    A managed policy engine exists but with limited expressiveness: only
+    predefined constraint templates are available (no custom policy logic),
+    custom rule authoring is not supported, the policy engine covers a
+    subset of the provider's API surface, or policies cannot be hierarchically
+    inherited across organizational units.
+  L3: >
+    A managed policy engine with tenant-authorable rules, broad service coverage,
+    hierarchical inheritance (organization → folder/OU → account/project),
+    and both deny and audit effects. Tenants can express arbitrary preventive
+    conditions (resource types, regions, required configurations). Policy
+    evaluation is synchronous (request is denied before execution, not remediated after).
+
+framework_mappings:
+  ccm: ["GRM-06", "GRM-09", "IVS-09"]
+  nist_800_53_r5: ["AC-3", "CM-7", "CM-9"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078"]
+
+service_scoped: true

@@ -1,0 +1,31 @@
+---
+name: "data-sovereignty"
+description: >
+  Profile for organizations with strict data sovereignty requirements —
+  government, critical infrastructure, or highly regulated sectors where
+  data location and provider access controls are paramount.
+
+must_have:
+  - control: "data.residency-guarantees"
+    min_level: 3
+  - control: "data.sovereignty-controls"
+    min_level: 2
+  - control: "enc.cmk"
+    min_level: 3
+  - control: "supply-chain.transparency-reports"
+    min_level: 2
+  - control: "supply-chain.compliance-certifications"
+    min_level: 2
+
+weights:
+  iam: 0.10
+  governance: 0.10
+  encryption: 0.25
+  network: 0.10
+  logging: 0.10
+  data: 0.25
+  compute: 0.03
+  incident: 0.04
+  supply-chain: 0.03
+
+mixed_aggregation: "min"

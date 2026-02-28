@@ -1,0 +1,43 @@
+---
+id: enc.encryption-in-transit
+domain: encryption
+name: "Encryption in Transit"
+description: >
+  TLS enforcement, minimum TLS version control, mutual TLS (mTLS) support,
+  certificate management, and whether tenants can enforce transit encryption
+  policies across their services. Assesses per-service since some services
+  may not support TLS enforcement or mTLS at all.
+
+criteria:
+  L0: >
+    Data in transit is not encrypted by default between client and service.
+    Plaintext connections are accepted, and tenants cannot enforce TLS.
+    Or TLS is enabled but no version/cipher control is available.
+  L1: >
+    TLS enforcement is achievable through infrastructure configuration:
+    security groups/firewall rules that block non-443 ports, load balancer
+    policies that redirect HTTP to HTTPS. But the managed service itself
+    accepts both plaintext and TLS; the restriction is applied outside
+    the service.
+  L2: >
+    TLS is enforced for all connections on major services. Minimum TLS version
+    control exists but options are limited (e.g., only TLS 1.2+ but not 1.3
+    selectable), mTLS is not supported or requires manual certificate management
+    without a managed certificate authority, or enforcement is not available
+    for all services in scope.
+  L3: >
+    TLS enforced across all services with no plaintext fallback. Tenants can
+    configure minimum TLS version (including TLS 1.3) and cipher suites. mTLS
+    is supported with managed certificate provisioning and rotation. Certificate
+    revocation is supported. In-cluster/inter-service traffic can also be
+    encrypted (not just external-facing endpoints).
+
+framework_mappings:
+  ccm: ["IVS-07", "IVS-08"]
+  nist_800_53_r5: ["SC-8", "SC-23"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1557"]
+
+service_scoped: true

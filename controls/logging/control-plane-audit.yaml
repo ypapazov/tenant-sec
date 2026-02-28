@@ -1,0 +1,41 @@
+---
+id: log.control-plane-audit
+domain: logging
+name: "Control Plane Audit Logging"
+description: >
+  Logging of all API calls and management operations (create, update, delete,
+  configuration changes). Covers completeness (all services emit logs),
+  event latency (time from action to log availability), default retention
+  period, and tamper resistance (can an admin delete their own audit trail?).
+
+criteria:
+  L0: >
+    No control plane audit logging. API calls and management actions are not
+    recorded. There is no way to determine who made a configuration change
+    or when.
+  L1: >
+    Audit logging is achievable by enabling logging per-service and forwarding
+    to a centralized store via custom pipelines. No always-on, organization-wide
+    audit log that automatically covers all services. Enabling and maintaining
+    logging is manual per account/project.
+  L2: >
+    An organization-wide audit trail service exists and is on by default for
+    major services, but some services do not emit events, event latency is
+    high (>15 minutes), default retention is short (<30 days), or administrators
+    can delete audit logs without leaving a meta-audit trail.
+  L3: >
+    Universal, always-on control plane audit log: all API calls across all
+    services are logged automatically from the moment an account is created.
+    Events are available within minutes. Default retention is 90+ days.
+    Audit logs can be locked (even root/owner cannot delete without explicit
+    unlock that itself creates an audit event). Exportable to external SIEM.
+
+framework_mappings:
+  ccm: ["LOG-01", "LOG-02", "LOG-03"]
+  nist_800_53_r5: ["AU-2", "AU-3", "AU-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1562.008"]
+
+service_scoped: true

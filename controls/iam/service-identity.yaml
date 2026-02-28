@@ -1,0 +1,42 @@
+---
+id: iam.service-identity
+domain: iam
+name: "Service Identity & Workload Authentication"
+description: >
+  How non-human identities authenticate to the cloud platform and its services.
+  Covers service accounts, managed identities, workload identity federation,
+  and instance profiles. Assesses whether long-lived credentials can be avoided
+  and whether cross-cloud workload authentication is supported without static keys.
+
+criteria:
+  L0: >
+    Non-human workloads must authenticate using static long-lived API keys or
+    access key pairs. No managed identity or instance profile mechanism exists.
+    Secrets must be stored in application configuration or environment variables.
+  L1: >
+    Workload identity federation or instance profiles are achievable but require
+    tenant-built configuration and are not a first-class feature. For example,
+    Kubernetes service accounts can be mapped to cloud roles, but only through
+    a custom setup with no managed tooling, documentation, or validation.
+  L2: >
+    Managed identity or instance profile capabilities exist but are limited:
+    available only for specific compute services (not containers, serverless,
+    or databases), no support for cross-cloud token exchange (e.g., GitHub
+    Actions or external K8s to cloud IAM), or require manual setup with no
+    automated rotation.
+  L3: >
+    First-class managed identities or workload identity federation across all
+    major compute surfaces (VMs, containers, serverless, CI/CD). Short-lived
+    credentials issued automatically. Support for OIDC-based cross-cloud
+    federation (accepting tokens from external IdPs like GitHub, GitLab,
+    other clouds). No static key required for workloads running on the platform.
+
+framework_mappings:
+  ccm: ["IAM-04", "IAM-07"]
+  nist_800_53_r5: ["IA-2", "IA-9", "SC-28"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078.004", "T1552"]
+
+service_scoped: false

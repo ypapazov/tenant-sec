@@ -1,0 +1,120 @@
+---
+# CCM v4.1 → tenant-sec control reverse index
+# Forward mappings are in individual control files (framework_mappings.ccm)
+framework: "CCM"
+version: "4.1"
+description: "Cloud Controls Matrix v4.1 — Cloud Security Alliance"
+
+mappings:
+  # Application & Interface Security
+  AIS-01: []
+  AIS-02: []
+  AIS-03: []
+
+  # Audit & Assurance
+  AAC-01: []
+  AAC-02: []
+  AAC-03: []
+
+  # Business Continuity Management
+  BCR-01: [data.backup-governance]
+  BCR-02: [data.backup-governance]
+  BCR-03: [data.backup-governance]
+  BCR-04: [incident.resilience-testing]
+  BCR-05: [incident.resilience-testing]
+  BCR-06: [incident.availability-zones]
+  BCR-07: [incident.availability-zones]
+  BCR-11: [incident.availability-zones]
+
+  # Change Control & Configuration Management
+  CCC-01: [compute.image-management]
+
+  # Cryptography, Encryption & Key Management
+  EKM-01: [enc.encryption-at-rest-default, compute.secrets-management]
+  EKM-02: [enc.encryption-at-rest-default, supply-chain.infrastructure-encryption]
+  EKM-03: [enc.cmk, enc.byok, enc.external-key-management]
+  EKM-04: [enc.cmk, enc.external-key-management]
+  EKM-05: [enc.hsm-backing]
+  EKM-06: [enc.key-lifecycle]
+
+  # Datacenter Security
+  DCS-01: [supply-chain.physical-security]
+  DCS-02: [supply-chain.physical-security]
+  DCS-03: [supply-chain.physical-security]
+
+  # Data Security & Privacy Lifecycle Management
+  DSP-01: [data.residency-guarantees]
+  DSP-07: [data.classification]
+  DSP-08: [data.classification]
+  DSP-10: [data.dlp]
+  DSP-11: [data.dlp]
+  DSP-16: [data.deletion-guarantees]
+  DSP-17: [data.residency-guarantees, data.sovereignty-controls]
+  DSP-18: [data.sovereignty-controls, data.deletion-guarantees]
+
+  # Governance, Risk & Compliance
+  GRM-01: [gov.account-lifecycle]
+  GRM-02: [gov.hierarchy-delegation]
+  GRM-03: [gov.hierarchy-delegation]
+  GRM-04: [gov.tagging-governance]
+  GRM-05: [gov.account-lifecycle]
+  GRM-06: [gov.preventive-policy]
+  GRM-07: [gov.detective-policy]
+  GRM-08: [gov.detective-policy]
+  GRM-09: [gov.preventive-policy]
+  GRM-10: [supply-chain.compliance-certifications]
+  GRM-11: [supply-chain.transparency-reports]
+
+  # Human Resources Security
+  HRS-01: [supply-chain.personnel-security]
+  HRS-02: [supply-chain.personnel-security]
+
+  # Identity & Access Management
+  IAM-01: [iam.external-idp-federation]
+  IAM-02: [iam.external-idp-federation, iam.directory-integration]
+  IAM-03: [iam.directory-integration]
+  IAM-04: [iam.service-identity]
+  IAM-05: [iam.privileged-access]
+  IAM-06: [iam.abac, iam.permission-boundaries]
+  IAM-07: [iam.service-identity]
+  IAM-08: [iam.credential-management]
+  IAM-09: [iam.privileged-access, iam.permission-boundaries]
+  IAM-10: [iam.credential-management]
+
+  # Infrastructure & Virtualization Security
+  IVS-01: [compute.image-management, log.resource-inventory]
+  IVS-03: [net.ddos-protection]
+  IVS-04: [enc.confidential-computing, compute.runtime-security, net.dns-security]
+  IVS-05: [compute.runtime-security]
+  IVS-06: [net.isolation-model, net.cross-environment-connectivity, iam.multi-tenancy-isolation, compute.container-orchestration]
+  IVS-07: [enc.encryption-in-transit, net.egress-control, compute.container-orchestration]
+  IVS-08: [enc.encryption-in-transit]
+  IVS-09: [gov.preventive-policy, gov.quotas-service-control, net.isolation-model, net.firewall, net.waf]
+  IVS-10: [gov.quotas-service-control, net.firewall]
+
+  # Logging & Monitoring
+  LOG-01: [log.control-plane-audit, log.data-plane-logging]
+  LOG-02: [log.control-plane-audit]
+  LOG-03: [log.control-plane-audit, log.immutability]
+  LOG-04: [log.data-plane-logging]
+  LOG-05: [log.immutability]
+  LOG-06: [log.export-integration]
+  LOG-07: [log.export-integration]
+
+  # Security Incident Management
+  SEF-03: [log.alerting-detection, incident.automated-response]
+  SEF-04: [incident.notification-sla]
+  SEF-05: [incident.notification-sla]
+  SEF-06: [incident.forensic-access]
+  SEF-07: [incident.automated-response]
+
+  # Supply Chain Management & Transparency
+  STA-01: [supply-chain.hardware-supply-chain]
+  STA-04: [supply-chain.dependency-disclosure]
+  STA-05: [supply-chain.dependency-disclosure]
+
+  # Threat & Vulnerability Management
+  TVM-01: [iam.multi-tenancy-isolation]
+  TVM-07: [compute.patch-management]
+  TVM-08: [compute.patch-management]
+  TVM-10: [log.alerting-detection]

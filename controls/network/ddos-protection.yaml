@@ -1,0 +1,39 @@
+---
+id: net.ddos-protection
+domain: network
+name: "DDoS Protection"
+description: >
+  Built-in vs. paid-tier DDoS protection, scope of protection (layer 3/4 vs.
+  layer 7), customizability of response (rate limits, geo-blocking), and
+  SLA guarantees for availability during attack.
+
+criteria:
+  L0: >
+    No DDoS protection. Tenants are fully exposed to volumetric and application-
+    layer attacks. Mitigation requires purchasing and deploying third-party
+    appliances or CDN services independently.
+  L1: >
+    DDoS mitigation is achievable by tenants who deploy and configure external
+    CDN/scrubbing services (Cloudflare, Akamai) in front of their cloud
+    resources. The provider has no native DDoS protection.
+  L2: >
+    Basic DDoS protection is included by default (layer 3/4 protection against
+    volumetric attacks) but application-layer (L7) protection requires a
+    separate paid service. Customization of mitigation policies (rate limiting,
+    IP allow/deny) is limited or not available at the standard tier.
+  L3: >
+    Multi-layer DDoS protection: automatic volumetric mitigation included by
+    default, application-layer (L7) protection available as a managed service
+    with customizable mitigation policies, real-time attack visibility and
+    reporting, SLA commitments for availability during attack, and protection
+    applies across all service endpoints including origin servers in the VPC.
+
+framework_mappings:
+  ccm: ["IVS-03"]
+  nist_800_53_r5: ["SC-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1498", "T1499"]
+
+service_scoped: false

@@ -1,0 +1,44 @@
+---
+id: iam.multi-tenancy-isolation
+domain: iam
+name: "Multi-Tenancy Isolation Within Tenant"
+description: >
+  The ability to create isolated sub-environments (accounts, projects,
+  subscriptions, namespaces) within a tenant's own cloud footprint, with
+  strong isolation boundaries between them. Covers blast radius containment,
+  independent billing and quota management, and the ability to prevent
+  lateral movement between sub-environments.
+
+criteria:
+  L0: >
+    All resources share a single flat namespace with no sub-environment
+    isolation. Teams or workloads cannot be given independent security
+    boundaries. A compromised resource can reach all others in the same
+    account/project without crossing an enforced boundary.
+  L1: >
+    Sub-environment isolation is achievable through tenant-implemented tagging,
+    network segmentation, and IAM policy conventions, but relies on convention
+    rather than enforced boundaries. A misconfiguration can break isolation.
+    No provider-enforced account/project separation with independent blast radius.
+  L2: >
+    Sub-account or project structure exists for isolation but with limitations:
+    cross-account access is difficult to configure, billing consolidation is
+    limited, provisioning new sub-environments is manual and error-prone,
+    or the hierarchy depth is fixed (e.g., cannot create organizational units
+    below a single management tier).
+  L3: >
+    Full multi-account or multi-project architecture with independently scoped
+    blast radius. New sub-environments can be provisioned programmatically
+    with baseline security configuration applied automatically (account factory
+    / landing zone). Cross-environment access is governed by explicit policy
+    grants (no implicit sharing). Independent quotas and billing per environment.
+
+framework_mappings:
+  ccm: ["TVM-01", "IVS-06"]
+  nist_800_53_r5: ["AC-4", "SC-2", "SC-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1619"]
+
+service_scoped: false

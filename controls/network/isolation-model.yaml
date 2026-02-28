@@ -1,0 +1,41 @@
+---
+id: net.isolation-model
+domain: network
+name: "Network Isolation Model"
+description: >
+  VPC/VNet architecture, regional vs. global scope, subnet model, and the
+  default isolation posture. Specifically: does the platform provide a deny-all
+  default (resources are not reachable until explicitly opened) or a permissive
+  default (resources are reachable unless explicitly blocked)?
+
+criteria:
+  L0: >
+    No tenant-controlled network isolation. All resources in the same account
+    share a flat network namespace. Resources are publicly reachable by default,
+    and no VPC, VNet, or equivalent tenant-controlled network boundary exists.
+  L1: >
+    Network isolation is achievable through manual security group configuration
+    on every resource, but the default posture is permissive. Resources are
+    publicly reachable unless explicitly blocked. Isolation requires ongoing
+    manual effort to enforce.
+  L2: >
+    A VPC or VNet model exists with deny-all default, but with limitations:
+    VPC scope is regional only with no global routing, subnet model is simple
+    (no granular subnet-level routing tables), private subnet support is
+    limited, or VPCs cannot be peered across accounts/projects.
+  L3: >
+    Full VPC/VNet with deny-all by default, tiered subnet model (public,
+    private, isolated), routing tables configurable per subnet, inter-VPC
+    peering supported across accounts and regions, and flow logs available
+    for all subnet traffic. Resources are not reachable until tenant explicitly
+    opens network paths.
+
+framework_mappings:
+  ccm: ["IVS-06", "IVS-09"]
+  nist_800_53_r5: ["SC-7", "AC-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1046"]
+
+service_scoped: false

@@ -1,0 +1,103 @@
+---
+# NIST SP 800-53 Rev 5 → tenant-sec control reverse index
+# Forward mappings are in individual control files (framework_mappings.nist_800_53_r5)
+framework: "NIST SP 800-53"
+version: "Rev 5"
+description: "Security and Privacy Controls for Information Systems and Organizations"
+
+mappings:
+  # Access Control (AC)
+  AC-2:  [iam.privileged-access, iam.directory-integration, gov.hierarchy-delegation]
+  AC-3:  [iam.abac, gov.preventive-policy, compute.container-orchestration, compute.serverless-security]
+  AC-4:  [net.isolation-model, net.cross-environment-connectivity, iam.multi-tenancy-isolation]
+  AC-5:  [gov.hierarchy-delegation]
+  AC-6:  [iam.permission-boundaries, iam.privileged-access, gov.hierarchy-delegation]
+  AC-16: [iam.abac, data.classification]
+  AC-17: [iam.external-idp-federation, iam.privileged-access]
+  AC-23: [data.residency-guarantees, data.sovereignty-controls, data.dlp]
+
+  # Audit and Accountability (AU)
+  AU-2:  [log.control-plane-audit, log.data-plane-logging]
+  AU-3:  [log.control-plane-audit, log.data-plane-logging]
+  AU-4:  [log.export-integration]
+  AU-6:  [log.alerting-detection]
+  AU-9:  [log.immutability, log.export-integration]
+  AU-11: [log.immutability, incident.forensic-access]
+  AU-12: [log.control-plane-audit, log.data-plane-logging]
+
+  # Assessment, Authorization, and Monitoring (CA)
+  CA-2:  [supply-chain.compliance-certifications]
+  CA-7:  [gov.detective-policy, log.resource-inventory, supply-chain.compliance-certifications]
+  CA-9:  [gov.account-lifecycle]
+
+  # Configuration Management (CM)
+  CM-2:  [gov.account-lifecycle]
+  CM-6:  [gov.account-lifecycle, compute.patch-management]
+  CM-7:  [gov.preventive-policy, gov.quotas-service-control, compute.image-management, compute.container-orchestration]
+  CM-8:  [gov.tagging-governance, log.resource-inventory, gov.detective-policy]
+  CM-9:  [gov.preventive-policy]
+
+  # Contingency Planning (CP)
+  CP-4:  [incident.resilience-testing]
+  CP-7:  [incident.availability-zones]
+  CP-8:  [incident.availability-zones]
+  CP-9:  [data.backup-governance, incident.availability-zones]
+  CP-10: [data.backup-governance]
+
+  # Identification and Authentication (IA)
+  IA-2:  [iam.external-idp-federation, iam.directory-integration]
+  IA-4:  [iam.directory-integration]
+  IA-5:  [iam.credential-management, compute.secrets-management]
+  IA-8:  [iam.external-idp-federation]
+  IA-9:  [iam.service-identity]
+
+  # Incident Response (IR)
+  IR-4:  [incident.forensic-access, incident.automated-response]
+  IR-5:  [incident.forensic-access, log.alerting-detection]
+  IR-6:  [incident.notification-sla]
+  IR-7:  [incident.notification-sla]
+
+  # Media Protection (MP)
+  MP-6:  [data.deletion-guarantees]
+
+  # Personnel Security (PS)
+  PS-3:  [supply-chain.personnel-security]
+  PS-4:  [supply-chain.personnel-security]
+  PS-6:  [supply-chain.personnel-security]
+
+  # Physical and Environmental Protection (PE)
+  PE-1:  [supply-chain.physical-security]
+  PE-2:  [supply-chain.physical-security]
+  PE-3:  [supply-chain.physical-security]
+
+  # Risk Assessment (RA)
+  RA-2:  [data.classification]
+
+  # System and Services Acquisition (SA)
+  SA-4:  [supply-chain.compliance-certifications]
+  SA-9:  [supply-chain.dependency-disclosure]
+  SA-10: [compute.image-management]
+  SA-12: [supply-chain.hardware-supply-chain, supply-chain.dependency-disclosure]
+  SA-15: [supply-chain.hardware-supply-chain]
+
+  # System and Communications Protection (SC)
+  SC-2:  [iam.multi-tenancy-isolation]
+  SC-5:  [net.ddos-protection, net.egress-control]
+  SC-7:  [net.isolation-model, net.cross-environment-connectivity, net.firewall, net.private-connectivity, net.egress-control]
+  SC-8:  [enc.encryption-in-transit, net.private-connectivity]
+  SC-12: [enc.byok, enc.external-key-management, enc.key-lifecycle, enc.hsm-backing]
+  SC-20: [net.dns-security]
+  SC-21: [net.dns-security]
+  SC-22: [net.dns-security]
+  SC-23: [enc.encryption-in-transit]
+  SC-28: [enc.encryption-at-rest-default, enc.cmk, enc.external-key-management, enc.confidential-computing, supply-chain.infrastructure-encryption]
+  SC-36: [data.residency-guarantees]
+  SC-39: [compute.serverless-security, compute.runtime-security]
+  SC-51: [enc.confidential-computing]
+
+  # System and Information Integrity (SI)
+  SI-2:  [compute.patch-management]
+  SI-3:  [net.waf, compute.image-management, compute.runtime-security]
+  SI-4:  [log.alerting-detection, incident.automated-response]
+  SI-7:  [gov.detective-policy, supply-chain.hardware-supply-chain]
+  SI-12: [data.dlp, data.deletion-guarantees]

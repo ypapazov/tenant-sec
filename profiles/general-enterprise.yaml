@@ -1,0 +1,27 @@
+---
+name: "general-enterprise"
+description: >
+  Balanced weighting profile for a general enterprise with broad cloud
+  security requirements. No domain is dramatically over-weighted; provides
+  a reasonable baseline for enterprise migration decisions.
+
+must_have:
+  - control: "iam.external-idp-federation"
+    min_level: 2
+  - control: "enc.encryption-at-rest-default"
+    min_level: 2
+  - control: "log.control-plane-audit"
+    min_level: 2
+
+weights:
+  iam: 0.15
+  governance: 0.12
+  encryption: 0.15
+  network: 0.12
+  logging: 0.12
+  data: 0.12
+  compute: 0.10
+  incident: 0.07
+  supply-chain: 0.05
+
+mixed_aggregation: "mean"

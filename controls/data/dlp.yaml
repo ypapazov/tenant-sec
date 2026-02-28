@@ -1,0 +1,42 @@
+---
+id: data.dlp
+domain: data
+name: "Data Loss Prevention (DLP)"
+description: >
+  Policies to prevent sensitive data from leaving defined boundaries. Covers
+  content inspection capabilities, exfiltration controls (blocking uploads to
+  external destinations), sharing restriction policies, and whether DLP policies
+  can be enforced at the organization level.
+
+criteria:
+  L0: >
+    No DLP capability. Tenants cannot prevent sensitive data from being shared
+    publicly, sent to external email, or downloaded to unmanaged devices.
+    No content inspection for sensitive data in transit.
+  L1: >
+    DLP is achievable through tenant-deployed network inspection (IDS/IPS, web
+    proxy with SSL inspection) that inspects outbound traffic. Requires
+    significant infrastructure and does not cover in-platform sharing
+    (e.g., making an object storage bucket public).
+  L2: >
+    A native DLP service exists for specific surfaces (e.g., preventing
+    public object storage bucket creation, blocking cross-account data sharing
+    without approval). However, content-aware inspection is not available,
+    or DLP covers only a subset of services, or policies must be applied
+    per account rather than at the org level.
+  L3: >
+    Full managed DLP: content-aware policies that detect and block sensitive
+    data (PII, secrets, payment card data) from being shared externally,
+    integrated with object storage public access blocks, API-level exfiltration
+    controls, org-level enforcement (policies apply to all accounts), and
+    incident reporting when DLP policies trigger.
+
+framework_mappings:
+  ccm: ["DSP-10", "DSP-11"]
+  nist_800_53_r5: ["AC-23", "SI-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1567", "T1048"]
+
+service_scoped: false

@@ -1,0 +1,39 @@
+---
+id: supply-chain.physical-security
+domain: supply-chain
+name: "Physical Security"
+description: >
+  Datacenter physical security certifications, access controls, and environmental
+  protections. This is an attestation-based assessment (tenants cannot test
+  physical security directly). Covers audit scope and certification currency.
+
+criteria:
+  L0: >
+    No physical security certifications held. No independent third-party
+    attestation of datacenter access controls or environmental protections.
+  L1: >
+    Physical security is mentioned in provider documentation but no third-party
+    audit or certification covers it. Or certifications are held for a subset
+    of facilities that may not include the regions where tenant data resides.
+  L2: >
+    SOC 2 Type II certification covers physical security for all production
+    regions. ISO 27001 certification is held. Certification is current (within
+    12 months). However, detailed physical security controls are not publicly
+    disclosed beyond what the certification requires.
+  L3: >
+    Comprehensive physical security attestation: SOC 2 Type II + ISO 27001 +
+    ISO 27017 covering all production regions, published summary of physical
+    security controls (biometric access, 24/7 surveillance, multi-factor
+    physical access, environmental monitoring), third-party penetration testing
+    of physical facilities, and a process for tenants to request audit reports
+    under NDA.
+
+framework_mappings:
+  ccm: ["DCS-01", "DCS-02", "DCS-03"]
+  nist_800_53_r5: ["PE-1", "PE-2", "PE-3"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

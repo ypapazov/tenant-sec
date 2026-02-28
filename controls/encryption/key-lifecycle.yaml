@@ -1,0 +1,42 @@
+---
+id: enc.key-lifecycle
+domain: encryption
+name: "Key Lifecycle Management"
+description: >
+  Automatic rotation, expiry, revocation, and deletion scheduling for
+  encryption keys. Covers rotation granularity (per-service vs. universal),
+  key version management (old versions still accessible for decryption after
+  rotation), and the ability to schedule cryptographic deletion of data by
+  destroying key material.
+
+criteria:
+  L0: >
+    No managed key lifecycle. Keys do not rotate automatically. Deletion
+    is immediate (no scheduled deletion with grace period). No key versioning;
+    rotating a key breaks access to data encrypted with the previous version.
+  L1: >
+    Key rotation is achievable through tenant-built automation: Lambda functions
+    or scripts that create new key versions, re-encrypt data, and mark old
+    versions for deletion. No platform-managed rotation schedule or guarantee.
+  L2: >
+    Automatic key rotation is available for provider-managed keys but limited:
+    rotation applies only to specific key types, custom rotation schedules
+    (e.g., every 30 days) are not supported (only annual rotation), or
+    rotation does not automatically re-encrypt existing data (old key
+    version must be maintained indefinitely).
+  L3: >
+    Full key lifecycle management: configurable automatic rotation schedule,
+    key versioning (old versions accessible for decryption, new versions for
+    encryption), scheduled deletion with configurable grace period to prevent
+    accidental data loss, pending deletion state with ability to cancel,
+    and key material deletion that cryptographically shreds associated data.
+
+framework_mappings:
+  ccm: ["EKM-06"]
+  nist_800_53_r5: ["SC-12", "SC-28"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

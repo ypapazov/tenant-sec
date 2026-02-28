@@ -1,0 +1,39 @@
+---
+id: iam.external-idp-federation
+domain: iam
+name: "External Identity Provider Federation"
+description: >
+  Support for connecting enterprise identity providers (IdPs) to the cloud IAM
+  using SAML 2.0, OIDC, or WS-Federation. Covers the breadth of federation
+  (console, API, programmatic access), support for multiple IdPs simultaneously,
+  and the depth of attribute mapping from IdP assertions to cloud permissions.
+
+criteria:
+  L0: >
+    No federation capability exists. Tenants must create and manage native cloud
+    identities separately from their corporate directory. SSO is not possible
+    through enterprise IdPs.
+  L1: >
+    Federation is achievable but requires tenant-built glue code or unsupported
+    workarounds — for example, using OIDC token exchange with a custom proxy,
+    or scripting attribute synchronization manually. No native connector exists.
+  L2: >
+    Native federation support exists (SAML 2.0 or OIDC) but with limitations:
+    only one IdP allowed at a time, limited attribute mapping, federation only
+    covers console access (not programmatic API keys), or the integration
+    requires significant manual configuration with no managed wizard.
+  L3: >
+    Full native federation with SAML 2.0 and OIDC, support for multiple
+    simultaneous IdPs, flexible attribute mapping to roles/groups, federation
+    covers all access paths (console, CLI, API, programmatic), and a managed
+    configuration experience exists. Supports IdP-initiated and SP-initiated flows.
+
+framework_mappings:
+  ccm: ["IAM-01", "IAM-02"]
+  nist_800_53_r5: ["IA-2", "IA-8", "AC-17"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078.004"]
+
+service_scoped: false

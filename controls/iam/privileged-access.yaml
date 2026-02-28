@@ -1,0 +1,42 @@
+---
+id: iam.privileged-access
+domain: iam
+name: "Privileged Access Management"
+description: >
+  Just-in-time (JIT) access elevation, time-bound privilege grants, approval
+  workflows for privileged operations, and break-glass procedures. Distinguishes
+  between provider-native PAM capabilities versus requiring a third-party PAM
+  tool deployed by the tenant.
+
+criteria:
+  L0: >
+    No JIT or time-bound privilege mechanism exists. Privileged roles must be
+    permanently assigned to users. No approval workflow for sensitive operations
+    is available from the platform. Break-glass procedures must be entirely
+    tenant-managed outside the platform.
+  L1: >
+    JIT access is achievable but requires tenant-built automation: custom Lambda
+    functions or scripts that grant/revoke roles on request, integration with
+    an external ticketing system, or deployment of a self-managed PAM tool
+    (CyberArk, HashiCorp Vault with custom workflows). No managed JIT exists natively.
+  L2: >
+    A native JIT or privileged identity management capability exists but is
+    limited: no custom approval workflows, fixed time windows only (no flexible
+    duration), limited to a subset of roles/services, or requires a paid add-on
+    that is not part of the standard IAM offering.
+  L3: >
+    Full managed PAM: JIT role elevation with configurable time windows,
+    multi-stage approval workflows, integration with ticketing systems (via
+    webhooks or native connectors), automatic role revocation at expiry,
+    audit trail of all elevation events, and break-glass procedure with
+    notification to security team.
+
+framework_mappings:
+  ccm: ["IAM-05", "IAM-09"]
+  nist_800_53_r5: ["AC-2", "AC-6", "AC-17"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078", "T1548"]
+
+service_scoped: false

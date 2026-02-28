@@ -1,0 +1,40 @@
+---
+id: log.data-plane-logging
+domain: logging
+name: "Data Plane Logging"
+description: >
+  Logging of data access operations: object reads, database queries, file
+  downloads, API data retrievals. Distinct from control plane (configuration
+  changes). Covers per-service availability, granularity (all reads vs. only
+  writes), cost implications of enabling full data access logging, and
+  whether it can be enforced org-wide.
+
+criteria:
+  L0: >
+    No data access logging is available for any service. Tenants cannot
+    determine what data was accessed, by whom, and when.
+  L1: >
+    Data access logging is achievable by configuring logging at the application
+    layer (application code logs each read operation) or via database-level
+    audit plugins. The cloud platform itself does not provide managed data
+    access logging.
+  L2: >
+    Data plane logging is available for major services (object storage, databases)
+    but not for others (ML platforms, messaging, analytics). Or data access logging
+    is available but must be enabled per-resource with no org-level default,
+    or logging imposes significant cost that makes full-coverage impractical.
+  L3: >
+    Data plane logging is available for all major services in scope, configurable
+    at the org level as a mandatory policy, has manageable cost (logging is
+    efficient, not one event per byte), and captures the essential metadata:
+    who, what, when, from where. Storage access patterns are queryable.
+
+framework_mappings:
+  ccm: ["LOG-01", "LOG-04"]
+  nist_800_53_r5: ["AU-2", "AU-3", "AU-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1530"]
+
+service_scoped: true

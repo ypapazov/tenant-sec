@@ -1,0 +1,43 @@
+---
+id: enc.confidential-computing
+domain: encryption
+name: "Confidential Computing"
+description: >
+  Support for encryption in use — trusted execution environments (TEEs),
+  secure enclaves, and confidential VMs that protect data from the hypervisor
+  and provider infrastructure. Covers attestation capabilities that allow
+  tenants to verify the integrity of the execution environment.
+
+criteria:
+  L0: >
+    No confidential computing capability. Data in use (in RAM, being processed)
+    is accessible to the hypervisor and potentially to provider personnel with
+    privileged access to the physical host.
+  L1: >
+    Confidential computing is achievable by tenants who deploy their own
+    enclave-enabled hardware (on-premises or via bare metal cloud instances)
+    and manage their own TEE stack. The provider's standard managed compute
+    offers no confidential computing option.
+  L2: >
+    Confidential VMs or enclave instances are available on specific instance
+    families or in specific regions, but attestation is not fully supported
+    (tenants cannot independently verify the TEE state), the confidential
+    computing capability does not extend to managed services (only VMs),
+    or the feature is in preview/beta with no SLA.
+  L3: >
+    Production-ready confidential VMs and/or enclaves across major instance
+    families in all production regions. Remote attestation is supported
+    (tenants can verify CPU/TEE state and get attestation reports). Confidential
+    computing extends to at least one managed service beyond VMs (e.g.,
+    confidential containers, confidential database). Clear documentation
+    of what is protected and what is not.
+
+framework_mappings:
+  ccm: ["IVS-04"]
+  nist_800_53_r5: ["SC-28", "SC-51"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

@@ -1,0 +1,43 @@
+---
+id: compute.container-orchestration
+domain: compute
+name: "Container Orchestration Security"
+description: >
+  Kubernetes-specific security: RBAC, network policies, pod security standards,
+  admission controllers, and audit logging. Covers managed vs. self-managed
+  security posture defaults — does the managed Kubernetes offering start secure
+  or require manual hardening?
+
+criteria:
+  L0: >
+    No managed Kubernetes offering. Container orchestration security is entirely
+    tenant-managed. If Kubernetes is used, all security configuration (RBAC,
+    network policies, admission control) is the tenant's responsibility with
+    no platform support.
+  L1: >
+    Managed Kubernetes exists but the security posture is permissive by default:
+    no pod security standards enforced, network policies not enabled, etcd
+    encryption is opt-in, RBAC configuration left to the tenant with no guardrails.
+    All hardening is manual.
+  L2: >
+    Managed Kubernetes with improved defaults: RBAC enabled, etcd encrypted at
+    rest, audit logging available. Pod security admission is available but not
+    enforced by default. Network policies must be explicitly created. Admission
+    controllers exist but managed webhook admission is limited. Control plane
+    is managed (patched by provider).
+  L3: >
+    Hardened managed Kubernetes: pod security standards enforced by default,
+    network policies enabled in the default namespace, managed admission
+    controller hooks (binary authorization / image verification), automatic
+    control and node security patching, runtime threat detection for container
+    behavior, and CIS Kubernetes benchmark compliance by default.
+
+framework_mappings:
+  ccm: ["IVS-06", "IVS-07"]
+  nist_800_53_r5: ["CM-7", "AC-3", "SC-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1610", "T1613"]
+
+service_scoped: false

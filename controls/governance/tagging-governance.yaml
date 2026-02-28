@@ -1,0 +1,40 @@
+---
+id: gov.tagging-governance
+domain: governance
+name: "Tagging / Labeling Governance"
+description: >
+  The ability to enforce mandatory tags or labels on resources, including
+  naming conventions and cost allocation tags. Enforcement strength ranges from
+  reporting non-compliance to preventing resource creation without required tags.
+
+criteria:
+  L0: >
+    No tag enforcement mechanism. Tags are optional metadata with no policy
+    enforcement. Resources can be created without any tags. No visibility
+    into untagged resources at the organization level.
+  L1: >
+    Tag compliance is achievable through tenant-built automation: custom
+    Lambda functions or scripts that detect untagged resources and either
+    tag them automatically (guessing values) or notify owners. No platform-native
+    enforcement prevents creation of untagged resources.
+  L2: >
+    A managed tag policy mechanism exists but enforcement is limited to reporting
+    (audit mode only): non-compliant resources are flagged but creation is not
+    blocked. Or enforcement is available only for a subset of resource types,
+    or tag inheritance from parent resources is not supported.
+  L3: >
+    Full tag governance: configurable mandatory tag requirements that prevent
+    resource creation (not just report after creation), support for tag value
+    validation (allowed values, patterns), tag inheritance (child resources
+    inherit parent tags), consolidated cost allocation views by tag, and
+    hierarchical tag policies at the organization/folder level.
+
+framework_mappings:
+  ccm: ["GRM-04"]
+  nist_800_53_r5: ["CM-8"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

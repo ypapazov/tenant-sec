@@ -1,0 +1,41 @@
+---
+id: log.resource-inventory
+domain: logging
+name: "Resource Inventory"
+description: >
+  Continuous, queryable inventory of all deployed resources across all accounts
+  and projects. Covers cross-account/project visibility, configuration history
+  (what did this resource look like 30 days ago?), drift detection against
+  desired state, and completeness of coverage across services.
+
+criteria:
+  L0: >
+    No centralized resource inventory. Tenants must query each service's list
+    API separately to enumerate resources. No configuration history, no
+    cross-account visibility, no drift detection.
+  L1: >
+    Resource inventory is achievable through tenant-built tooling: scheduled
+    scripts that enumerate resources via provider APIs and store snapshots.
+    No managed continuous inventory service; coverage depends on what the
+    tenant implements.
+  L2: >
+    A managed resource inventory service exists for major services but with
+    limitations: configuration history has a short retention window (<90 days),
+    cross-account aggregation requires manual setup per account, or service
+    coverage is incomplete (many resource types not tracked).
+  L3: >
+    Full managed resource configuration inventory: continuous tracking of all
+    resource types, configuration history with long retention (1+ year),
+    cross-account/project aggregated view, drift detection against baseline
+    configurations, queryable (SQL-like or API), and automatically covers
+    newly created resource types without configuration changes.
+
+framework_mappings:
+  ccm: ["IVS-01"]
+  nist_800_53_r5: ["CM-8", "CA-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

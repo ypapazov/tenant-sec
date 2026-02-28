@@ -1,0 +1,42 @@
+---
+id: log.alerting-detection
+domain: logging
+name: "Alerting & Anomaly Detection"
+description: >
+  Built-in threat detection applied to cloud activity logs. Covers detection
+  of common cloud attack patterns (credential abuse, unusual API access,
+  privilege escalation, data exfiltration indicators), customizability of
+  detection rules, and integration with response automation.
+
+criteria:
+  L0: >
+    No built-in threat detection or alerting on cloud activity. Tenants must
+    export all logs to an external SIEM and build detection rules from scratch.
+    No managed baseline detection is provided.
+  L1: >
+    Alerting is achievable by forwarding logs to an external SIEM (Splunk,
+    Elastic) and writing custom detection rules. Or by using an open-source
+    CSPM/detection tool (Falco, CloudTrail Insights equivalents built manually).
+    No managed detection from the provider.
+  L2: >
+    A native threat detection service exists (equivalent to GuardDuty, Defender
+    for Cloud, Security Command Center) with predefined detection rules for
+    common attack patterns. However, custom rule creation is not supported,
+    coverage is limited to specific log sources, or the service requires
+    additional cost on top of standard logging.
+  L3: >
+    Full managed threat detection: predefined rules covering a broad attack
+    surface (credential abuse, lateral movement, data exfiltration, C2
+    communication, privilege escalation), custom rule authoring, integration
+    with response automation (auto-remediation playbooks), aggregated findings
+    across all accounts/projects, and findings exportable to external SIEM.
+
+framework_mappings:
+  ccm: ["TVM-10", "SEF-03"]
+  nist_800_53_r5: ["SI-4", "AU-6", "IR-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

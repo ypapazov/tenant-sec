@@ -1,0 +1,34 @@
+---
+name: "eu-regulated-fintech"
+description: >
+  Weighting profile for a European fintech operating under DORA and GDPR,
+  prioritizing data residency, encryption controls, and audit capabilities.
+  Identity and governance are heavily weighted to reflect regulatory requirements
+  for access control and organizational oversight.
+
+must_have:
+  - control: "iam.external-idp-federation"
+    min_level: 2
+  - control: "gov.preventive-policy"
+    min_level: 2
+  - control: "enc.cmk"
+    min_level: 2
+  - control: "log.immutability"
+    min_level: 2
+  - control: "data.residency-guarantees"
+    min_level: 2
+  - control: "log.control-plane-audit"
+    min_level: 2
+
+weights:
+  iam: 0.20
+  governance: 0.15
+  encryption: 0.20
+  network: 0.10
+  logging: 0.15
+  data: 0.10
+  compute: 0.05
+  incident: 0.03
+  supply-chain: 0.02
+
+mixed_aggregation: "p20"

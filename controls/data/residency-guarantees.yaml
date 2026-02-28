@@ -1,0 +1,42 @@
+---
+id: data.residency-guarantees
+domain: data
+name: "Data Residency Guarantees"
+description: >
+  Contractual and technical guarantees that tenant data remains within specified
+  geographic regions or jurisdictions. Covers technical enforcement mechanisms
+  (data cannot leave region even if misconfigured), metadata residency
+  (not just primary data but also backups, replicas, and service metadata),
+  and contractual commitments.
+
+criteria:
+  L0: >
+    No data residency guarantees. Data may be replicated or processed outside
+    the tenant's selected region without notice. No contractual commitment
+    to geographic data confinement is offered.
+  L1: >
+    Data residency is achievable through careful architecture: tenants avoid
+    services that cross-replicate, use region-specific endpoints only, and
+    implement network controls to prevent cross-region data movement. Requires
+    ongoing vigilance; the provider makes no commitment to confine data.
+  L2: >
+    Data residency is guaranteed for primary data in major services (object storage,
+    databases) but not universally: service metadata (logs, monitoring data)
+    may reside outside the region, backups may cross regions, or residency
+    guarantees are contractually offered but not technically enforced.
+  L3: >
+    Strong data residency: technical controls prevent data leaving the specified
+    region even with misconfigured services. Contractual commitment covers both
+    primary data and metadata (logs, backups, replicas). Residency scope is
+    auditable (tenant can verify where their data is). Available as a standard
+    offering, not a premium add-on.
+
+framework_mappings:
+  ccm: ["DSP-01", "DSP-17"]
+  nist_800_53_r5: ["AC-23", "SC-36"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

@@ -1,0 +1,42 @@
+---
+id: data.deletion-guarantees
+domain: data
+name: "Data Deletion Guarantees"
+description: >
+  Verifiable data destruction on resource deletion. Covers crypto-shredding
+  support (destroying the encryption key to make data unrecoverable), timeline
+  guarantees (when is data actually purged after deletion?), and media
+  sanitization attestations for physical decommission.
+
+criteria:
+  L0: >
+    No deletion guarantees. Data remains on provider infrastructure for an
+    unspecified time after tenant deletes a resource. No crypto-shredding.
+    No attestation of physical media sanitization.
+  L1: >
+    Data deletion is achievable via crypto-shredding: tenants manage their own
+    CMKs and destroy the key material when deleting a resource, making data
+    theoretically unrecoverable (assuming no key backup). This depends on the
+    CMK capability existing; if CMK is not supported, not possible.
+  L2: >
+    The provider publishes a data deletion policy with a defined timeline
+    (e.g., "data is purged within 180 days of resource deletion") but the
+    timeline is long, crypto-shredding (immediate effective deletion via key
+    deletion) is not supported for all services, or media sanitization
+    attestation is not available per-customer.
+  L3: >
+    Clear, contractual data deletion timeline (within 30 days of resource
+    deletion). Crypto-shredding is supported where CMK is available (key
+    deletion = immediate effective data deletion). Physical media sanitization
+    attestations available on request. Deletion is complete including all
+    replicas, backups, and snapshots (unless explicitly retained by tenant).
+
+framework_mappings:
+  ccm: ["DSP-18", "DSP-16"]
+  nist_800_53_r5: ["MP-6", "SI-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tenant-sec.dev/schema/maturity.schema.json",
+  "title": "Maturity Schema",
+  "description": "Building blocks for maturity levels and control scores",
+  "$defs": {
+    "maturity_level": {
+      "type": "integer",
+      "enum": [0, 1, 2, 3],
+      "description": "L0=impossible from tenant space, L1=requires own processing loop, L2=available managed limited, L3=available managed customizable"
+    },
+    "service_score": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "oneOf": [
+            { "$ref": "#/$defs/maturity_level" },
+            { "type": "null" }
+          ],
+          "description": "Maturity level for this service, or null if not applicable"
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Evidence justifying the score; required even for null (explain why not applicable)"
+        }
+      },
+      "required": ["score", "evidence"],
+      "additionalProperties": false
+    },
+    "leaf_control_score": {
+      "type": "object",
+      "properties": {
+        "score": { "$ref": "#/$defs/maturity_level" },
+        "evidence": { "type": "string", "minLength": 1 },
+        "compensating_controls": { "type": "string" },
+        "verified_at": { "type": "string", "format": "date" }
+      },
+      "required": ["score", "evidence"],
+      "additionalProperties": false
+    },
+    "mixed_control_score": {
+      "type": "object",
+      "properties": {
+        "score": { "const": "mixed" },
+        "summary": { "type": "string" },
+        "services": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/service_score" },
+          "minProperties": 1
+        },
+        "verified_at": { "type": "string", "format": "date" }
+      },
+      "required": ["score", "services"],
+      "additionalProperties": false
+    },
+    "control_score": {
+      "oneOf": [
+        { "$ref": "#/$defs/leaf_control_score" },
+        { "$ref": "#/$defs/mixed_control_score" }
+      ]
+    }
+  }
+}

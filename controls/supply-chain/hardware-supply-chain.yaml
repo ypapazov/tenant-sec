@@ -1,0 +1,41 @@
+---
+id: supply-chain.hardware-supply-chain
+domain: supply-chain
+name: "Hardware Supply Chain"
+description: >
+  Custom silicon, hardware root of trust, firmware integrity, and supply chain
+  provenance. Covers whether the provider uses purpose-built security silicon
+  (Nitro, Titan, Pluton equivalents) to isolate the hypervisor from tenant
+  workloads and attest to firmware integrity at boot.
+
+criteria:
+  L0: >
+    Standard commercial off-the-shelf hardware with no custom security silicon.
+    No hardware root of trust. Firmware integrity is not attested. Supply
+    chain provenance is not disclosed.
+  L1: >
+    The provider uses commercial Trusted Platform Modules (TPMs) and measured
+    boot on standard server hardware, but no custom security silicon. Firmware
+    integrity attestation is available informally but not audited.
+  L2: >
+    Custom security hardware exists (or a documented equivalent) for hypervisor
+    isolation. Firmware integrity is measured and attested as part of SOC 2
+    audit scope. Supply chain risk management practices are documented but
+    specific provenance is not disclosed.
+  L3: >
+    Purpose-built security silicon (Nitro-class, Titan-class, or equivalent)
+    provides hardware root of trust and hypervisor isolation. Firmware integrity
+    is continuously measured and attested. Supply chain provenance program exists
+    (preferred suppliers, hardware inspection, tamper-evident packaging).
+    Attestation reports are available for the specific host types where
+    confidential workloads run.
+
+framework_mappings:
+  ccm: ["STA-01"]
+  nist_800_53_r5: ["SA-12", "SA-15", "SI-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1195"]
+
+service_scoped: false

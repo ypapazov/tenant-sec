@@ -1,0 +1,45 @@
+---
+id: incident.forensic-access
+domain: incident
+name: "Forensic Data Access"
+description: >
+  Ability to capture memory dumps, disk snapshots, and network captures
+  for forensic analysis of compromised instances. Evidence preservation
+  capabilities including creating forensic copies without interrupting
+  production instances.
+
+criteria:
+  L0: >
+    No forensic capture capability. Memory dumps and disk snapshots of running
+    instances are not available. A compromised instance must be terminated
+    before forensic investigation is possible, destroying volatile evidence.
+    Network captures are not accessible.
+  L1: >
+    Forensic data capture is achievable through manual procedures: SSH into
+    the instance, run memory acquisition tools (LiME), manually create disk
+    snapshots. Requires compromised instance to be accessible and active;
+    if the instance is already compromised, running tools on it may contaminate
+    evidence.
+  L2: >
+    Disk snapshots of running instances are available and can be created without
+    instance shutdown. Cross-account snapshot copying is possible to isolate
+    the forensic copy. However, in-memory forensic capture is not supported
+    from the control plane, and VPC traffic mirroring (network capture) is
+    limited or unavailable.
+  L3: >
+    Full forensic capability: hot disk snapshots without instance stop,
+    cross-account snapshot isolation for forensic analysis, VPC traffic
+    mirroring (full packet capture to a target interface), optional automated
+    instance isolation on security finding (quarantine mode), and integration
+    with incident response workflows (snapshot creation triggered by security
+    alerts).
+
+framework_mappings:
+  ccm: ["SEF-06"]
+  nist_800_53_r5: ["IR-4", "IR-5", "AU-11"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

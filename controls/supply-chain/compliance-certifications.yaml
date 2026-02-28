@@ -1,0 +1,40 @@
+---
+id: supply-chain.compliance-certifications
+domain: supply-chain
+name: "Compliance Certifications"
+description: >
+  Catalog of held third-party certifications and the scope of those certifications
+  (which services and regions are covered). Key certifications: ISO 27001,
+  SOC 2 Type II, ISO 27017, C5, FedRAMP, PCI DSS. Scope breadth matters:
+  a certification that covers 10 of 200 services provides limited assurance.
+
+criteria:
+  L0: >
+    No significant compliance certifications held. No SOC 2, no ISO 27001,
+    no independent third-party attestation of security controls.
+  L1: >
+    Basic certifications held (ISO 27001 or SOC 2 Type II) but with limited
+    scope: only a small subset of services or regions are in scope, certifications
+    are not current (>12 months old), or reports are not available to customers
+    even under NDA.
+  L2: >
+    Core certifications held (SOC 2 Type II, ISO 27001) covering most production
+    services and regions. Reports available to customers under NDA. Industry-specific
+    certifications (C5, FedRAMP, HDS) held for relevant markets, but with
+    reduced service scope compared to standard offerings.
+  L3: >
+    Comprehensive certification portfolio: SOC 2 Type II + ISO 27001 + ISO 27017
+    + ISO 27018 in scope for all production services and regions. Industry-specific
+    certifications (C5 for Germany/EU, FedRAMP for US federal, HDS for French
+    healthcare) at full service scope. Certificates and audit reports publicly
+    listed and downloadable (no NDA required for standard reports). Annual recertification.
+
+framework_mappings:
+  ccm: ["GRM-10"]
+  nist_800_53_r5: ["CA-2", "CA-7", "SA-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

@@ -1,0 +1,42 @@
+---
+id: compute.serverless-security
+domain: compute
+name: "Serverless Security Posture"
+description: >
+  Function-level IAM permissions (least privilege per function), VPC attachment
+  for private network access, execution environment isolation guarantees,
+  and concurrency/timeout limits as security controls (preventing runaway
+  functions from being used as crypto miners or C2 relays).
+
+criteria:
+  L0: >
+    Serverless functions have no granular IAM permissions — all functions
+    in an account share the same identity. No VPC attachment possible.
+    No isolation guarantees between function executions.
+  L1: >
+    Per-function IAM roles are achievable through careful provisioning, but
+    the platform does not enforce least-privilege defaults. Functions are
+    deployed with overly broad permissions unless tenants deliberately configure
+    minimal roles. VPC attachment requires complex manual networking setup.
+  L2: >
+    Per-function IAM roles supported and recommended. VPC attachment is
+    supported for major function runtimes. Cold start isolation is documented.
+    However, concurrent execution limits are coarse (account-level, not
+    per-function), or the function execution environment does not provide
+    security isolation guarantees against cross-function data leakage.
+  L3: >
+    Full serverless security: per-function IAM roles enforced, VPC attachment
+    with private endpoint access, per-function concurrency limits, execution
+    environment isolation guarantees (each invocation gets a clean environment),
+    function-level audit logging (who invoked, with what payload size, from
+    where), and runtime monitoring for anomalous behavior.
+
+framework_mappings:
+  ccm: ["IVS-04"]
+  nist_800_53_r5: ["AC-3", "SC-39"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1648"]
+
+service_scoped: false

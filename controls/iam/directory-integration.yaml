@@ -1,0 +1,39 @@
+---
+id: iam.directory-integration
+domain: iam
+name: "Directory Integration"
+description: >
+  Native integration with external directories (Active Directory, LDAP) for
+  user and group synchronization. Covers sync mechanisms (SCIM 2.0, proprietary
+  connectors), bidirectionality, user lifecycle management (provisioning,
+  deprovisioning), and whether group membership can drive permission assignments.
+
+criteria:
+  L0: >
+    No directory synchronization capability. Tenants must manually create and
+    maintain all identities in the cloud provider's native identity store.
+    Group memberships from corporate directories cannot influence cloud permissions.
+  L1: >
+    Directory sync is achievable via custom scripts or third-party tools
+    (e.g., Azure AD Connect to a non-native provider, custom SCIM bridges).
+    Tenant must build, deploy, and maintain the sync pipeline. No provider-managed
+    sync agent exists.
+  L2: >
+    A native sync agent or SCIM connector exists but with limitations: one-way
+    sync only (directory to cloud, no writeback), limited attribute mapping,
+    no group nesting support, or sync is periodic (not real-time / event-driven).
+  L3: >
+    Full managed directory integration with SCIM 2.0 or equivalent: real-time
+    or near-real-time sync, bidirectional support where applicable, group nesting,
+    flexible attribute mapping, automatic deprovisioning on directory deletion,
+    and support for multiple directory sources simultaneously.
+
+framework_mappings:
+  ccm: ["IAM-02", "IAM-03"]
+  nist_800_53_r5: ["IA-2", "IA-4", "AC-2"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078"]
+
+service_scoped: false

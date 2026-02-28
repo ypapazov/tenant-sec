@@ -1,0 +1,41 @@
+---
+id: gov.account-lifecycle
+domain: governance
+name: "Account / Project Lifecycle Management"
+description: >
+  Automated provisioning of new accounts, projects, or subscriptions with
+  baseline security configurations applied automatically (account factory,
+  landing zones). Covers templated baseline policies, guardrails on new
+  environments, automated offboarding, and drift detection against baseline.
+
+criteria:
+  L0: >
+    No automated account provisioning. New accounts/projects must be created
+    manually with no baseline configuration applied automatically. Each new
+    environment starts empty and must be configured from scratch.
+  L1: >
+    Account lifecycle automation is achievable through tenant-built IaC
+    (Terraform modules, CDK templates) that provision new accounts with baseline
+    configurations when triggered. No managed account vending machine exists;
+    tenants build and maintain their own pipeline.
+  L2: >
+    A managed account factory or landing zone solution exists but is limited:
+    limited baseline configuration options, no drift detection after provisioning,
+    onboarding workflow exists but offboarding is manual, or baseline guardrails
+    cannot be customized beyond a fixed template.
+  L3: >
+    Full managed account lifecycle: new accounts/projects provisioned via API or
+    self-service with tenant-defined baseline configurations automatically applied
+    (SCPs, default VPC, logging, security tooling). Drift detection against
+    baseline post-provisioning. Automated offboarding workflow that revokes access
+    and preserves audit data. Configuration is version-controlled and auditable.
+
+framework_mappings:
+  ccm: ["GRM-01", "GRM-05"]
+  nist_800_53_r5: ["CM-2", "CM-6", "CA-9"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

@@ -1,0 +1,43 @@
+---
+id: gov.hierarchy-delegation
+domain: governance
+name: "Hierarchy & Delegation"
+description: >
+  Organizational unit structure (management groups, folders, OUs), depth and
+  flexibility of the hierarchy, hierarchical policy inheritance (policies set
+  at parent nodes flow to children), and delegated administration (ability to
+  give a team administrative rights over a sub-tree without root access).
+
+criteria:
+  L0: >
+    Flat account structure with no organizational hierarchy. Policies cannot
+    be applied at a parent level and inherited by sub-accounts. All policy
+    management must be done per-account. No delegation model exists for
+    sub-account administration.
+  L1: >
+    Hierarchy is achievable but requires custom convention and tooling:
+    tenants impose structure via tagging, separate management accounts, or
+    custom automation that replicates policies across accounts. No platform-native
+    hierarchy with policy inheritance.
+  L2: >
+    An organizational hierarchy exists but with constraints: hierarchy is
+    limited to two levels (organization + accounts, no intermediate folders/OUs),
+    policy inheritance is available for a subset of policy types only,
+    or delegated administration exists but only for pre-defined role assignments
+    not custom scopes.
+  L3: >
+    Deep, flexible organizational hierarchy (multiple tiers of folders/OUs),
+    full policy inheritance at every level, delegated administration with
+    customizable scopes per organizational node. New hierarchy nodes can be
+    created programmatically. Policy evaluation respects the full inheritance
+    chain (organization → folder → account → resource).
+
+framework_mappings:
+  ccm: ["GRM-02", "GRM-03"]
+  nist_800_53_r5: ["AC-2", "AC-5", "AC-6"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

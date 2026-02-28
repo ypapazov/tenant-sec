@@ -1,0 +1,39 @@
+---
+id: net.dns-security
+domain: network
+name: "DNS Security"
+description: >
+  Private DNS zones, DNS firewall (blocking resolution of malicious or
+  unauthorized domains), DNSSEC support, and tenant control over DNS resolution
+  within and across VPCs.
+
+criteria:
+  L0: >
+    No tenant-managed DNS. Tenants rely entirely on provider default DNS
+    resolution with no ability to create private zones, configure custom
+    resolvers, or filter DNS queries.
+  L1: >
+    Private DNS is achievable through self-managed DNS servers (BIND, Unbound)
+    deployed on EC2 instances or equivalent within the VPC. Tenant manages
+    the DNS infrastructure, not a managed service.
+  L2: >
+    Managed private DNS zones exist, allowing custom domain resolution
+    within the VPC. DNS firewall or query filtering may not be available,
+    DNSSEC signing is not supported for private zones, or DNS resolution
+    cannot be centralized across multiple VPCs/accounts from a single managed
+    configuration.
+  L3: >
+    Full managed DNS security: private zones with cross-VPC/account resolution,
+    DNS firewall for domain allow/deny-listing, DNSSEC support (signing and
+    validation), DNS query logging, and centralized resolver configuration
+    that can be shared across organizational units.
+
+framework_mappings:
+  ccm: ["IVS-04"]
+  nist_800_53_r5: ["SC-20", "SC-21", "SC-22"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1071.004"]
+
+service_scoped: false

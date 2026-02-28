@@ -1,0 +1,42 @@
+---
+id: compute.patch-management
+domain: compute
+name: "Patch Management"
+description: >
+  Managed patching for OS, runtime, and platform components. Tenant visibility
+  into patch compliance status and the ability to configure automated vs. manual
+  patching. Assessed per service since managed services handle patching differently
+  than IaaS VMs.
+
+criteria:
+  L0: >
+    No managed patch management. All OS and runtime patching for VMs is
+    entirely the tenant's responsibility. For managed services, the provider's
+    patch schedule is opaque (no visibility, no tenant control, no notifications).
+  L1: >
+    Patch management is achievable through tenant-deployed tooling (AWS Systems
+    Manager Patch Manager, Ansible, etc.) that scans and applies patches to
+    instances. For managed services, the provider handles patching but without
+    tenant visibility or scheduling control.
+  L2: >
+    A managed patch orchestration service exists for VM fleets with compliance
+    reporting. Managed services notify tenants of upcoming maintenance windows.
+    However, tenants cannot control patch scheduling within a window, patch
+    compliance reporting is not consolidated across all services, or patching
+    of Kubernetes node pools requires manual intervention.
+  L3: >
+    Full managed patch lifecycle: automated patch scanning and application with
+    configurable maintenance windows, patch compliance dashboard across all VM
+    fleets and managed services, automatic Kubernetes node pool upgrades within
+    configured windows, zero-downtime patching for managed databases (minor
+    versions), and emergency patch fast-track with minimal notice for critical CVEs.
+
+framework_mappings:
+  ccm: ["TVM-07", "TVM-08"]
+  nist_800_53_r5: ["SI-2", "CM-6"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

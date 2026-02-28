@@ -1,0 +1,44 @@
+---
+id: data.backup-governance
+domain: data
+name: "Backup & Recovery Governance"
+description: >
+  Tenant control over backup encryption, retention schedules, cross-region
+  replication policies, and deletion protection. Covers whether backups are
+  isolated from the production account (so a compromised production account
+  cannot delete backups), and whether backup governance can be enforced at
+  the org level.
+
+criteria:
+  L0: >
+    No managed backup governance. Backup existence, retention, encryption,
+    and replication must be configured per-resource manually. No org-level
+    backup policy. Backup deletion is subject to the same permissions as
+    any other resource deletion.
+  L1: >
+    Backup governance is achievable through tenant-implemented IaC that
+    creates backup schedules and retention policies as part of resource
+    provisioning. Ongoing drift from the desired policy must be detected
+    by custom tooling. No managed backup policy engine.
+  L2: >
+    A managed backup policy service exists for major services (VM snapshots,
+    database backups) but coverage is incomplete (not all services in scope),
+    or backup isolation (separate account with independent IAM) requires
+    manual cross-account configuration, or backup retention policies cannot
+    be enforced at the org level.
+  L3: >
+    Full backup governance: org-level backup policies that automatically apply
+    to all covered resources (including newly created ones), backup isolation
+    (backup copies stored in a vault that production account cannot delete),
+    cross-region replication configurable via policy, encryption of backups
+    with CMK, and recovery testing automation.
+
+framework_mappings:
+  ccm: ["BCR-01", "BCR-02", "BCR-03"]
+  nist_800_53_r5: ["CP-9", "CP-10"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1490"]
+
+service_scoped: true

@@ -1,0 +1,40 @@
+---
+id: net.cross-environment-connectivity
+domain: network
+name: "Cross-Environment Connectivity"
+description: >
+  VPC peering, transit gateways, hub-spoke topologies, and shared VPCs/VNets.
+  Covers cross-account and cross-project network sharing, the complexity of
+  connecting many environments at scale, and whether transitive routing is
+  supported (traffic can traverse multiple connected networks).
+
+criteria:
+  L0: >
+    No cross-environment network connectivity. Each VPC/account is completely
+    isolated and cannot be connected to other environments without going
+    through the public internet.
+  L1: >
+    Cross-environment connectivity is achievable through VPN tunnels between
+    VPCs (tenant-managed), requiring ongoing VPN infrastructure management.
+    No managed peering or transit hub capability exists.
+  L2: >
+    VPC peering exists but with constraints: peering is non-transitive (A peers
+    B and B peers C does not mean A can reach C), peering is limited to the
+    same region, or the number of peering connections per VPC is severely
+    limited. No hub-spoke / transit architecture.
+  L3: >
+    Full cross-environment connectivity: VPC peering (including transitive
+    routing via transit gateway or equivalent), hub-spoke topology with centralized
+    routing management, shared VPC/VNet support, cross-account and cross-region
+    peering, and the ability to centralize egress/ingress inspection across
+    all connected environments.
+
+framework_mappings:
+  ccm: ["IVS-06"]
+  nist_800_53_r5: ["SC-7", "AC-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

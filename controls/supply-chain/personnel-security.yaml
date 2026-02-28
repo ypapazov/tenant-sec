@@ -1,0 +1,42 @@
+---
+id: supply-chain.personnel-security
+domain: supply-chain
+name: "Personnel Security"
+description: >
+  Background checks, access controls for provider employees who may access
+  tenant infrastructure or data, insider threat programs, and whether the
+  provider has privileged access management for their own personnel.
+  Assessment is attestation-based.
+
+criteria:
+  L0: >
+    No disclosure of personnel security practices. No attestation that
+    employees with potential access to tenant infrastructure are background
+    checked or subject to access controls.
+  L1: >
+    Personnel security practices are mentioned in provider documentation
+    (background checks performed, access requires justification) but are
+    not covered by third-party audits. No technical controls on provider
+    employee access are disclosed.
+  L2: >
+    Personnel security is covered by SOC 2 Type II audit scope (background
+    checks, access provisioning, termination procedures). Provider employees
+    with access to production systems are disclosed in the audit report.
+    Insider threat program exists but details are not public.
+  L3: >
+    Comprehensive personnel security: SOC 2 Type II + ISO 27001 scope covering
+    access controls for all employees with production access, just-in-time
+    access for provider personnel (no standing access to tenant infrastructure),
+    access audit log available (what provider employees accessed tenant systems),
+    and contractual commitment to notify tenants of authorized provider access
+    on request.
+
+framework_mappings:
+  ccm: ["HRS-01", "HRS-02"]
+  nist_800_53_r5: ["PS-3", "PS-4", "PS-6"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

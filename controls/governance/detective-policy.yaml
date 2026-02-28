@@ -1,0 +1,42 @@
+---
+id: gov.detective-policy
+domain: governance
+name: "Detective Policy / Compliance Monitoring"
+description: >
+  Continuous evaluation of resource configuration against defined compliance
+  rules, with findings surfaced in a central dashboard. Covers the depth of
+  built-in rule sets, ability to author custom rules, service coverage breadth,
+  and whether findings trigger automated remediation or are manual. Examples:
+  AWS Config Rules, Azure Policy audit mode, GCP Security Health Analytics.
+
+criteria:
+  L0: >
+    No native compliance monitoring capability. Tenants must manually audit
+    resource configurations or build custom tooling from scratch. No centralized
+    view of configuration compliance across accounts/projects.
+  L1: >
+    Compliance monitoring is achievable through tenant-built tooling: deploying
+    open-source scanners (Prowler, Steampipe, Cloud Custodian) on a schedule,
+    writing custom scripts to query provider APIs, or using a third-party CSPM.
+    No managed, always-on rule evaluation engine is provided by the platform.
+  L2: >
+    A managed compliance monitoring service exists with a library of predefined
+    rules, but custom rule authoring is not supported, service coverage is
+    incomplete, evaluation is periodic (not real-time / near-real-time), or
+    findings cannot trigger automated remediation natively.
+  L3: >
+    Fully managed continuous compliance monitoring: real-time or near-real-time
+    evaluation triggered on resource changes, a rich library of predefined rules,
+    support for custom rule authoring (Lambda functions, Rego policies, etc.),
+    broad service coverage, aggregated dashboard across all accounts/projects,
+    and native support for automated remediation actions on finding creation.
+
+framework_mappings:
+  ccm: ["GRM-07", "GRM-08"]
+  nist_800_53_r5: ["CA-7", "CM-8", "SI-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

@@ -1,0 +1,41 @@
+---
+id: incident.automated-response
+domain: incident
+name: "Automated Response Capabilities"
+description: >
+  Native event-driven security response automation: auto-remediation of security
+  findings, playbook/runbook automation triggered by threat detection events,
+  and integration with SOAR platforms for coordinated response across tools.
+
+criteria:
+  L0: >
+    No automated response capabilities. Security findings require manual
+    review and response. Tenants must build their own event-driven response
+    pipelines from scratch using generic cloud functions.
+  L1: >
+    Automated response is achievable through custom event-driven pipelines:
+    Lambda functions or equivalent triggered by CloudTrail events, SNS
+    notifications, or EventBridge rules. Tenants write and maintain all
+    response logic. No managed playbook library.
+  L2: >
+    A native event-driven response framework exists (EventBridge + Lambda,
+    Logic Apps, Cloud Functions triggers) with documented patterns for common
+    security responses. However, SOAR integration requires custom connectors,
+    the response framework is general-purpose (not security-specific), or
+    pre-built security response playbooks are limited.
+  L3: >
+    Full managed security response automation: security-specific event bus
+    that normalizes findings from all detection sources, pre-built response
+    playbooks for common scenarios (isolate compromised instance, revoke
+    credentials, block IP), native SOAR integration, bi-directional ticketing
+    system integration, and audit trail of all automated response actions.
+
+framework_mappings:
+  ccm: ["SEF-03", "SEF-07"]
+  nist_800_53_r5: ["IR-4", "SI-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

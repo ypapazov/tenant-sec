@@ -1,0 +1,43 @@
+---
+id: data.sovereignty-controls
+domain: data
+name: "Data Sovereignty Controls"
+description: >
+  Beyond residency: controls over who can access tenant data under which legal
+  jurisdiction, including whether the provider can be compelled to disclose
+  data by a foreign government. Covers sovereign cloud offerings, access
+  controls on provider personnel, and legal jurisdiction of the service agreement.
+
+criteria:
+  L0: >
+    No sovereignty controls. The provider is subject to data disclosure orders
+    from foreign governments without tenant notification. No controls on
+    provider personnel access from specific jurisdictions. No sovereign cloud
+    option.
+  L1: >
+    Sovereignty controls are achievable through encryption: tenant encrypts all
+    data with keys managed entirely outside the provider (HYOK/EKM) so the
+    provider cannot access plaintext even under a legal order. Requires
+    application-layer encryption complexity.
+  L2: >
+    The provider offers a distinct sovereign cloud region with contractual
+    commitments about personnel jurisdiction and legal disclosure processes.
+    However, the sovereign region has reduced service availability compared
+    to standard regions, or the offering requires a separate contract at
+    significant premium.
+  L3: >
+    Full sovereignty offering: technically enforced access controls on provider
+    personnel (operator access control), contractual jurisdictional commitments
+    (EU service agreement governed by EU law with no access without tenant
+    consent), customer-controlled key management (HYOK/EKM) for all data,
+    and comparable service availability to standard regions.
+
+framework_mappings:
+  ccm: ["DSP-17", "DSP-18"]
+  nist_800_53_r5: ["AC-23"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

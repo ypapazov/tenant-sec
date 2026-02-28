@@ -1,0 +1,42 @@
+---
+id: data.classification
+domain: data
+name: "Data Classification"
+description: >
+  Built-in tools for discovering and classifying sensitive data stored in cloud
+  services. Covers automated PII/PHI detection, data labeling/tagging, policy
+  enforcement based on data classification, and coverage across service types.
+
+criteria:
+  L0: >
+    No data classification or sensitive data discovery tools. Tenants must
+    build or purchase third-party DLP/classification tooling entirely outside
+    the platform. No visibility into what sensitive data exists in their
+    cloud storage.
+  L1: >
+    Data classification is achievable through tenant-deployed scanning tools
+    (open-source or commercial) that read from cloud storage and tag resources.
+    The provider has no native classification service. Tenants maintain
+    the scanner infrastructure.
+  L2: >
+    A native managed classification / sensitive data discovery service exists
+    for major storage services (object storage, databases) but not for all
+    services in scope (no classification for data warehouse, AI/ML datasets,
+    messaging queues). Classification labels cannot drive automated policy
+    enforcement natively.
+  L3: >
+    Full managed data classification: automated PII/PHI/sensitive data discovery
+    across all major storage surfaces, customizable classification rules,
+    classification results that automatically trigger policy actions (e.g., apply
+    CMK, restrict access, send alert), and classification state queryable across
+    all accounts/projects.
+
+framework_mappings:
+  ccm: ["DSP-07", "DSP-08"]
+  nist_800_53_r5: ["RA-2", "AC-16"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

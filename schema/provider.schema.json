@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tenant-sec.dev/schema/provider.schema.json",
+  "title": "Provider Profile Schema",
+  "description": "Validates files in providers/",
+  "$defs": {
+    "service_in_scope": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Provider-local service alias matching service-catalog.yaml"
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "category": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical service category from service-catalog.yaml"
+        },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["id", "name", "category"],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Provider slug, e.g. aws, azure, gcp, scaleway"
+    },
+    "display_name": { "type": "string", "minLength": 1 },
+    "assessed_by": {
+      "type": "string",
+      "pattern": "^(self|community:[a-z0-9_-]+|accredited:[a-z0-9_-]+)$",
+      "description": "Assessor identifier: self, community:{handle}, or accredited:{org}"
+    },
+    "assessed_at": {
+      "type": "string",
+      "format": "date"
+    },
+    "methodology_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonically increasing profile revision number"
+    },
+    "services_in_scope": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/service_in_scope" },
+      "minItems": 1
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "score": { "type": "integer", "enum": [0, 1, 2, 3] },
+              "evidence": { "type": "string", "minLength": 1 },
+              "compensating_controls": { "type": "string" },
+              "verified_at": { "type": "string", "format": "date" }
+            },
+            "required": ["score", "evidence"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "score": { "const": "mixed" },
+              "summary": { "type": "string" },
+              "services": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "score": {
+                      "oneOf": [
+                        { "type": "integer", "enum": [0, 1, 2, 3] },
+                        { "type": "null" }
+                      ]
+                    },
+                    "evidence": { "type": "string", "minLength": 1 }
+                  },
+                  "required": ["score", "evidence"],
+                  "additionalProperties": false
+                },
+                "minProperties": 1
+              },
+              "verified_at": { "type": "string", "format": "date" }
+            },
+            "required": ["score", "services"],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "provider",
+    "display_name",
+    "assessed_by",
+    "assessed_at",
+    "methodology_version",
+    "revision",
+    "services_in_scope",
+    "controls"
+  ],
+  "additionalProperties": false
+}

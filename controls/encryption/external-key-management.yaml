@@ -1,0 +1,43 @@
+---
+id: enc.external-key-management
+domain: encryption
+name: "External Key Management (HYOK / EKM)"
+description: >
+  Ability to use encryption keys that never enter the provider's infrastructure.
+  Covers hold-your-own-key (HYOK) solutions, external key manager (EKM)
+  integrations, and client-side encryption workflows where the key material
+  resides entirely outside the cloud provider.
+
+criteria:
+  L0: >
+    No external key management support. All keys used for encryption at rest
+    must reside within the provider's KMS. The provider holds key material
+    for all tenant-encrypted data.
+  L1: >
+    External key management is achievable through application-layer client-side
+    encryption before data is sent to the provider. Tenants implement encrypt/decrypt
+    in their application code using an external key server. The provider has
+    no visibility, but this approach breaks most managed service features
+    and requires significant application complexity.
+  L2: >
+    An external key manager integration exists for specific use cases
+    (e.g., SaaS application-level HYOK for email/collaboration) but is not
+    available for general-purpose infrastructure encryption (block storage,
+    databases, object storage). Or the integration requires a specific
+    vendor's key management software.
+  L3: >
+    Full EKM integration: the provider's KMS can call out to a tenant-hosted
+    external key manager for key material on every encryption/decryption
+    operation. If the external KMS is unavailable or access is revoked, the
+    provider cannot access the data. Supported for major storage and database
+    services. Standard protocols (KMIP) or documented API.
+
+framework_mappings:
+  ccm: ["EKM-03", "EKM-04"]
+  nist_800_53_r5: ["SC-12", "SC-28"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

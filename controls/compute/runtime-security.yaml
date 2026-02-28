@@ -1,0 +1,40 @@
+---
+id: compute.runtime-security
+domain: compute
+name: "Runtime Security"
+description: >
+  OS-level security features, secure boot, vTPM, integrity monitoring,
+  and host-based intrusion detection/prevention options. Covers whether
+  these features are managed by the provider or require tenant-side agents.
+
+criteria:
+  L0: >
+    No runtime security features. VMs have no secure boot, no vTPM, no
+    integrity monitoring. Host-based IDS/IPS must be entirely tenant-managed
+    (installing and maintaining agents, managing update cycles, reviewing alerts).
+  L1: >
+    Runtime security is achievable by installing tenant-managed security agents
+    (CrowdStrike, Carbon Black, Wazuh) on instances. These agents provide
+    detection and response but require tenant management of agent lifecycle,
+    updates, and alert triage.
+  L2: >
+    Managed shielded VM or secure launch features exist (secure boot, vTPM,
+    integrity monitoring on VM startup) but runtime behavioral detection is
+    not included. Or managed endpoint detection and response is available
+    as a paid add-on with limited integration into the broader security tooling.
+  L3: >
+    Full managed runtime security: shielded instances with secure boot, vTPM,
+    and integrity monitoring by default. Optional managed host-based detection
+    with behavioral analysis (not just signature-based). Integration with
+    the provider's threat detection service. Findings surfaced in the central
+    security console. Available for major instance types.
+
+framework_mappings:
+  ccm: ["IVS-04", "IVS-05"]
+  nist_800_53_r5: ["SI-3", "SI-7", "SC-39"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1543", "T1547"]
+
+service_scoped: true

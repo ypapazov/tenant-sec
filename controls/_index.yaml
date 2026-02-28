@@ -1,0 +1,99 @@
+---
+version: "0.1.0"
+
+domains:
+  iam:
+    name: "Identity & Access Management"
+    controls:
+      - iam.external-idp-federation
+      - iam.directory-integration
+      - iam.privileged-access
+      - iam.service-identity
+      - iam.abac
+      - iam.permission-boundaries
+      - iam.credential-management
+      - iam.multi-tenancy-isolation
+
+  governance:
+    name: "Organization Governance & Policy"
+    controls:
+      - gov.preventive-policy
+      - gov.detective-policy
+      - gov.tagging-governance
+      - gov.hierarchy-delegation
+      - gov.account-lifecycle
+      - gov.quotas-service-control
+
+  encryption:
+    name: "Encryption & Key Management"
+    controls:
+      - enc.encryption-at-rest-default
+      - enc.cmk
+      - enc.byok
+      - enc.external-key-management
+      - enc.key-lifecycle
+      - enc.hsm-backing
+      - enc.encryption-in-transit
+      - enc.confidential-computing
+
+  network:
+    name: "Network Security"
+    controls:
+      - net.isolation-model
+      - net.cross-environment-connectivity
+      - net.firewall
+      - net.private-connectivity
+      - net.dns-security
+      - net.ddos-protection
+      - net.waf
+      - net.egress-control
+
+  logging:
+    name: "Logging, Monitoring & Audit"
+    controls:
+      - log.control-plane-audit
+      - log.data-plane-logging
+      - log.immutability
+      - log.export-integration
+      - log.alerting-detection
+      - log.resource-inventory
+
+  data:
+    name: "Data Security & Residency"
+    controls:
+      - data.residency-guarantees
+      - data.sovereignty-controls
+      - data.classification
+      - data.dlp
+      - data.backup-governance
+      - data.deletion-guarantees
+
+  compute:
+    name: "Compute & Workload Security"
+    controls:
+      - compute.image-management
+      - compute.runtime-security
+      - compute.container-orchestration
+      - compute.serverless-security
+      - compute.patch-management
+      - compute.secrets-management
+
+  incident:
+    name: "Incident Response & Resilience"
+    controls:
+      - incident.forensic-access
+      - incident.notification-sla
+      - incident.automated-response
+      - incident.availability-zones
+      - incident.resilience-testing
+
+  supply-chain:
+    name: "Supply Chain & Platform Transparency"
+    controls:
+      - supply-chain.infrastructure-encryption
+      - supply-chain.physical-security
+      - supply-chain.hardware-supply-chain
+      - supply-chain.personnel-security
+      - supply-chain.compliance-certifications
+      - supply-chain.transparency-reports
+      - supply-chain.dependency-disclosure

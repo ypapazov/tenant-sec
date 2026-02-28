@@ -1,0 +1,43 @@
+---
+id: incident.resilience-testing
+domain: incident
+name: "Chaos & Resilience Testing"
+description: >
+  Provider-supported fault injection and resilience testing tools. Covers
+  the scope of supported failure modes (AZ failure, instance termination,
+  network partition, dependency timeouts), integration with CI/CD, and
+  whether testing can be scoped to avoid production blast radius.
+
+criteria:
+  L0: >
+    No resilience or chaos testing tooling from the provider. Tenants must
+    build their own fault injection mechanisms (terminating instances manually,
+    blocking traffic with firewall rules) or use third-party chaos engineering
+    tools with no platform integration.
+  L1: >
+    Resilience testing is achievable using third-party chaos engineering tools
+    (Chaos Monkey, Gremlin, LitmusChaos) deployed on the platform. No native
+    integration with provider fault injection APIs; testing relies on external
+    tooling.
+  L2: >
+    A native fault injection service exists (e.g., AWS Fault Injection Service)
+    supporting common failure scenarios (instance termination, CPU stress,
+    network degradation). However, the scope of supported failure modes is
+    limited, integration with CI/CD pipelines requires custom work, or the
+    service is available in limited regions.
+  L3: >
+    Full managed resilience testing: broad failure mode library (infrastructure
+    failures, dependency failures, network partitions, latency injection),
+    safety controls (stop conditions, blast radius limits), integration with
+    CI/CD and automated test execution, pre-built scenario templates for
+    common resilience patterns, and cross-service experiment orchestration.
+
+framework_mappings:
+  ccm: ["BCR-04", "BCR-05"]
+  nist_800_53_r5: ["CP-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

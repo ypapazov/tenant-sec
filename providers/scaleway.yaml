@@ -1,0 +1,893 @@
+---
+provider: scaleway
+display_name: "Scaleway"
+assessed_by: "community:tenant-sec-maintainers"
+assessed_at: "2026-02-01"
+methodology_version: "1.0"
+revision: 1
+
+services_in_scope:
+  - { id: "instances", name: "Instances (VMs)", category: "compute.vm" }
+  - { id: "kapsule", name: "Kubernetes Kapsule", category: "compute.containers" }
+  - { id: "functions", name: "Serverless Functions", category: "compute.serverless" }
+  - { id: "containers", name: "Serverless Containers", category: "compute.serverless" }
+  - { id: "object-storage", name: "Object Storage", category: "storage.object" }
+  - { id: "block-storage", name: "Block Storage", category: "storage.block" }
+  - { id: "rdb", name: "Managed Databases (RDB)", category: "database.relational" }
+  - { id: "document-db", name: "Document DB (MongoDB)", category: "database.nosql" }
+  - { id: "vpc", name: "VPC", category: "network.vpc" }
+  - { id: "load-balancer", name: "Load Balancer", category: "network.loadbalancer" }
+  - { id: "dns", name: "DNS", category: "network.dns" }
+  - { id: "secret-manager", name: "Secret Manager", category: "security.secrets" }
+  - { id: "iam", name: "IAM", category: "identity.iam" }
+
+controls:
+
+  # ── IAM ──────────────────────────────────────────────────────────────────
+
+  iam.external-idp-federation:
+    score: 2
+    evidence: >
+      Scaleway IAM supports OIDC-based federation for console and API access
+      via external IdPs. A single IdP can be configured per organization.
+      Multi-IdP support is not available. Federation covers API key generation
+      post-authentication but attribute mapping is limited to predefined role
+      bindings. SAML 2.0 is not natively supported.
+    verified_at: "2026-01-30"
+
+  iam.directory-integration:
+    score: 1
+    evidence: >
+      No native SCIM or LDAP connector for directory synchronization. Users
+      must be created manually in the Scaleway IAM console or via API. OIDC
+      federation enables SSO but does not provision/deprovision users
+      automatically from an external directory. Lifecycle management requires
+      custom automation.
+    verified_at: "2026-01-30"
+
+  iam.privileged-access:
+    score: 0
+    evidence: >
+      No JIT access elevation mechanism exists in Scaleway IAM. Privileged
+      roles (Owner, Administrator) must be permanently assigned. No approval
+      workflows, no time-bound grants, no break-glass automation. All
+      privileged access is standing access. Tenants must implement any JIT
+      workflow entirely outside the platform.
+    compensating_controls: >
+      Tenants can use separate dedicated accounts for privileged operations
+      and enforce MFA, but no managed JIT from the platform.
+    verified_at: "2026-01-30"
+
+  iam.service-identity:
+    score: 2
+    evidence: >
+      Scaleway IAM supports API keys scoped to applications (projects) as
+      service identities. API keys can have limited scope (specific project,
+      specific resource types via IAM policies). However, there is no
+      instance-level workload identity (no instance profile/managed identity
+      for VMs). Functions and Containers have limited IAM role binding but
+      not a full managed identity. Short-lived token exchange (OIDC workload
+      federation) is not supported.
+    verified_at: "2026-01-30"
+
+  iam.abac:
+    score: 1
+    evidence: >
+      Scaleway IAM policies support resource-level conditions using principal
+      and resource filters (project scoping, resource type matching). However,
+      there is no tag-based ABAC — IAM conditions cannot be based on resource
+      tags. Conditional access based on request context (IP, time, MFA state)
+      is not available in standard IAM policies. Dynamic ABAC is achievable
+      only through custom application-layer authorization.
+    verified_at: "2026-01-30"
+
+  iam.permission-boundaries:
+    score: 0
+    evidence: >
+      No permission boundary mechanism. Scaleway IAM allows attaching policies
+      to groups and API keys, but there is no per-principal ceiling. A
+      principal that can manage IAM policies can grant themselves or others
+      any permission within the organization. Delegation of IAM administration
+      is unsafe without full organizational-level trust.
+    verified_at: "2026-01-30"
+
+  iam.credential-management:
+    score: 2
+    evidence: >
+      Scaleway Secret Manager can store and manage API keys and credentials.
+      IAM API keys support expiry dates and can be restricted by resource
+      type. However, automatic rotation of IAM API keys is not natively
+      managed — tenants must implement rotation logic themselves. Detection
+      of unused credentials is not available as a managed feature. No enforcement
+      mechanism to prohibit long-lived keys exists at the org level.
+    verified_at: "2026-01-30"
+
+  iam.multi-tenancy-isolation:
+    score: 2
+    evidence: >
+      Scaleway supports a two-level hierarchy: Organization → Projects.
+      Projects provide separate IAM scopes and resource namespaces. Each
+      project has independent billing visibility. However, hierarchy is
+      limited to two levels (no nested project groups or folders). Policy
+      inheritance from organization to projects is limited. Cross-project
+      IAM delegation requires explicit policy grants and is possible but
+      complex.
+    verified_at: "2026-01-30"
+
+  # ── Governance ───────────────────────────────────────────────────────────
+
+  gov.preventive-policy:
+    score: 0
+    evidence: >
+      Scaleway provides IAM with policies, users, groups, and API keys
+      at the organization level. No mechanism exists to define preventive
+      policies that deny specific API actions across projects. No equivalent
+      to AWS SCPs, Azure Policy deny effects, or GCP Org Policy constraints.
+      IAM permissions are the only governance boundary. Preventive enforcement
+      at the organizational level does not exist.
+    compensating_controls: >
+      Tenant must implement CI/CD pipeline guardrails using external
+      policy-as-code tooling (OPA/Rego) at deployment time. This covers
+      IaC-deployed resources but not console or direct API actions.
+    verified_at: "2026-01-28"
+
+  gov.detective-policy:
+    score: 1
+    evidence: >
+      No native compliance monitoring or continuous evaluation of resource
+      configuration. Tenants must deploy open-source CSPM tools or write
+      custom scripts to query Scaleway APIs and evaluate compliance. No
+      managed Config-rules equivalent. Scaleway Cockpit provides metrics
+      and logs but not compliance policy evaluation.
+    verified_at: "2026-01-28"
+
+  gov.tagging-governance:
+    score: 1
+    evidence: >
+      Scaleway supports tags on resources, but tag enforcement (requiring
+      specific tags on resource creation) is not available as a managed
+      feature. No tag policy engine. No prevention of creating untagged
+      resources. Tenants must implement custom tooling to detect and report
+      on untagged resources.
+    verified_at: "2026-01-28"
+
+  gov.hierarchy-delegation:
+    score: 1
+    evidence: >
+      Organization → Projects hierarchy exists (two levels). No organizational
+      units, folders, or deeper hierarchy levels. Policy inheritance from
+      organization to projects is limited to IAM policies explicitly attached
+      at the org level. Delegated administration exists (project-level IAM
+      admin) but is limited to pre-defined roles. Deep hierarchy for large
+      enterprise organizational structures is not achievable natively.
+    verified_at: "2026-01-28"
+
+  gov.account-lifecycle:
+    score: 1
+    evidence: >
+      Projects can be created programmatically via API with default resource
+      namespaces. However, baseline security configuration is not applied
+      automatically to new projects — tenants must configure IAM policies,
+      logging, and networking manually per project. No account factory
+      or landing zone equivalent. Offboarding is manual. No drift detection
+      against baseline for existing projects.
+    verified_at: "2026-01-28"
+
+  gov.quotas-service-control:
+    score: 1
+    evidence: >
+      Service quotas exist per-resource type within projects but these are
+      throughput limits rather than security controls. No mechanism to
+      restrict which Scaleway services are accessible within specific projects.
+      No region restriction mechanism at the org level. Tenants can restrict
+      access to specific services only via IAM policies applied manually
+      per principal, not as org-wide enforcement.
+    verified_at: "2026-01-28"
+
+  # ── Encryption ───────────────────────────────────────────────────────────
+
+  enc.encryption-at-rest-default:
+    score: mixed
+    summary: "Default encryption varies significantly across services"
+    services:
+      object-storage:
+        score: 2
+        evidence: >
+          Scaleway Object Storage encrypts data at rest using AES-256 with
+          Scaleway-managed keys (SSE-S3 equivalent). Encryption is automatic
+          and non-optional. Tenant cannot disable it, but CMK is not available
+          (L2, not L3).
+      block-storage:
+        score: 2
+        evidence: >
+          Block storage volumes are encrypted at rest by default using
+          Scaleway-managed keys. Cannot be disabled. No CMK option.
+      rdb:
+        score: 1
+        evidence: >
+          Managed database instances support encryption at rest but it requires
+          explicit enablement at database creation time. Not default-on for
+          existing databases created before the feature launch. Key management
+          is provider-controlled with no tenant key option.
+      document-db:
+        score: 0
+        evidence: >
+          No encryption at rest option is exposed for Document DB (MongoDB
+          compatible) instances as of the assessment date. Data is stored
+          unencrypted at the managed service layer, relying only on physical
+          media encryption at the datacenter level.
+      instances:
+        score: null
+        evidence: >
+          VM instances themselves do not store application data in a way
+          subject to this control. Block storage (separate control) handles
+          persistent storage encryption for instances.
+      kapsule:
+        score: 2
+        evidence: >
+          Kubernetes Kapsule etcd is encrypted at rest with Scaleway-managed
+          keys as part of the managed control plane. Worker node persistent
+          volumes inherit block storage encryption.
+    verified_at: "2026-01-28"
+
+  enc.cmk:
+    score: mixed
+    summary: "CMK support varies significantly across services — limited or absent for most"
+    services:
+      object-storage:
+        score: 2
+        evidence: >
+          SSE-S3 equivalent with Scaleway-managed keys. No tenant-managed
+          key option as of assessment date. No BYOK. Encryption is automatic
+          and non-optional but the key material is controlled by Scaleway.
+      rdb:
+        score: 0
+        evidence: >
+          No CMK option for managed database instances. Encryption key
+          management is entirely provider-controlled. Tenants cannot use
+          their own keys.
+      block-storage:
+        score: 1
+        evidence: >
+          Block storage volumes can be encrypted with a customer-managed key
+          stored in Scaleway Secret Manager, but the integration requires
+          manual configuration and is not yet a first-class feature in all
+          regions. Key usage logging is not available per-key.
+      instances:
+        score: null
+        evidence: >
+          VMs do not have a direct CMK mechanism; encryption of attached
+          block storage is covered under block-storage above.
+      kapsule:
+        score: 0
+        evidence: >
+          No CMK option for Kubernetes Kapsule etcd encryption. Control
+          plane encryption is managed entirely by Scaleway.
+    verified_at: "2026-01-28"
+
+  enc.byok:
+    score: 1
+    evidence: >
+      No native BYOK (key import) capability in Scaleway's Secret Manager
+      or KMS equivalent. Tenants who require key material of their own
+      provenance must implement client-side encryption at the application
+      layer before sending data to Scaleway services. This breaks most
+      managed service features.
+    verified_at: "2026-01-28"
+
+  enc.external-key-management:
+    score: 0
+    evidence: >
+      No external key manager integration exists. No HYOK or EKM capability.
+      All encryption key material must reside within Scaleway's infrastructure.
+    verified_at: "2026-01-28"
+
+  enc.key-lifecycle:
+    score: 1
+    evidence: >
+      Scaleway Secret Manager supports versioning of secrets (creating new
+      versions). Automatic rotation of secrets is not managed natively —
+      tenants must implement rotation logic. No scheduled deletion with grace
+      period for keys. Key material cannot be imported (BYOK not supported),
+      so crypto-shredding is not available.
+    verified_at: "2026-01-28"
+
+  enc.hsm-backing:
+    score: 1
+    evidence: >
+      Scaleway does not publicly disclose whether their key management
+      infrastructure is backed by HSMs. No dedicated HSM service is available
+      for tenants. Physical media is encrypted at the infrastructure level
+      but HSM backing of the key management service is not attested in
+      available documentation.
+    verified_at: "2026-01-28"
+
+  enc.encryption-in-transit:
+    score: mixed
+    summary: "TLS enforced for major services; no mTLS or TLS version control"
+    services:
+      object-storage:
+        score: 2
+        evidence: >
+          HTTPS (TLS 1.2+) is enforced for all S3-compatible API calls.
+          HTTP is rejected. Minimum TLS version control is not available
+          to tenants. mTLS is not supported.
+      rdb:
+        score: 2
+        evidence: >
+          TLS is available for managed database connections and can be
+          required. Certificate authority certificates are provided by
+          Scaleway. Custom client certificates (mTLS) are not supported
+          for most database engines.
+      kapsule:
+        score: 2
+        evidence: >
+          Kubernetes API server uses TLS. In-cluster pod-to-pod traffic
+          encryption requires tenant-deployed service mesh (Istio, Linkerd).
+          No managed mTLS for workloads.
+      load-balancer:
+        score: 2
+        evidence: >
+          Load balancers support TLS termination with certificate management
+          (Let's Encrypt or custom certificates). TLS passthrough is also
+          supported. Minimum TLS version and cipher suite selection are
+          limited (no explicit TLS 1.3 enforcement).
+    verified_at: "2026-01-28"
+
+  enc.confidential-computing:
+    score: 0
+    evidence: >
+      No confidential computing capability is available at Scaleway. No
+      TEE, secure enclave, or confidential VM offering. No hardware root
+      of trust attestation for workloads. Data in use is not protected from
+      the hypervisor or infrastructure-level access.
+    verified_at: "2026-01-28"
+
+  # ── Network ──────────────────────────────────────────────────────────────
+
+  net.isolation-model:
+    score: 2
+    evidence: >
+      Scaleway VPC provides L2 private networks (Private Networks) within
+      projects. Resources attached to a Private Network are isolated from
+      the public internet unless explicitly given public IPs. Default
+      posture for resources on Private Networks is isolated. However,
+      resources can still have public IPs by default on creation without
+      explicit Private Network attachment. VPC is regional. No subnet-level
+      routing tables independent of the VPC. Cross-project VPC not supported.
+    verified_at: "2026-01-30"
+
+  net.cross-environment-connectivity:
+    score: 1
+    evidence: >
+      Scaleway VPC routing allows communication across Private Networks
+      within the same VPC (via VPC Routes). Cross-project network sharing
+      is limited (no VPC peering between projects). No managed transit
+      gateway or hub-spoke topology. Cross-region connectivity requires
+      tenant-managed VPN tunnels or public IP routing.
+    verified_at: "2026-01-30"
+
+  net.firewall:
+    score: 2
+    evidence: >
+      Scaleway Security Groups provide stateful L4 firewall rules for
+      VM instances. Rules can allow/deny on port, protocol, and source IP.
+      No managed next-generation firewall service. No org-level policy
+      to mandate security group rules. Security groups apply to instances
+      only; managed services (RDB, Object Storage) have their own
+      network access controls but not security group integration.
+    verified_at: "2026-01-30"
+
+  net.private-connectivity:
+    score: mixed
+    summary: "Private endpoint availability varies significantly by service"
+    services:
+      object-storage:
+        score: 2
+        evidence: >
+          Object Storage can be accessed via a VPC-local endpoint when
+          the bucket is in the same region and the instance is on a Private
+          Network with VPC routing enabled. Traffic stays on Scaleway's
+          internal backbone. Not automatic — requires VPC configuration.
+      rdb:
+        score: 2
+        evidence: >
+          Managed databases can be attached to a Private Network, making
+          them accessible only from within the VPC. No public endpoint
+          required. This is the recommended configuration.
+      kapsule:
+        score: 2
+        evidence: >
+          Kubernetes API server can be configured as private (no public
+          endpoint) with access only from within a Private Network.
+          Node-to-node communication is private. Requires explicit private
+          cluster configuration.
+      load-balancer:
+        score: 1
+        evidence: >
+          Internal (private) load balancers are supported (no public IP).
+          However, the Load Balancer service itself does not have a private
+          endpoint for management API calls — API management traffic goes
+          over the public internet.
+      dns:
+        score: 0
+        evidence: >
+          DNS service is a public service; no private DNS zone feature
+          that integrates with Private Networks is generally available
+          as of assessment date. Private DNS requires self-managed DNS
+          servers within the VPC.
+    verified_at: "2026-01-30"
+
+  net.dns-security:
+    score: 1
+    evidence: >
+      Scaleway DNS provides managed public DNS for domains. Private DNS
+      zones integrated with VPC Private Networks are not available as
+      a managed feature as of this assessment. DNS firewall (domain
+      filtering/blocking) does not exist. DNSSEC support for zones is
+      not available. Tenants requiring private DNS must deploy BIND
+      or similar within their instances.
+    verified_at: "2026-01-30"
+
+  net.ddos-protection:
+    score: 2
+    evidence: >
+      Basic DDoS protection (L3/L4 volumetric mitigation) is included
+      for all Scaleway resources as part of the infrastructure. Scaleway
+      has upstream anti-DDoS measures. However, application-layer (L7)
+      DDoS protection, WAF, and customizable rate limiting are not available
+      as managed services. No SLA for availability during DDoS attacks.
+    verified_at: "2026-01-30"
+
+  net.waf:
+    score: 0
+    evidence: >
+      No managed WAF service available at Scaleway as of this assessment.
+      Tenants who need web application firewall capabilities must deploy
+      self-managed solutions (nginx with ModSecurity, Cloudflare in front
+      of Scaleway-hosted applications) or use a third-party WAF service.
+    verified_at: "2026-01-30"
+
+  net.egress-control:
+    score: 1
+    evidence: >
+      Egress control is limited to security group rules that can block
+      outbound connections on specific ports/IPs. VPC flow logs are
+      available to inspect egress traffic after the fact. No managed
+      egress firewall with domain/URL filtering. No TLS inspection.
+      No centralized egress via a managed NAT with deep inspection.
+    verified_at: "2026-01-30"
+
+  # ── Logging ──────────────────────────────────────────────────────────────
+
+  log.control-plane-audit:
+    score: mixed
+    summary: "Audit logging available via Cockpit for major services; not universal"
+    services:
+      iam:
+        score: 2
+        evidence: >
+          IAM actions (policy changes, user creation, key generation) are
+          logged in Scaleway Cockpit audit trail. Logs are available within
+          minutes. Retention is 30 days in the free tier, extendable with
+          paid Cockpit. Admins can delete log data from Cockpit — not
+          tamper-proof.
+      object-storage:
+        score: 1
+        evidence: >
+          Object Storage bucket access logs are available if explicitly
+          enabled per-bucket. No default audit logging at the org level.
+          Log delivery to a separate bucket is possible but must be
+          configured per bucket.
+      rdb:
+        score: 1
+        evidence: >
+          Database management actions (creation, deletion, scaling) are
+          logged in Cockpit. Database-level query logging requires enabling
+          slow query logs or audit extensions per-engine. Not comprehensive
+          by default.
+      kapsule:
+        score: 2
+        evidence: >
+          Kubernetes API audit logs are available and configurable. Logs
+          are forwarded to Cockpit. Retention configurable up to 90 days.
+    verified_at: "2026-01-28"
+
+  log.data-plane-logging:
+    score: mixed
+    summary: "Data access logging limited and not available for all services"
+    services:
+      object-storage:
+        score: 1
+        evidence: >
+          S3-compatible access logs (who accessed which object) can be
+          enabled per bucket. Not enabled by default. Logs include source
+          IP, operation, and object key. No org-level default.
+      rdb:
+        score: 1
+        evidence: >
+          Database query logging requires enabling per-engine extensions
+          (e.g., pgaudit for PostgreSQL). Not managed natively. Significant
+          performance overhead for full query logging.
+      document-db:
+        score: 0
+        evidence: >
+          No data access logging mechanism available for Document DB.
+      kapsule:
+        score: null
+        evidence: >
+          Kubernetes itself does not emit data access events for workload
+          data. Application-level data access logging is the tenant's
+          responsibility.
+    verified_at: "2026-01-28"
+
+  log.immutability:
+    score: 0
+    evidence: >
+      Scaleway does not offer an immutable log store or audit vault.
+      Cockpit logs can be deleted by users with sufficient permissions.
+      Object Storage supports object lock (WORM) for log buckets, but
+      an organization administrator can still modify the bucket policy
+      or disable the lock. No compliance-mode lock where even the owner
+      cannot delete logs before expiry.
+    verified_at: "2026-01-28"
+
+  log.export-integration:
+    score: 2
+    evidence: >
+      Scaleway Cockpit supports log export to external SIEM via Grafana
+      agent (Loki-compatible). Metrics and logs can be forwarded to
+      external destinations. However, not all log types are covered
+      (IAM audit logs export is limited), real-time streaming requires
+      additional setup, and the OCSF format is not natively supported.
+    verified_at: "2026-01-28"
+
+  log.alerting-detection:
+    score: 1
+    evidence: >
+      Scaleway Cockpit includes Grafana-based alerting on metrics and
+      logs. Alert rules can be defined on log patterns and metric thresholds.
+      However, there is no managed threat detection service (no GuardDuty
+      equivalent) with predefined cloud attack pattern detection. All
+      detection rules must be authored by the tenant. No SOAR integration.
+    verified_at: "2026-01-28"
+
+  log.resource-inventory:
+    score: 1
+    evidence: >
+      Resources can be listed via the Scaleway API and console, and the
+      Terraform Scaleway provider supports resource import/inventory.
+      No managed continuous resource inventory service with configuration
+      history. No drift detection. No cross-project aggregated inventory.
+      Tenants must build custom inventory tooling using the API.
+    verified_at: "2026-01-28"
+
+  # ── Data ─────────────────────────────────────────────────────────────────
+
+  data.residency-guarantees:
+    score: 2
+    evidence: >
+      Scaleway is a European provider with datacenters in France (Paris,
+      Lille), Netherlands (Amsterdam), and Poland (Warsaw). Data residency
+      within EU is achievable by selecting EU regions. Contractual GDPR
+      data processing agreements are offered. However, technical enforcement
+      (preventing data replication outside selected region) is limited —
+      Scaleway does not disclose whether metadata and logs remain strictly
+      within the selected region. Service metadata residency is not explicitly
+      guaranteed in standard documentation.
+    verified_at: "2026-01-28"
+
+  data.sovereignty-controls:
+    score: 2
+    evidence: >
+      Scaleway is headquartered in France (EU jurisdiction) and offers
+      GDPR-compliant DPAs. No US CLOUD Act exposure (not a US company).
+      No dedicated sovereign cloud offering with technically enforced
+      access controls on Scaleway personnel. Operator access controls
+      are not detailed in public documentation. HYOK/EKM is not available
+      (see enc.external-key-management). European sovereignty guarantee
+      is contractual, not technically enforced.
+    verified_at: "2026-01-28"
+
+  data.classification:
+    score: 0
+    evidence: >
+      No native data classification or sensitive data discovery service.
+      Tenants must deploy third-party DLP/classification tools or build
+      custom classification pipelines. No automated PII/PHI detection
+      in stored data. No classification labeling integrated with storage.
+    verified_at: "2026-01-28"
+
+  data.dlp:
+    score: 0
+    evidence: >
+      No managed DLP capabilities. No content inspection. No policies
+      to prevent sensitive data from being publicly exposed or exfiltrated.
+      Tenants can prevent public bucket access via IAM policies (not making
+      buckets publicly accessible), but this is not DLP — it is access control.
+    verified_at: "2026-01-28"
+
+  data.backup-governance:
+    score: mixed
+    summary: "Backup features exist for some services but governance is manual"
+    services:
+      rdb:
+        score: 2
+        evidence: >
+          Scaleway RDB supports automated daily backups with configurable
+          retention (up to 365 days). Backups are created within the same
+          region. Cross-region replication of backups is not available.
+          Backup encryption uses the same key as the database (no independent
+          CMK). Backup isolation (separate account) is not supported.
+      block-storage:
+        score: 1
+        evidence: >
+          Block storage snapshots must be created manually or via custom
+          automation. No managed backup policy that automatically snapshots
+          volumes on a schedule. Snapshot encryption is inherited from
+          the volume (Scaleway-managed keys). No cross-region snapshot
+          replication.
+      object-storage:
+        score: 1
+        evidence: >
+          Object Storage does not have a managed backup service. Versioning
+          is available (enables point-in-time recovery for individual objects)
+          but cross-region replication must be manually configured with
+          custom replication scripts or third-party tools.
+    verified_at: "2026-01-28"
+
+  data.deletion-guarantees:
+    score: 1
+    evidence: >
+      Scaleway's DPA includes commitments for data deletion after contract
+      termination. The specific timeline for physical media sanitization
+      is not publicly documented. Crypto-shredding is not feasible as CMK
+      is not available for most services. No media sanitization attestation
+      available per-customer. Data deletion timeline is contractual but
+      not technically verifiable.
+    verified_at: "2026-01-28"
+
+  # ── Compute ──────────────────────────────────────────────────────────────
+
+  compute.image-management:
+    score: mixed
+    summary: "Private registry available for containers; VM image management is basic"
+    services:
+      instances:
+        score: 1
+        evidence: >
+          Scaleway provides a marketplace of public OS images for VM instances.
+          Private images (snapshots) can be created from running instances.
+          No image vulnerability scanning for VM images. No signed image
+          enforcement for VMs.
+      kapsule:
+        score: 2
+        evidence: >
+          Scaleway Container Registry provides a private OCI-compatible
+          registry for container images. Image vulnerability scanning is
+          available via the registry. However, admission controller for
+          signed-only image enforcement requires manual configuration
+          (Kyverno, OPA Gatekeeper). No org-level policy to enforce
+          registry source.
+      functions:
+        score: 1
+        evidence: >
+          Serverless Functions deploy from ZIP archives or container images.
+          Container image deployment supports Scaleway Container Registry
+          images. No image scanning at deploy time. Source/digest pinning
+          must be done manually.
+    verified_at: "2026-01-30"
+
+  compute.runtime-security:
+    score: mixed
+    summary: "Basic runtime features; no managed behavioral detection"
+    services:
+      instances:
+        score: 1
+        evidence: >
+          Scaleway VM instances run on standard KVM hypervisors. No shielded
+          VM / secure boot as a tenant-selectable option. No managed
+          host-based IDS/IPS. Tenants must install and manage their own
+          security agents (e.g., Wazuh, Falco) on instances.
+      kapsule:
+        score: 2
+        evidence: >
+          Kapsule clusters run on managed nodes. Runtime security for
+          containers requires tenant-deployed tools (Falco). Kubernetes
+          audit logging is available. No managed container runtime
+          threat detection from Scaleway.
+    verified_at: "2026-01-30"
+
+  compute.container-orchestration:
+    score: 2
+    evidence: >
+      Scaleway Kubernetes Kapsule is a managed Kubernetes service. RBAC
+      is enabled. Control plane is managed and patched by Scaleway. etcd
+      is encrypted at rest. Pod Security Admission is available but
+      not enforced by default. Network policies must be explicitly created.
+      No managed admission controller for image verification. Node pool
+      auto-upgrade is available. CIS Kubernetes benchmark compliance
+      is not default but achievable with configuration.
+    verified_at: "2026-01-30"
+
+  compute.serverless-security:
+    score: 2
+    evidence: >
+      Scaleway Functions and Containers support per-function IAM role
+      assignments (scoped API keys). VPC attachment is possible for
+      Serverless Containers (Private Network integration). Per-function
+      concurrency limits are configurable. Execution environment isolation
+      between invocations is not explicitly documented. Function-level
+      audit logging is limited (invocation metadata but not payload).
+    verified_at: "2026-01-30"
+
+  compute.patch-management:
+    score: mixed
+    summary: "Managed services patched by Scaleway; VM patching is tenant responsibility"
+    services:
+      instances:
+        score: 0
+        evidence: >
+          VM OS patching is entirely the tenant's responsibility. No managed
+          patch service, no compliance reporting, no automated patching.
+          Tenants must use OS-level tools (apt, yum) or deploy configuration
+          management (Ansible, Chef) themselves.
+      rdb:
+        score: 2
+        evidence: >
+          RDB minor version patches are applied automatically during
+          maintenance windows. Major version upgrades are manual. Maintenance
+          window scheduling is available. Tenant is notified before planned
+          maintenance.
+      kapsule:
+        score: 2
+        evidence: >
+          Control plane is patched automatically by Scaleway. Node pool
+          Kubernetes version upgrades can be configured for auto-upgrade
+          within a defined channel. Node OS patches for managed node pools
+          are applied by Scaleway during node pool recreation.
+    verified_at: "2026-01-30"
+
+  compute.secrets-management:
+    score: 2
+    evidence: >
+      Scaleway Secret Manager provides a managed secrets store with
+      versioning and access control via IAM. Secrets can be referenced
+      by Serverless Functions and Containers via environment variable
+      injection at runtime (the value is injected at function startup,
+      not as a CSI driver equivalent). Automatic rotation is not natively
+      managed — tenants must implement rotation scripts. Cross-project
+      secret sharing requires explicit IAM grants.
+    verified_at: "2026-01-30"
+
+  # ── Incident Response ─────────────────────────────────────────────────────
+
+  incident.forensic-access:
+    score: 1
+    evidence: >
+      VM disk snapshots can be created while instances are running. Snapshots
+      can be copied to a separate project for isolated forensic analysis.
+      However, VPC traffic mirroring (packet capture) is not available
+      as a managed feature. Memory dumps must be performed manually within
+      a running instance. No automated instance quarantine / isolation
+      triggered by security events.
+    verified_at: "2026-01-28"
+
+  incident.notification-sla:
+    score: 2
+    evidence: >
+      Scaleway publishes security advisories and incident reports on their
+      trust center (status.scaleway.com). As a GDPR-subject company,
+      Scaleway has contractual obligations for data breach notification
+      within 72 hours. However, targeted notification for specific affected
+      tenants (rather than general announcements) is limited. No published
+      SLA for advance notification of vulnerabilities requiring tenant action.
+    verified_at: "2026-01-28"
+
+  incident.automated-response:
+    score: 1
+    evidence: >
+      No native security-specific automated response capability. Cockpit
+      alert webhooks can trigger external automation (Zapier, custom webhooks).
+      Tenants can build event-driven response pipelines using Scaleway
+      Functions triggered by logs/metrics. No pre-built security response
+      playbooks from Scaleway. No SOAR integration.
+    verified_at: "2026-01-28"
+
+  incident.availability-zones:
+    score: 2
+    evidence: >
+      Scaleway's PAR region (Paris) has two distinct AZs (PAR-1, PAR-2,
+      PAR-3 in newer infrastructure). AZ independence is documented at the
+      network and power level. Multi-AZ deployment is supported and
+      documented for Load Balancers and RDB. Cross-region failover requires
+      tenant-managed replication. Three AZs are available in PAR but not
+      in all Scaleway regions (AMS and WAW may have fewer).
+    verified_at: "2026-01-28"
+
+  incident.resilience-testing:
+    score: 0
+    evidence: >
+      No managed chaos or resilience testing tooling from Scaleway. Tenants
+      must use third-party tools (Chaos Monkey, LitmusChaos) or manual
+      procedures (stopping instances, blocking security group rules) to
+      test resilience. No native fault injection API.
+    verified_at: "2026-01-28"
+
+  # ── Supply Chain ──────────────────────────────────────────────────────────
+
+  supply-chain.infrastructure-encryption:
+    score: 2
+    evidence: >
+      Scaleway attests to infrastructure-level encryption of physical storage
+      media in their security documentation and DPA. The attestation is
+      included within ISO 27001 audit scope. Algorithm details (AES-256)
+      are referenced in documentation. The attestation is not broken down
+      by datacenter site or hardware generation.
+    verified_at: "2026-01-28"
+
+  supply-chain.physical-security:
+    score: 2
+    evidence: >
+      Scaleway holds ISO 27001 certification covering its Paris, Amsterdam,
+      and Warsaw datacenters. SOC 2 Type II certification is not publicly
+      confirmed. Physical security practices (biometric access, 24/7
+      surveillance, environmental controls) are described in marketing
+      materials but detailed third-party audit reports are available only
+      under NDA. Certification scope covers physical security in Paris
+      (AMS and WAW coverage to be confirmed).
+    verified_at: "2026-01-28"
+
+  supply-chain.hardware-supply-chain:
+    score: 1
+    evidence: >
+      Scaleway uses standard commercial server hardware without publicly
+      disclosed custom security silicon. No Nitro-class or Titan-class
+      equivalent. TPM usage for measured boot is not confirmed in public
+      documentation. Supply chain provenance program details are not
+      publicly disclosed.
+    verified_at: "2026-01-28"
+
+  supply-chain.personnel-security:
+    score: 2
+    evidence: >
+      Personnel security practices are covered within Scaleway's ISO 27001
+      audit scope (background checks, access provisioning, termination
+      procedures). Scaleway has published that employees with datacenter
+      access are subject to specific vetting requirements. No public
+      disclosure of just-in-time access for Scaleway personnel to production
+      systems. No per-tenant access audit trail for operator access is available.
+    verified_at: "2026-01-28"
+
+  supply-chain.compliance-certifications:
+    score: 2
+    evidence: >
+      Scaleway holds ISO 27001 and ISO 27701 (Privacy Information Management)
+      certifications. HDS (Hébergeur de Données de Santé) certification
+      for healthcare data hosting in France. Qualifications: SecNumCloud
+      qualification under evaluation as of early 2026. SOC 2 Type II
+      is not publicly confirmed. Certifications cover production regions
+      (Paris, Amsterdam, Warsaw). Reports available under NDA request.
+    verified_at: "2026-01-28"
+
+  supply-chain.transparency-reports:
+    score: 2
+    evidence: >
+      Scaleway publishes a transparency report covering government data
+      requests on their trust page. The report includes quantitative
+      data on requests by jurisdiction (primarily France/EU). No canary
+      statement. Semi-annual reporting cadence is not confirmed —
+      report frequency has been annual. Legal challenge policy is
+      described but not in contractual terms.
+    verified_at: "2026-01-28"
+
+  supply-chain.dependency-disclosure:
+    score: 2
+    evidence: >
+      Scaleway publishes a sub-processor list as required by GDPR/DPA.
+      The list includes named sub-processors with data processing scope.
+      Tenants are notified of new sub-processors via DPA updates.
+      Infrastructure partners (hardware vendors, network providers,
+      facility operators) are not fully disclosed. Opt-out right for
+      specific sub-processors is available via contractual process.
+    verified_at: "2026-01-28"

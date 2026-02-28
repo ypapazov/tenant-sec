@@ -1,0 +1,39 @@
+---
+id: net.waf
+domain: network
+name: "Web Application Firewall"
+description: >
+  Managed WAF capabilities for protecting web applications from OWASP Top 10
+  and other HTTP-based attacks. Covers custom rule authoring, managed rule sets,
+  bot management, and integration with CDN/load balancers.
+
+criteria:
+  L0: >
+    No WAF capability. Tenant web applications have no managed application-layer
+    protection. Custom application-level filtering must be implemented in
+    application code or via self-managed reverse proxies.
+  L1: >
+    WAF is achievable by tenants who deploy and manage an open-source WAF
+    (ModSecurity, NGINX App Protect) on self-managed instances in front of
+    their applications. No managed WAF service from the provider.
+  L2: >
+    A managed WAF service exists with predefined rule sets (OWASP Core Rule Set
+    or equivalent) but custom rule authoring is limited (e.g., only rate-limiting
+    rules, no custom match conditions), bot management is not available, or
+    integration is limited to specific load balancer types.
+  L3: >
+    Full managed WAF: extensive managed rule sets with automatic updates,
+    custom rule authoring with complex match conditions (geo, IP reputation,
+    header matching, rate limiting per client), bot management (bot detection,
+    CAPTCHA challenge), integration with CDN and all load balancer types,
+    and logging of all inspected requests.
+
+framework_mappings:
+  ccm: ["IVS-09"]
+  nist_800_53_r5: ["SC-7", "SI-3"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1190"]
+
+service_scoped: false

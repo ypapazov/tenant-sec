@@ -1,0 +1,42 @@
+---
+id: log.immutability
+domain: logging
+name: "Log Immutability"
+description: >
+  Ability to guarantee that audit logs cannot be modified or deleted, even
+  by tenant administrators with full privileges. Covers write-once storage
+  (WORM) locks, vault-style locking policies, and whether disabling immutability
+  itself creates a tamper-evident audit trail.
+
+criteria:
+  L0: >
+    Log immutability is not achievable from within the platform. Administrators
+    can delete or modify log files. An insider threat with admin access can
+    cover their tracks without leaving evidence.
+  L1: >
+    Log immutability is achievable by exporting logs to a separate account
+    controlled by a different administrative boundary (e.g., a dedicated
+    security account with no access from operational accounts). Requires
+    deliberate architectural design; it is not a managed feature.
+  L2: >
+    Write-once storage (WORM / object lock) is available and can be applied
+    to log storage buckets to prevent deletion during a retention period.
+    However, an account administrator can still create a parallel bucket without
+    lock and redirect logs there, or the lock policy can be removed with
+    appropriate permissions before expiry.
+  L3: >
+    Managed log immutability: dedicated audit log vaults or log archive services
+    with compliance-mode locks that cannot be deleted even by the root/owner
+    account during the lock period. Attempts to modify or delete locked logs
+    fail and generate meta-audit events. The lock period is configurable
+    and the lock itself cannot be shortened without a regulatory unlock procedure.
+
+framework_mappings:
+  ccm: ["LOG-03", "LOG-05"]
+  nist_800_53_r5: ["AU-9", "AU-11"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1562.008"]
+
+service_scoped: false

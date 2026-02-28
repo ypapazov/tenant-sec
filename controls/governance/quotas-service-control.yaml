@@ -1,0 +1,44 @@
+---
+id: gov.quotas-service-control
+domain: governance
+name: "Quotas & Service Control"
+description: >
+  Ability to restrict which services, regions, or resource types are available
+  within specific organizational units. Includes service whitelisting (allow-listing
+  approved services only), regional restriction (confine workloads to approved
+  regions), and resource type constraints (prevent creation of specific resource
+  types that are not approved for use).
+
+criteria:
+  L0: >
+    No mechanism to restrict which services or regions are accessible within
+    the tenant's organizational units. Any user with IAM permissions can use
+    any service in any region. Service restriction requires manual IAM policy
+    management per account.
+  L1: >
+    Service and region restriction is achievable through tenant-built IAM
+    policies that deny access to non-approved services/regions, applied manually
+    to each account. No organization-level enforcement; a new account without
+    the policy can access all services. Maintenance is ongoing manual effort.
+  L2: >
+    Organization-level service restriction exists but limited: only deny-list
+    (blocking specific services), not allow-list (permitting only approved
+    services); or restriction applies to services but not resource types within
+    services; or regional restriction works but cannot target specific
+    organizational units (applies to all accounts uniformly).
+  L3: >
+    Full service and region control at the organizational level: allow-list
+    of approved services, regional boundaries enforced per OU/folder, resource
+    type constraints within services, and these restrictions cascade to all
+    sub-accounts/projects in the hierarchy. New accounts inherit the restrictions
+    automatically without manual policy application.
+
+framework_mappings:
+  ccm: ["IVS-09", "IVS-10"]
+  nist_800_53_r5: ["CM-7", "CM-8", "AC-3"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

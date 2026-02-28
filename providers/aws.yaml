@@ -1,0 +1,720 @@
+---
+provider: aws
+display_name: "Amazon Web Services"
+assessed_by: "community:tenant-sec-maintainers"
+assessed_at: "2026-02-01"
+methodology_version: "1.0"
+revision: 1
+
+services_in_scope:
+  - { id: "ec2", name: "EC2 (Virtual Machines)", category: "compute.vm" }
+  - { id: "eks", name: "Elastic Kubernetes Service", category: "compute.containers" }
+  - { id: "ecs", name: "Elastic Container Service", category: "compute.containers" }
+  - { id: "lambda", name: "Lambda (Serverless)", category: "compute.serverless" }
+  - { id: "s3", name: "S3 (Object Storage)", category: "storage.object" }
+  - { id: "ebs", name: "EBS (Block Storage)", category: "storage.block" }
+  - { id: "rds", name: "RDS (Managed Databases)", category: "database.relational" }
+  - { id: "dynamodb", name: "DynamoDB (NoSQL)", category: "database.nosql" }
+  - { id: "elasticache", name: "ElastiCache (Cache)", category: "database.cache" }
+  - { id: "vpc", name: "VPC", category: "network.vpc" }
+  - { id: "alb", name: "Application Load Balancer", category: "network.loadbalancer" }
+  - { id: "route53", name: "Route 53 (DNS)", category: "network.dns" }
+  - { id: "kms", name: "Key Management Service", category: "security.kms" }
+  - { id: "secrets-manager", name: "Secrets Manager", category: "security.secrets" }
+  - { id: "waf", name: "WAF", category: "security.waf" }
+  - { id: "iam", name: "IAM", category: "identity.iam" }
+
+controls:
+
+  iam.external-idp-federation:
+    score: 3
+    evidence: >
+      AWS IAM Identity Center (formerly SSO) and IAM SAML federation support
+      multiple simultaneous IdPs via SAML 2.0 and OIDC. Federation covers
+      console, CLI, and programmatic API access. Multiple IdPs can be configured
+      in IAM Identity Center. Attribute mapping to permission sets is fully
+      configurable. Both SP-initiated and IdP-initiated flows are supported.
+    verified_at: "2026-01-30"
+
+  iam.directory-integration:
+    score: 3
+    evidence: >
+      AWS IAM Identity Center supports SCIM 2.0 for automatic user and group
+      provisioning from external directories (Azure AD, Okta, Google Workspace).
+      Near-real-time sync, group nesting, automatic deprovisioning on directory
+      deletion. AWS Managed Microsoft AD provides native Active Directory
+      integration. Multiple simultaneous directory sources are supported.
+    verified_at: "2026-01-30"
+
+  iam.privileged-access:
+    score: 3
+    evidence: >
+      AWS IAM Identity Center Permission Sets with time-bound assignments.
+      AWS supports just-in-time access via IAM Identity Center + custom
+      approval workflows. AWS CloudTrail captures all privilege elevation events.
+      For EC2/SSM: AWS Systems Manager Session Manager with JIT access policies.
+      Third-party integrations (CyberArk, BeyondTrust) are well-supported.
+    verified_at: "2026-01-30"
+
+  iam.service-identity:
+    score: 3
+    evidence: >
+      IAM roles for EC2 instance profiles, ECS task roles, EKS service accounts
+      via IRSA (IAM Roles for Service Accounts), Lambda execution roles.
+      OIDC-based workload identity federation supports GitHub Actions, GitLab,
+      and other external OIDC providers natively. Short-lived credentials
+      issued via STS. No static keys required for AWS-hosted workloads.
+    verified_at: "2026-01-30"
+
+  iam.abac:
+    score: 3
+    evidence: >
+      AWS IAM supports extensive ABAC via tag-based conditions, principal
+      tag conditions, and request context conditions (MFA, source IP, time,
+      VPC source, requested region). Condition keys cover hundreds of AWS
+      services. Session tags flow through role chaining. Conditions compose
+      with logical operators. Consistent across all major services.
+    verified_at: "2026-01-30"
+
+  iam.permission-boundaries:
+    score: 3
+    evidence: >
+      AWS IAM Permission Boundaries supported for all IAM principals (users
+      and roles). Boundary is evaluated as an intersection with attached policies.
+      Enforced synchronously at the IAM policy evaluation layer. Supports
+      safe delegation: administrators can grant others the ability to create
+      roles constrained by a boundary, preventing privilege escalation.
+    verified_at: "2026-01-30"
+
+  iam.credential-management:
+    score: 3
+    evidence: >
+      AWS IAM Access Analyzer flags unused credentials. IAM credential report
+      shows last-used dates. AWS Secrets Manager handles automated rotation for
+      many secret types (RDS passwords, API keys). IAM policies can deny
+      long-lived access key creation for human identities. Secrets Manager
+      rotation integrates with Lambda for custom rotation workflows.
+    verified_at: "2026-01-30"
+
+  iam.multi-tenancy-isolation:
+    score: 3
+    evidence: >
+      AWS Organizations supports deep OU hierarchy (multiple levels) with
+      independent AWS accounts as the blast radius boundary. SCPs enforce
+      guardrails at every level. AWS Control Tower provides automated account
+      factory with baseline configurations. Each account has independent IAM,
+      networking, and billing. Cross-account access requires explicit role
+      trust relationships.
+    verified_at: "2026-01-30"
+
+  gov.preventive-policy:
+    score: 3
+    evidence: >
+      AWS Service Control Policies (SCPs) in AWS Organizations provide
+      synchronous deny-before-execution policies at the org, OU, and account
+      level. Resource Control Policies (RCPs) extend preventive controls
+      to resource-based policies. Declarative Policies enforce specific
+      service configurations. Custom SCP logic can deny any IAM action,
+      enforce region restrictions, require specific resource configurations.
+      Hierarchical inheritance from organization to OU to account.
+    verified_at: "2026-01-30"
+
+  gov.detective-policy:
+    score: 3
+    evidence: >
+      AWS Config provides continuous compliance monitoring with 300+ managed
+      rules and support for custom Lambda-based rules. Real-time evaluation
+      on resource changes. AWS Security Hub aggregates findings across accounts.
+      Conformance Packs provide packaged compliance standards. Auto-remediation
+      via Systems Manager Automation or Lambda. Coverage spans all major
+      AWS services.
+    verified_at: "2026-01-30"
+
+  gov.tagging-governance:
+    score: 3
+    evidence: >
+      AWS Tag Policies in Organizations enforce mandatory tags with allowed
+      value lists. Tag policies can prevent resource creation without required
+      tags (enforcement mode) or report non-compliance (audit mode). Tag
+      inheritance support via CloudFormation. Resource Groups and Cost
+      Allocation Tags for consolidated views. AWS Config rules for tag compliance.
+    verified_at: "2026-01-30"
+
+  gov.hierarchy-delegation:
+    score: 3
+    evidence: >
+      AWS Organizations supports deep OU hierarchy. SCPs inherit hierarchically.
+      Delegated administrator feature allows member accounts to manage specific
+      services (Security Hub, GuardDuty, Config) for the organization without
+      root access. Management account isolation from workloads is a best
+      practice supported by the architecture.
+    verified_at: "2026-01-30"
+
+  gov.account-lifecycle:
+    score: 3
+    evidence: >
+      AWS Control Tower provides full account factory: new accounts provisioned
+      via Service Catalog with baseline guardrails (SCPs, Config rules, CloudTrail,
+      GuardDuty) applied automatically. Account Factory for Terraform (AFT) for
+      IaC-based provisioning. Drift detection via Control Tower. Offboarding
+      via account closure API. Customizable baseline using Control Tower Customizations.
+    verified_at: "2026-01-30"
+
+  gov.quotas-service-control:
+    score: 3
+    evidence: >
+      AWS SCPs can deny access to specific services entirely (whitelist or
+      blacklist approach). Region restriction via SCPs (aws:RequestedRegion
+      condition). Resource type restriction via IAM condition keys. All applied
+      hierarchically via Organizations. New accounts inherit restrictions
+      from parent OU automatically. CloudFormation Service Control Policies
+      extend restriction to IaC-deployed resources.
+    verified_at: "2026-01-30"
+
+  enc.encryption-at-rest-default:
+    score: mixed
+    summary: "Default encryption nearly universal across AWS services; some services opt-in"
+    services:
+      s3:
+        score: 3
+        evidence: >
+          S3 encrypts all objects at rest by default (SSE-S3/AES-256) since
+          January 2023. Cannot be disabled. All new and existing objects
+          encrypted automatically.
+      ebs:
+        score: 3
+        evidence: >
+          EBS encryption by default can be enabled at the account level
+          (and enforced via SCP). When enabled, all new EBS volumes are
+          encrypted with KMS keys. Account-level default can be enforced
+          org-wide via SCP.
+      rds:
+        score: 2
+        evidence: >
+          RDS encryption at rest is available but must be enabled at database
+          creation time (cannot be added to existing unencrypted instances
+          without snapshot + restore). Not default without explicit account
+          setting or SCP.
+      dynamodb:
+        score: 3
+        evidence: >
+          DynamoDB encrypts all data at rest by default (AWS-owned keys)
+          with no configuration required. Encryption cannot be disabled.
+      lambda:
+        score: 3
+        evidence: >
+          Lambda function environment variables are encrypted at rest by default
+          using AWS-managed KMS keys. Deployment packages stored in S3 (encrypted).
+      eks:
+        score: 2
+        evidence: >
+          EKS etcd can be encrypted at rest with a CMK (required explicit
+          configuration at cluster creation). Not enabled by default. Persistent
+          volumes use EBS encryption (separate configuration).
+    verified_at: "2026-01-30"
+
+  enc.cmk:
+    score: mixed
+    summary: "CMK available across virtually all AWS services with full key policy control"
+    services:
+      s3:
+        score: 3
+        evidence: >
+          S3 supports SSE-KMS with tenant-managed CMKs. Full key policy control,
+          usage logging in CloudTrail, cross-account key sharing. Key can be
+          disabled to effectively lock access. Available in all regions.
+      ebs:
+        score: 3
+        evidence: >
+          EBS volumes support CMK encryption. Full key policy control. Usage
+          logged in CloudTrail. Cross-account snapshot sharing with CMK
+          is supported.
+      rds:
+        score: 3
+        evidence: >
+          RDS databases support CMK encryption at rest. Key must be specified
+          at creation time. Cross-region CMK for read replicas requires
+          per-region key setup. Full key usage logging.
+      dynamodb:
+        score: 3
+        evidence: >
+          DynamoDB supports CMK (AWS-managed or customer-managed via KMS).
+          Key policies control access. Usage logging available. PITR
+          backups encrypted with same key.
+      lambda:
+        score: 3
+        evidence: >
+          Lambda environment variables can be encrypted with a custom CMK.
+          Full KMS key policy control. CloudTrail logs key usage.
+      eks:
+        score: 2
+        evidence: >
+          EKS etcd encryption with CMK is supported at cluster creation.
+          Persistent volume CMK encryption is through EBS (see above).
+          Limited to cluster-level key, not per-workload.
+    verified_at: "2026-01-30"
+
+  enc.byok:
+    score: 3
+    evidence: >
+      AWS KMS supports import of externally generated key material (AES-256,
+      RSA). Key material is wrapped with a provider-provided RSA public key
+      before import. Imported keys have the same capabilities as KMS-generated
+      keys including usage with all CMK-supporting services. Annual re-import
+      for imported keys (365-day limit on validity). CloudHSM can serve as
+      the external key generator.
+    verified_at: "2026-01-30"
+
+  enc.external-key-management:
+    score: 3
+    evidence: >
+      AWS XKS (External Key Store) allows KMS to call out to an external
+      key manager for every cryptographic operation. External Key Store Proxy
+      must be operated by the tenant. Key material never enters AWS.
+      Available for many KMS-integrated services. XKS Proxy spec is public.
+      If the external KMS is unavailable, the protected data is inaccessible.
+    verified_at: "2026-01-30"
+
+  enc.key-lifecycle:
+    score: 3
+    evidence: >
+      AWS KMS automatic key rotation (configurable: 90, 180, 270, 365 days
+      or custom for symmetric keys). Versioned key aliases. Old key versions
+      remain for decryption. Scheduled key deletion with configurable
+      7-30 day grace period. Pending deletion state with cancellation option.
+      Key disablement (immediate effective revocation). CloudTrail logs
+      all key management operations.
+    verified_at: "2026-01-30"
+
+  enc.hsm-backing:
+    score: 3
+    evidence: >
+      AWS KMS is backed by FIPS 140-2 Level 3 HSMs in multi-tenant HSM
+      partitions. AWS CloudHSM provides dedicated single-tenant FIPS 140-2
+      Level 3 HSMs available in all AWS regions. CloudHSM attestation
+      reports available. CloudHSM keys can be used as CMKs via custom
+      key store integration.
+    verified_at: "2026-01-30"
+
+  enc.encryption-in-transit:
+    score: 3
+    evidence: >
+      TLS enforced across all AWS service endpoints (minimum TLS 1.2, TLS 1.3
+      available and recommended). S3, RDS, ELB/ALB all support TLS with
+      configurable minimum versions. ACM manages certificates. mTLS supported
+      on ALB and API Gateway. VPC endpoint policies further restrict access.
+      AWS Certificate Manager provides automated cert rotation.
+    verified_at: "2026-01-30"
+
+  enc.confidential-computing:
+    score: 3
+    evidence: >
+      AWS Nitro Enclaves provide isolated confidential compute environments
+      on EC2 with cryptographic attestation. Available on most modern
+      instance types. AWS Nitro System provides hardware-enforced hypervisor
+      isolation. EC2 Trusted Platform Module (NitroTPM) available. AMD SEV-SNP
+      confidential VMs available on select instance types. Attestation
+      documents verifiable by tenants.
+    verified_at: "2026-01-30"
+
+  net.isolation-model:
+    score: 3
+    evidence: >
+      AWS VPC with deny-all default (implicit deny for all inbound traffic
+      unless explicitly opened). Multi-tier subnet model (public, private,
+      isolated). Per-subnet route tables. Availability Zone subnet segmentation.
+      VPC Flow Logs for all traffic. Cross-account VPC peering and Transit
+      Gateway for enterprise-scale connectivity.
+    verified_at: "2026-01-30"
+
+  net.cross-environment-connectivity:
+    score: 3
+    evidence: >
+      AWS Transit Gateway enables hub-spoke topology with transitive routing
+      across hundreds of VPCs and accounts. VPC peering (non-transitive) also
+      available. AWS PrivateLink for service endpoint sharing across accounts.
+      Direct Connect for on-premises. Network inspection via AWS Network Firewall
+      in centralized egress topology.
+    verified_at: "2026-01-30"
+
+  net.firewall:
+    score: 3
+    evidence: >
+      Security Groups (stateful, per-ENI), Network ACLs (stateless, per-subnet),
+      AWS Network Firewall (managed NGFW with domain filtering, IDS/IPS rules,
+      Suricata-compatible rules). AWS Firewall Manager for org-level security
+      group and firewall rule enforcement across all accounts. SCPs can enforce
+      baseline security group rules.
+    verified_at: "2026-01-30"
+
+  net.private-connectivity:
+    score: 3
+    evidence: >
+      AWS PrivateLink provides VPC endpoints for 100+ AWS services and
+      third-party services. Interface endpoints (ENI in VPC) and gateway
+      endpoints (S3, DynamoDB). DNS automatically resolves to private
+      endpoints within VPC. Available in all regions for all major services.
+      Cross-account PrivateLink service sharing is supported.
+    verified_at: "2026-01-30"
+
+  net.dns-security:
+    score: 3
+    evidence: >
+      Route 53 Resolver with private hosted zones, DNS firewall (domain
+      allow/deny-list filtering), DNSSEC signing and validation for hosted
+      zones. Route 53 Resolver logs all DNS queries. Centralized resolver
+      configuration shareable across accounts via Resource Access Manager.
+      VPC-level custom DNS resolvers also supported.
+    verified_at: "2026-01-30"
+
+  net.ddos-protection:
+    score: 3
+    evidence: >
+      AWS Shield Standard (free) protects against L3/L4 volumetric attacks
+      automatically for all AWS resources. AWS Shield Advanced provides
+      L7 protection, custom mitigation rules, 24/7 DRT access, SLA credits
+      for attack-related scaling costs, and cost protection. Customizable
+      mitigation policies, near real-time attack visibility.
+    verified_at: "2026-01-30"
+
+  net.waf:
+    score: 3
+    evidence: >
+      AWS WAF supports custom rules (IP match, geo match, string match,
+      rate limiting, regex, SQL injection, XSS detection), managed rule groups
+      (AWS and third-party), Bot Control (bot detection, CAPTCHA), Fraud Control
+      (account takeover, account creation). Integrated with ALB, CloudFront,
+      API Gateway, AppSync. Full request logging to S3/CloudWatch.
+    verified_at: "2026-01-30"
+
+  net.egress-control:
+    score: 3
+    evidence: >
+      AWS Network Firewall with domain filtering and stateful rules provides
+      L7 egress control. NAT Gateway with VPC Flow Logs. DNS Firewall for
+      domain-based egress filtering. AWS Gateway Load Balancer for third-party
+      inspection appliances. AWS Firewall Manager for centralized egress
+      policy across all accounts. TLS inspection via Network Firewall.
+    verified_at: "2026-01-30"
+
+  log.control-plane-audit:
+    score: 3
+    evidence: >
+      AWS CloudTrail provides always-on control plane audit logging for all
+      API calls across all AWS services. Organization Trails capture events
+      from all accounts. Events available within minutes. CloudTrail Lake for
+      queryable log archives. Log file integrity validation. Event history
+      retained 90 days in CloudTrail event history; indefinitely in S3.
+    verified_at: "2026-01-30"
+
+  log.data-plane-logging:
+    score: 3
+    evidence: >
+      S3 server access logging and S3 Data Events in CloudTrail. CloudTrail
+      Data Events for Lambda, DynamoDB, and other services. RDS logs (slow
+      query, general, audit). ALB access logs. VPC Flow Logs. All configurable
+      at account or org level via SCPs/CloudFormation. CloudTrail Data Events
+      can be enabled org-wide via Organization Trails.
+    verified_at: "2026-01-30"
+
+  log.immutability:
+    score: 3
+    evidence: >
+      CloudTrail log file integrity validation detects tampering. S3 Object
+      Lock (Compliance mode) prevents deletion even by root account until
+      lock expiry. AWS CloudTrail Lake has tamper-proof retention. AWS Backup
+      Vault Lock with compliance mode. S3 Glacier Vault Lock. Attempting to
+      delete locked objects fails and creates an audit event.
+    verified_at: "2026-01-30"
+
+  log.export-integration:
+    score: 3
+    evidence: >
+      CloudTrail → S3, CloudWatch Logs, EventBridge for real-time streaming.
+      VPC Flow Logs → S3, CloudWatch. Kinesis Data Firehose for SIEM forwarding
+      (Splunk, Datadog, Sumo Logic native integrations). OCSF format support
+      via Security Lake. Security Lake normalizes all log sources to OCSF.
+      AWS Security Hub for aggregated findings export.
+    verified_at: "2026-01-30"
+
+  log.alerting-detection:
+    score: 3
+    evidence: >
+      Amazon GuardDuty provides ML-based threat detection on CloudTrail,
+      DNS, VPC Flow Logs, S3, EKS, RDS, Lambda, and more with 200+ finding
+      types. Custom threat intelligence feeds. EventBridge integration for
+      automated response. AWS Security Hub aggregates findings across accounts.
+      Amazon Detective for investigation. Inspector for vulnerability scanning.
+      All manageable org-wide from Security Hub delegated administrator.
+    verified_at: "2026-01-30"
+
+  log.resource-inventory:
+    score: 3
+    evidence: >
+      AWS Config records configuration history for all resource types.
+      360+ resource types tracked. Configuration history retained up to
+      7 years. Advanced Query (SQL-like) for cross-account inventory.
+      AWS Systems Manager Inventory for OS-level data. Resource Explorer
+      for cross-account, cross-region search. Org-level aggregation via
+      Config Aggregator.
+    verified_at: "2026-01-30"
+
+  data.residency-guarantees:
+    score: 3
+    evidence: >
+      Data stays within the AWS Region selected by the customer. AWS does
+      not move customer content outside the selected Region without customer
+      consent (with exceptions for compliance with legal orders). S3 doesn't
+      replicate outside region without explicit Cross-Region Replication.
+      AWS Data Residency Addendum provides contractual commitment. Regional
+      isolation is technically enforced for all primary services.
+    verified_at: "2026-01-30"
+
+  data.sovereignty-controls:
+    score: 2
+    evidence: >
+      AWS is a US company subject to US laws including CLOUD Act and FISA.
+      EU Data Boundary program commits to keeping EU customer data and
+      metadata in EU. AWS Dedicated Local Zones and AWS GovCloud available
+      for specific sovereignty requirements. Standard commercial offering does
+      not include operator access controls visible to tenants. HYOK via XKS
+      is available. EU sovereign cloud offering is partial compared to hyperscalers'
+      full sovereign programs.
+    verified_at: "2026-01-30"
+
+  data.classification:
+    score: 3
+    evidence: >
+      Amazon Macie provides automated sensitive data discovery (PII, PHI,
+      financial data, credentials) across S3. Custom data identifiers via
+      regex. Finding aggregation in Security Hub. Integration with EventBridge
+      for automated response on high-severity findings. Available in all
+      commercial regions.
+    verified_at: "2026-01-30"
+
+  data.dlp:
+    score: 2
+    evidence: >
+      S3 Block Public Access at account and org level prevents accidental
+      public bucket exposure. S3 Access Analyzer flags publicly accessible
+      buckets. No content-aware DLP for preventing data exfiltration to
+      external destinations (Macie is discovery, not prevention). Org-level
+      SCPs can enforce S3 Block Public Access. Content inspection of
+      egress traffic requires third-party tools.
+    verified_at: "2026-01-30"
+
+  data.backup-governance:
+    score: 3
+    evidence: >
+      AWS Backup provides centralized backup management across EC2, EBS, RDS,
+      DynamoDB, EFS, Aurora, FSx, Storage Gateway. Backup Vault Lock (WORM)
+      for immutable backups. Cross-region and cross-account backup copying.
+      Org-level backup policies via AWS Organizations. CMK encryption for
+      backups. AWS Backup Audit Manager for compliance reporting.
+    verified_at: "2026-01-30"
+
+  data.deletion-guarantees:
+    score: 3
+    evidence: >
+      AWS publishes Media Sanitization Policy aligned with NIST SP 800-88.
+      Decommissioned storage media is degaussed and shredded. 90-day
+      data deletion timeline after service termination (documented).
+      Crypto-shredding supported via CMK deletion (KMS key deletion
+      = effective data deletion). Certificates of destruction available for
+      dedicated hardware customers. SOC 2 covers data handling procedures.
+    verified_at: "2026-01-30"
+
+  compute.image-management:
+    score: 3
+    evidence: >
+      Amazon ECR provides private container registries with integrated image
+      scanning (Enhanced Scanning via Inspector v2 on push and continuously).
+      ECR image signing via Sigstore/cosign integration. AWS Signer for
+      container image signing. ECR repository policies restrict pull sources.
+      AWS Verified Access and Image Builder for VM images (AMI). Org-level
+      SCPs can restrict which ECR repositories can be pulled from.
+    verified_at: "2026-01-30"
+
+  compute.runtime-security:
+    score: 3
+    evidence: >
+      EC2 Nitro hypervisor hardware isolation. Shielded VMs via NitroTPM
+      and Secure Boot (Unified Extensible Firmware Interface). GuardDuty
+      Runtime Monitoring for EC2 and EKS (behavioral detection). Amazon
+      Inspector for vulnerability scanning of running instances. Systems
+      Manager Patch Manager for OS patching. VPC endpoint for all management
+      traffic.
+    verified_at: "2026-01-30"
+
+  compute.container-orchestration:
+    score: 3
+    evidence: >
+      Amazon EKS with Kubernetes RBAC, pod security admission webhook,
+      network policies (via VPC CNI or Calico), etcd encryption with CMK,
+      EKS Anywhere for on-premises. EKS Blueprints provide hardened baseline.
+      GuardDuty EKS Protection for runtime threat detection. Image policy
+      via ECR + OPA Gatekeeper or Kyverno. AWS Managed Node Groups with
+      auto-patching. EKS CIS Benchmark profile available.
+    verified_at: "2026-01-30"
+
+  compute.serverless-security:
+    score: 3
+    evidence: >
+      Lambda per-function execution roles (enforced, each function requires
+      a role). VPC attachment for private network access. Function-level
+      concurrency limits. Lambda SnapStart with per-invocation isolation.
+      Lambda URL resource policies. GuardDuty Lambda Protection (threat
+      detection for Lambda invocations). Lambda Power Tools for observability.
+      CloudTrail records all Lambda API calls.
+    verified_at: "2026-01-30"
+
+  compute.patch-management:
+    score: 3
+    evidence: >
+      AWS Systems Manager Patch Manager: configurable patch baselines,
+      maintenance windows, compliance reporting across EC2 fleet.
+      EKS managed node groups: auto-upgrade within configured channels.
+      RDS/Aurora: automated minor version upgrades within maintenance window.
+      ElastiCache: automatic minor version patching. Inspector continuously
+      scans for CVEs in running workloads. AWS Security Hub aggregates
+      patch compliance findings.
+    verified_at: "2026-01-30"
+
+  compute.secrets-management:
+    score: 3
+    evidence: >
+      AWS Secrets Manager with automatic rotation for RDS, Redshift, DocumentDB,
+      and custom Lambda rotation functions for other secret types. Secrets
+      injected into ECS/EKS as environment variables or via CSI driver.
+      Lambda accesses secrets via Secrets Manager SDK (no plaintext in env).
+      Cross-account secret sharing. Resource-based policies for secret access.
+      Full CloudTrail audit of every secret access.
+    verified_at: "2026-01-30"
+
+  incident.forensic-access:
+    score: 3
+    evidence: >
+      EBS snapshot while instance running (no downtime). Cross-account
+      snapshot isolation for forensics. VPC Traffic Mirroring (full packet
+      capture to a target ENI) for L2-L7 traffic analysis. AWS Wickr for
+      secure incident communication. GuardDuty + Security Hub can trigger
+      automated isolation (Lambda removes instance from security group).
+      Systems Manager Session Manager for forensic shell access with logging.
+    verified_at: "2026-01-30"
+
+  incident.notification-sla:
+    score: 3
+    evidence: >
+      AWS has a documented security incident response process. Targeted
+      notification to affected customers for data breaches. AWS Security
+      Bulletins for vulnerabilities requiring customer action. AWS Trust
+      & Safety team direct communication channel. AWS Support (Business/Enterprise)
+      provides security-specific escalation paths. Historical track record
+      of timely disclosure for major incidents.
+    verified_at: "2026-01-30"
+
+  incident.automated-response:
+    score: 3
+    evidence: >
+      AWS Security Hub + EventBridge + Lambda for security-specific event-driven
+      response. GuardDuty automated findings with pre-built response playbooks
+      (in AWS Solutions Library). Step Functions for complex multi-step
+      response workflows. AWS Systems Manager Automation documents for
+      remediation. Native SOAR integration via EventBridge. Bi-directional
+      ticketing via Service Management Connector.
+    verified_at: "2026-01-30"
+
+  incident.availability-zones:
+    score: 3
+    evidence: >
+      All major AWS regions have 3+ physically independent AZs with separate
+      power, cooling, and network infrastructure. AZ independence formally
+      guaranteed in SLA. Multi-AZ is the default recommendation and many
+      services (RDS Multi-AZ, ELB, EKS) are designed for AZ failures.
+      Cross-region active-active via Route 53 health checks and Global
+      Accelerator. 99.99% availability SLA for many services.
+    verified_at: "2026-01-30"
+
+  incident.resilience-testing:
+    score: 3
+    evidence: >
+      AWS Fault Injection Service (FIS) supports 100+ fault injection actions
+      across EC2, ECS, EKS, RDS, SSM, CloudWatch. Experiment templates,
+      stop conditions (CloudWatch alarms), blast radius controls. AWS Resilience
+      Hub for resilience scoring and recommendations. Well-Architected Tool
+      for resilience assessment. GameDay patterns documented in AWS documentation.
+    verified_at: "2026-01-30"
+
+  supply-chain.infrastructure-encryption:
+    score: 3
+    evidence: >
+      AWS attests to AES-256 encryption of all data at rest at the infrastructure
+      level across all storage media. Included in SOC 2 Type II, ISO 27001,
+      and ISO 27018 audit scope. Specific attestation per region available
+      in AWS Artifact (compliance reports portal). Physical media sanitization
+      per NIST SP 800-88 on decommission.
+    verified_at: "2026-01-30"
+
+  supply-chain.physical-security:
+    score: 3
+    evidence: >
+      AWS datacenters certified under SOC 2 Type II, ISO 27001, and physical
+      security-specific standards (PCI DSS, FedRAMP). Published overview
+      of physical security measures (multi-factor access, biometric, 24/7
+      surveillance, environmental monitoring). Third-party penetration testing.
+      Audit reports available via AWS Artifact under BAA/NDA.
+    verified_at: "2026-01-30"
+
+  supply-chain.hardware-supply-chain:
+    score: 3
+    evidence: >
+      AWS Nitro System: purpose-built security silicon (Nitro card) providing
+      hardware root of trust and hypervisor isolation. Nitro firmware integrity
+      measured at boot. Supply chain security program with preferred hardware
+      partners. AWS publishes detailed Nitro Security Paper. NitroTPM
+      provides attestation. EC2 bare metal instances allow tenant attestation
+      of host hardware state.
+    verified_at: "2026-01-30"
+
+  supply-chain.personnel-security:
+    score: 3
+    evidence: >
+      AWS personnel with production access subject to background checks
+      (covered in SOC 2). No standing operator access to customer data —
+      all access requires explicit business justification and is time-limited.
+      AWS Access Transparency (Mayday) provides audit log of AWS support
+      engineer access to customer resources (with customer consent). SOC 2
+      audits personnel security controls annually.
+    verified_at: "2026-01-30"
+
+  supply-chain.compliance-certifications:
+    score: 3
+    evidence: >
+      AWS holds 100+ security and compliance certifications including
+      SOC 2 Type II, ISO 27001, ISO 27017, ISO 27018, PCI DSS Level 1,
+      FedRAMP High (GovCloud), C5, BSI C5, IRAP, MTCS, K-ISMS, and more.
+      Certifications cover all AWS commercial regions. Service scope for
+      each certification listed in AWS Compliance documentation. All
+      reports available via AWS Artifact (free, no NDA for standard reports).
+    verified_at: "2026-01-30"
+
+  supply-chain.transparency-reports:
+    score: 3
+    evidence: >
+      AWS publishes bi-annual transparency reports with quantitative data
+      on government requests by type and jurisdiction. Legal challenge
+      commitment documented. AWS does not provide customer content to
+      law enforcement absent a court order. AWS fights national security
+      orders where legally permissible. No canary statement but detailed
+      statistical disclosure. Reports available on aws.amazon.com/compliance.
+    verified_at: "2026-01-30"
+
+  supply-chain.dependency-disclosure:
+    score: 3
+    evidence: >
+      AWS publishes a GDPR sub-processor list with named entities and
+      data processing scope. Updates notified via email to DPA subscribers.
+      30-day advance notice for new sub-processors. Infrastructure partners
+      described at service category level. Sub-processor list publicly
+      available at aws.amazon.com/compliance/sub-processors.
+    verified_at: "2026-01-30"

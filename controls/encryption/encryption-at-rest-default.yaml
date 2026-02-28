@@ -1,0 +1,40 @@
+---
+id: enc.encryption-at-rest-default
+domain: encryption
+name: "Encryption at Rest — Default"
+description: >
+  Whether data at rest is encrypted by default across services without tenant
+  action. Covers the scope of default encryption (which services encrypt by
+  default), the algorithm and key size used, and whether encryption can be
+  disabled by tenants.
+
+criteria:
+  L0: >
+    Data at rest is not encrypted by default on any service. Tenants must
+    explicitly enable encryption for each resource type, and many services
+    may not offer an encryption option at all.
+  L1: >
+    Default encryption is achievable by tenants through explicit configuration
+    at resource creation time, or via automated tooling that enforces encryption.
+    The platform does not encrypt by default; encryption is opt-in.
+  L2: >
+    Default encryption exists on major services (object storage, block storage,
+    databases) but not universally: some services (messaging queues, caches,
+    AI/ML platforms, stream processing) do not encrypt by default, or the
+    encryption uses provider-managed keys only with no visibility into the
+    key material or rotation schedule.
+  L3: >
+    All storage surfaces encrypt data at rest by default using AES-256 or
+    equivalent. Encryption cannot be disabled by tenants. Provider discloses
+    the default key management approach. This default applies universally
+    across all service categories in scope.
+
+framework_mappings:
+  ccm: ["EKM-01", "EKM-02"]
+  nist_800_53_r5: ["SC-28"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

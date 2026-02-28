@@ -1,0 +1,41 @@
+---
+id: net.private-connectivity
+domain: network
+name: "Private Connectivity to Provider Services"
+description: >
+  Private endpoints, private link, and service endpoints that allow tenant
+  workloads to access provider-managed services (databases, object storage,
+  KMS, etc.) without traffic traversing the public internet. Assessed per
+  service since coverage varies significantly across a provider's portfolio.
+
+criteria:
+  L0: >
+    No private connectivity option. All access to provider-managed services
+    (e.g., managed databases, object storage, KMS APIs) goes over the public
+    internet, even from within a VPC. Traffic exits the VPC boundary.
+  L1: >
+    Private connectivity is achievable via VPN or Direct Connect from on-premises,
+    which keeps traffic off the public internet from the on-premises side, but
+    within the cloud VPC the traffic still uses public service endpoints.
+    Or private connectivity requires self-managed reverse proxies/NAT.
+  L2: >
+    Private endpoints exist for a subset of major services (object storage,
+    key management, databases) but not for all services in scope. Or private
+    endpoints are available but require a per-resource endpoint creation
+    (no global endpoint option), making it complex to manage at scale.
+  L3: >
+    Private connectivity (private endpoints, private link, or VPC service
+    endpoints) is available for all major services in scope. Traffic from
+    within the VPC to provider services never leaves the provider's backbone.
+    DNS automatically resolves to private endpoints when within the VPC.
+    Available across all regions.
+
+framework_mappings:
+  ccm: ["IVS-06"]
+  nist_800_53_r5: ["SC-7", "SC-8"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

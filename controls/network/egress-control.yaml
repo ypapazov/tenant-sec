@@ -1,0 +1,42 @@
+---
+id: net.egress-control
+domain: network
+name: "Egress Control"
+description: >
+  Ability to restrict and inspect outbound traffic from cloud workloads.
+  Covers NAT gateway logging, egress firewall with domain/URL filtering,
+  and whether all outbound traffic from a VPC can be forced through a
+  centralized inspection point.
+
+criteria:
+  L0: >
+    No egress control. Workloads within the VPC can make outbound connections
+    to any destination on any port without restriction. No logging of outbound
+    connections. No way to prevent data exfiltration via outbound channels.
+  L1: >
+    Egress control is achievable through security group rules that block
+    outbound traffic to specific IP ranges, but DNS-based filtering is not
+    possible (only IP-based), and maintaining IP-based block lists is
+    operationally complex. No centralized egress point.
+  L2: >
+    Centralized egress via NAT gateway with outbound connection logging. Basic
+    URL/domain filtering via DNS firewall. No deep-packet inspection or
+    HTTPS-aware filtering (traffic is filtered by domain at DNS level but
+    not inspected inline). Or egress filtering is limited to internet-bound
+    traffic and does not cover inter-service traffic within the provider.
+  L3: >
+    Full egress control: centralized egress via managed NAT/firewall service,
+    URL/domain allow/deny lists enforced at the network layer (not just DNS),
+    TLS inspection option for HTTPS traffic, logging of all outbound connections
+    with destination and data volume, and org-level policy that can enforce
+    egress inspection for all accounts/projects.
+
+framework_mappings:
+  ccm: ["IVS-07"]
+  nist_800_53_r5: ["SC-7", "SC-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1048", "T1567"]
+
+service_scoped: false
