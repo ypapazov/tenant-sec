@@ -1,0 +1,45 @@
+---
+id: compute.secure-remote-access
+domain: compute
+name: "Secure Remote Access to Instances"
+description: >
+  Managed mechanisms for interactive access to compute instances without
+  exposing public SSH or RDP endpoints. Covers session manager / bastion
+  services, audit logging of interactive sessions, session recording,
+  and IAM-gated access that eliminates the need for key pair distribution
+  or public IP assignment.
+
+criteria:
+  L0: >
+    No managed remote access service. Interactive access requires SSH or RDP
+    over public IPs (or a tenant-deployed jump host). No session audit logging
+    beyond OS-level syslog. Key pairs must be distributed and managed manually.
+  L1: >
+    Secure remote access is achievable through tenant-deployed bastion hosts
+    or VPN-based access. The provider does not offer a managed session
+    service. Audit logging of sessions depends on tenant OS-level
+    configuration. Public IP or VPN is required for all interactive access.
+  L2: >
+    A managed session or bastion service exists that enables interactive
+    access without public IPs. IAM controls who can start sessions. Session
+    activity is logged (start, end, commands). However, full session recording
+    (keystroke-level replay) is not available, or the service does not
+    support all instance types (e.g., Windows RDP not covered), or
+    file transfer via the session channel is not audited.
+  L3: >
+    Full managed session management: interactive access to any instance
+    without public IP or key pair. IAM-gated with fine-grained policies
+    (who can access which instances). Full session recording with replay
+    capability. Audit trail of all session activity exported to SIEM.
+    Supports SSH, RDP, and port forwarding. Org-level policy can mandate
+    that all interactive access goes through the session service.
+
+framework_mappings:
+  ccm: ["IAM-12", "IVS-01"]
+  nist_800_53_r5: ["AC-17", "AU-14", "SC-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1021", "T1133"]
+
+service_scoped: false

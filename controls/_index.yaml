@@ -13,6 +13,8 @@ domains:
       - iam.permission-boundaries
       - iam.credential-management
       - iam.multi-tenancy-isolation
+      - iam.mfa-enforcement
+      - iam.identity-lifecycle
 
   governance:
     name: "Organization Governance & Policy"
@@ -47,6 +49,7 @@ domains:
       - net.ddos-protection
       - net.waf
       - net.egress-control
+      - net.flow-logging
 
   logging:
     name: "Logging, Monitoring & Audit"
@@ -67,6 +70,7 @@ domains:
       - data.dlp
       - data.backup-governance
       - data.deletion-guarantees
+      - data.object-retention-immutability
 
   compute:
     name: "Compute & Workload Security"
@@ -77,6 +81,7 @@ domains:
       - compute.serverless-security
       - compute.patch-management
       - compute.secrets-management
+      - compute.secure-remote-access
 
   incident:
     name: "Incident Response & Resilience"

@@ -1,0 +1,46 @@
+---
+id: iam.mfa-enforcement
+domain: iam
+name: "MFA Enforcement & Configuration"
+description: >
+  Ability to require multi-factor authentication at the organization or account
+  level, covering all access paths (console, CLI, API). Includes the breadth of
+  supported MFA methods (TOTP, hardware tokens, FIDO2/WebAuthn), conditional
+  access policies (require MFA from untrusted networks or for sensitive
+  operations), and whether enforcement can be mandated via org-level policy
+  rather than relying on per-user opt-in.
+
+criteria:
+  L0: >
+    MFA is not available as a platform capability. Tenants cannot enable
+    second-factor authentication for any access path. All authentication
+    relies solely on username/password or API key.
+  L1: >
+    MFA is available as a per-user opt-in setting (TOTP-based) but cannot
+    be enforced at the organization level. Administrators cannot require
+    MFA for all users or for specific operations. No conditional access
+    policies exist. Enforcement requires manual compliance checks or
+    tenant-built detective scripts.
+  L2: >
+    MFA can be enforced at the organization or account level for console
+    access. Hardware token or TOTP support exists. However, enforcement
+    does not extend to programmatic access (CLI/API), conditional access
+    policies (context-aware MFA challenges) are not available, or only a
+    single MFA method is supported.
+  L3: >
+    Full MFA enforcement: org-level policy mandates MFA for all users across
+    all access paths (console, CLI, API). Multiple MFA methods supported
+    (TOTP, hardware security keys, FIDO2/WebAuthn). Conditional access
+    policies allow context-aware challenges (e.g., require MFA from new
+    devices, untrusted networks, or for destructive operations). MFA
+    compliance is auditable via API.
+
+framework_mappings:
+  ccm: ["IAM-10"]
+  nist_800_53_r5: ["IA-2(1)", "IA-2(2)", "IA-2(6)"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078"]
+
+service_scoped: false

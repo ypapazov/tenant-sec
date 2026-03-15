@@ -1,0 +1,46 @@
+---
+id: data.object-retention-immutability
+domain: data
+name: "Object Retention & Immutability"
+description: >
+  Tenant-configurable write-once-read-many (WORM) storage, legal holds, and
+  compliance-mode retention policies for primary data stores (not just backups).
+  Covers object versioning with deletion protection, governance-mode vs.
+  compliance-mode retention locks, and legal hold capabilities for e-discovery
+  and regulatory preservation requirements.
+
+criteria:
+  L0: >
+    No retention or immutability capabilities. Objects can be overwritten or
+    deleted by any principal with write/delete permissions. No versioning,
+    no retention locks, no legal hold mechanism.
+  L1: >
+    Immutability is achievable through tenant-built compensating controls:
+    restrictive IAM policies that deny delete operations, or versioning
+    enabled with MFA-delete (where supported). No native WORM or retention
+    lock. Legal hold must be implemented via tagging conventions and manual
+    process.
+  L2: >
+    Object versioning and retention policies exist for major storage services
+    (object storage, managed databases). A retention lock mechanism prevents
+    deletion during the retention period. However, only governance-mode locks
+    are available (administrators can override), compliance-mode (no one can
+    delete, including root) is not supported, or legal hold is not available
+    as a distinct feature independent of retention period.
+  L3: >
+    Full WORM support: compliance-mode retention locks that even
+    root/organization administrators cannot override before expiry. Legal hold
+    as a separate, independent mechanism (holds objects regardless of retention
+    expiry until explicitly released). Versioning with deletion protection.
+    Retention policies enforceable at the bucket/container level and via
+    org-level policy. Audit logging of all retention and hold changes.
+
+framework_mappings:
+  ccm: ["DSP-10", "DSP-16"]
+  nist_800_53_r5: ["SI-12", "AU-9"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1485", "T1490"]
+
+service_scoped: true

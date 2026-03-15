@@ -1,0 +1,44 @@
+---
+id: net.flow-logging
+domain: network
+name: "Network Flow Logging"
+description: >
+  VPC-level and subnet-level flow logs that capture packet metadata (source/
+  destination IP, port, protocol, action, bytes transferred) for network
+  forensics, anomaly detection, and compliance. Distinct from control plane
+  audit logging (API calls) and data plane logging (storage/database access);
+  this control evaluates visibility into network-layer traffic patterns.
+
+criteria:
+  L0: >
+    No network flow logging capability. Traffic patterns within or between
+    VPCs are not recorded. Network forensics requires packet capture on
+    individual instances, which is manual and does not scale.
+  L1: >
+    Flow logging is achievable through tenant-deployed solutions: running
+    packet capture agents on instances, deploying traffic mirroring to a
+    self-managed collector, or using third-party network monitoring tools.
+    No managed flow log service from the platform.
+  L2: >
+    Managed VPC flow logs exist and capture accepted/rejected traffic
+    metadata. Logs can be exported to object storage or a log service.
+    However, granularity is limited (VPC-level only, not subnet or ENI-level),
+    log delivery latency is high (>10 minutes), or flow logs do not capture
+    inter-service traffic within the provider's managed network.
+  L3: >
+    Full managed flow logging: configurable at VPC, subnet, and network
+    interface level. Captures accepted and rejected traffic with metadata
+    including source/destination, port, protocol, bytes, and packets. Near
+    real-time delivery (<5 min). Exportable to object storage, log analytics,
+    and external SIEM. Traffic mirroring available for full packet capture
+    of selected flows. Org-level policy can mandate flow logging on all VPCs.
+
+framework_mappings:
+  ccm: ["IVS-01", "LOG-01"]
+  nist_800_53_r5: ["AU-12", "SI-4", "SC-7"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1046", "T1048"]
+
+service_scoped: false

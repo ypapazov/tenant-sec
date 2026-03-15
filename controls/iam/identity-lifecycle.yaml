@@ -1,0 +1,48 @@
+---
+id: iam.identity-lifecycle
+domain: iam
+name: "Identity Lifecycle Governance"
+description: >
+  Managed capabilities for the full identity lifecycle: automated provisioning
+  and deprovisioning of users tied to directory or HR events, detection and
+  deactivation of stale or orphaned accounts, approval workflows for identity
+  creation, and periodic access review campaigns. Distinct from federation
+  (how identities authenticate) and credential management (key rotation);
+  this control evaluates whether the platform helps tenants ensure the right
+  people have access at the right time and that access is revoked when no
+  longer needed.
+
+criteria:
+  L0: >
+    No identity lifecycle capabilities. Users are created and deleted manually.
+    No stale account detection. No integration with directory lifecycle events.
+    Orphaned accounts (users who have left the organization) persist
+    indefinitely unless manually discovered and removed.
+  L1: >
+    Identity lifecycle is achievable through tenant-built automation: scripts
+    that query the corporate directory and reconcile with cloud IAM, or SCIM
+    integrations built on top of generic API access. Stale account detection
+    requires custom querying of last-login timestamps. No managed lifecycle
+    engine.
+  L2: >
+    SCIM provisioning is natively supported, enabling automated user creation
+    and deactivation from the corporate IdP. However, stale account detection
+    is not automated, approval workflows for identity creation are not
+    available, or periodic access review campaigns (recertification) are
+    not supported as a managed feature.
+  L3: >
+    Full managed identity lifecycle: SCIM-based provisioning and deprovisioning
+    with group membership sync, automated stale account detection and
+    deactivation (configurable inactivity threshold), approval workflows
+    for identity creation and role assignment, and managed access review
+    campaigns that surface over-privileged or dormant accounts to reviewers.
+
+framework_mappings:
+  ccm: ["IAM-06", "IAM-09"]
+  nist_800_53_r5: ["AC-2", "PS-4", "PS-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1078.004", "T1136"]
+
+service_scoped: false
