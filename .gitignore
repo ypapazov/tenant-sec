@@ -63,6 +63,7 @@ cover/
 
 # Output files
 *.html
+!docs/*.html
 *.png
 *.csv
 !tests/fixtures/**/*.csv

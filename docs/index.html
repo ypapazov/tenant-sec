@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tenant-sec — Cloud Provider Security Capability Framework</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --border:    #21262d;
+    --accent:    #2ea043;
+    --accent2:   #388bfd;
+    --warn:      #d29922;
+    --danger:    #f85149;
+    --text:      #e6edf3;
+    --muted:     #7d8590;
+    --code-bg:   #1c2128;
+    --radius:    8px;
+    --max:       1100px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font: 16px/1.65 'Inter', system-ui, sans-serif; }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; gap: 2rem; height: 56px;
+  }
+  nav .logo { font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; }
+  nav .logo span { color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; font-size: .9rem; transition: color .15s; }
+  nav a:hover { color: var(--text); }
+  nav .cta {
+    margin-left: auto; background: var(--accent); color: #fff;
+    padding: .4rem 1rem; border-radius: var(--radius); font-size: .875rem; font-weight: 600;
+    transition: background .15s;
+  }
+  nav .cta:hover { background: #3fb950; }
+  nav .contribute { font-size: .78rem; color: var(--muted); opacity: .7; }
+  nav .contribute:hover { opacity: 1; }
+  nav .gh-icon { display: flex; align-items: center; color: var(--muted); }
+  nav .gh-icon:hover { color: var(--text); }
+
+  /* ── Layout helpers ── */
+  section { padding: 5rem 2rem; }
+  .inner { max-width: var(--max); margin: 0 auto; }
+  h2 { font-size: 1.75rem; margin-bottom: 1rem; }
+  h3 { font-size: 1.15rem; margin-bottom: .5rem; }
+  p  { color: #b0bac6; margin-bottom: 1rem; }
+  .label {
+    display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: .75rem;
+  }
+
+  /* ── Hero ── */
+  #hero { padding: 4rem 2rem 5rem; text-align: center; }
+  .hero-brand {
+    font-size: clamp(4rem, 10vw, 7rem); font-weight: 800; line-height: 1;
+    color: var(--text); margin-bottom: 1.5rem; letter-spacing: -.03em;
+  }
+  .hero-brand span { color: var(--accent); }
+  #hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; }
+  #hero h1 em { color: var(--accent); font-style: normal; }
+  #hero .sub {
+    max-width: 620px; margin: 0 auto 2.5rem;
+    font-size: 1.1rem; color: var(--muted);
+  }
+  .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    padding: .65rem 1.5rem; border-radius: var(--radius); font-weight: 600;
+    font-size: .95rem; text-decoration: none; transition: all .15s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #3fb950; }
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--muted); }
+
+  /* ── Problem strip ── */
+  #problem { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .problem-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+  .problem-card { padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius); }
+  .problem-card .icon { font-size: 1.5rem; margin-bottom: .75rem; }
+  .problem-card h3 { color: var(--text); }
+  .problem-card p { margin: 0; font-size: .9rem; }
+
+  /* ── Maturity levels ── */
+  #levels .level-row {
+    display: flex; align-items: flex-start; gap: 1.25rem;
+    padding: 1.25rem 0; border-bottom: 1px solid var(--border);
+  }
+  #levels .level-row:last-child { border-bottom: none; }
+  .badge {
+    flex-shrink: 0; width: 36px; height: 36px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .85rem;
+  }
+  .l0 { background: #3d1010; color: var(--danger); }
+  .l1 { background: #3d2a0a; color: var(--warn); }
+  .l2 { background: #0a2440; color: var(--accent2); }
+  .l3 { background: #0a2d14; color: var(--accent); }
+  .lm { background: #1a1a3a; color: #a78bfa; }
+  .level-label { font-weight: 700; font-size: .95rem; margin-bottom: .25rem; }
+  .level-row p { margin: 0; font-size: .875rem; }
+
+  /* ── Architecture ── */
+  #arch { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .arch-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+  @media (max-width: 700px) { .arch-cols { grid-template-columns: 1fr; } }
+  .arch-tree {
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: .8rem; line-height: 1.8;
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 1.25rem;
+    color: #c9d1d9;
+    overflow-x: auto;
+  }
+  .arch-tree .dir  { color: var(--accent2); }
+  .arch-tree .file { color: #c9d1d9; }
+  .arch-tree .note { color: var(--muted); }
+  .layer-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+  .layer-list li {
+    padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--code-bg);
+  }
+  .layer-list li strong { display: block; color: var(--accent2); margin-bottom: .35rem; font-size: .9rem; }
+  .layer-list li span { font-size: .85rem; color: var(--muted); }
+
+  /* ── Controls ── */
+  .domain-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .domain-card {
+    padding: 1rem 1.1rem; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--code-bg);
+  }
+  .domain-card .dname { font-weight: 700; font-size: .9rem; margin-bottom: .3rem; }
+  .domain-card .count { font-size: .8rem; color: var(--muted); }
+  .domain-card .controls-list { margin-top: .6rem; font-size: .75rem; color: #6e7681; line-height: 1.7; }
+
+  /* ── CLI ── */
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 1.25rem; overflow-x: auto;
+    font-family: 'Fira Code', 'Cascadia Code', monospace;
+    font-size: .82rem; line-height: 1.7;
+    color: #c9d1d9;
+  }
+  .cmd  { color: #7ee787; }
+  .flag { color: var(--accent2); }
+  .path { color: var(--warn); }
+  .cmt  { color: var(--muted); }
+  .cmd-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .cmd-tab {
+    padding: .35rem .85rem; border-radius: 20px; font-size: .8rem; cursor: pointer;
+    border: 1px solid var(--border); background: var(--code-bg); color: var(--muted);
+    transition: all .15s;
+  }
+  .cmd-tab.active, .cmd-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .cmd-block { display: none; }
+  .cmd-block.active { display: block; }
+
+  /* ── Use cases ── */
+  .use-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+  .use-card {
+    padding: 1.5rem; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface);
+  }
+  .use-card .icon { font-size: 1.75rem; margin-bottom: .75rem; }
+  .use-card h3 { color: var(--text); margin-bottom: .5rem; }
+  .use-card p { margin: 0; font-size: .875rem; }
+
+  /* ── Scoring profile example ── */
+  #scoring { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .score-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+  @media (max-width: 700px) { .score-cols { grid-template-columns: 1fr; } }
+
+  /* ── CTA section ── */
+  #cta { text-align: center; }
+  #cta h2 { font-size: 2rem; margin-bottom: 1rem; }
+  #cta p { max-width: 500px; margin: 0 auto 2rem; }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 2rem;
+    text-align: center; color: var(--muted); font-size: .85rem;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* ── Inline code ── */
+  code {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 4px; padding: .15em .4em;
+    font-family: 'Fira Code', monospace; font-size: .85em;
+  }
+
+  /* ── Comparison preview table ── */
+  .cmp-wrap { overflow-x: auto; margin-top: 2rem; }
+  .cmp-table { border-collapse: collapse; width: 100%; font-size: .82rem; }
+  .cmp-table th {
+    background: var(--code-bg); padding: .6rem 1rem;
+    border: 1px solid var(--border); font-weight: 600;
+    text-align: left; white-space: nowrap;
+  }
+  .cmp-table td {
+    padding: .5rem 1rem; border: 1px solid var(--border); vertical-align: top;
+  }
+  .cmp-table tr:nth-child(even) td { background: var(--code-bg); }
+  .tag-l0 { color: var(--danger);   font-weight: 700; }
+  .tag-l1 { color: var(--warn);     font-weight: 700; }
+  .tag-l2 { color: var(--accent2);  font-weight: 700; }
+  .tag-l3 { color: var(--accent);   font-weight: 700; }
+  .tag-mx { color: #a78bfa;         font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ── Nav ─────────────────────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="logo">tenant<span>-sec</span></a>
+  <a href="#" class="contribute">Contribute</a>
+  <a href="controls.html">Controls Explorer</a>
+  <a href="#levels">Scale</a>
+  <a href="#problem">Problem</a>
+  <a href="#cli">CLI</a>
+  <a href="#usecases">Use Cases</a>
+  <a href="evaluate.html" class="cta">▶ Try the Evaluator</a>
+  <a href="#" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="inner">
+    <div class="hero-brand">tenant<span>-sec</span></div>
+    <div class="label">Open Source · Cloud Security</div>
+    <h1>
+      Security capability assessment<br>
+      for cloud providers — <em>done right</em>.
+    </h1>
+    <p class="sub">
+      Binary compliance checklists lie. tenant-sec measures what cloud providers
+      actually give you as a tenant: maturity levels, per-service breakdowns,
+      and scoring profiles that match your real threat model.
+    </p>
+    <div class="btn-row">
+      <a href="evaluate.html" class="btn btn-primary">Run in browser →</a>
+      <a href="#cli" class="btn btn-secondary">CLI quickstart</a>
+      <a href="#arch" class="btn btn-secondary">Architecture</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Problem ──────────────────────────────────────────────────────────── -->
+<section id="problem">
+  <div class="inner">
+    <div class="label">The Problem</div>
+    <h2>Compliance frameworks are lying to you</h2>
+    <p>
+      When a provider checks "encryption at rest: ✓", they're hiding three different realities.
+      Standard frameworks have no language to represent the difference.
+    </p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">⚙️</div>
+        <h3>Partial implementation</h3>
+        <p>A control may be achievable — but only through custom automation you build and maintain.
+        Existing frameworks mark this the same as a fully managed capability.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🗂️</div>
+        <h3>Per-service inconsistency</h3>
+        <p>CMK encryption on S3 but not on the managed database. WAF available for EC2 but not
+        for the AI platform. No framework represents this unevenness.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🎛️</div>
+        <h3>Maturity variance</h3>
+        <p>A fixed managed capability with no configuration options is operationally
+        different from a fully policy-driven implementation. Compliance checklists collapse both to "yes".</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Maturity levels ──────────────────────────────────────────────────── -->
+<section id="levels">
+  <div class="inner">
+    <div class="label">The Model</div>
+    <h2>A 4-level maturity scale that tells the truth</h2>
+    <p>
+      Each control for each provider gets one of four leaf scores, or a
+      <strong>mixed composite</strong> when capability varies across service types.
+    </p>
+
+    <div>
+      <div class="level-row">
+        <div class="badge l0">L0</div>
+        <div>
+          <div class="level-label">Impossible from tenant space</div>
+          <p>The platform does not expose this capability. No amount of tenant-side effort can achieve it.
+          Accept the risk, implement an external compensating control, or change providers.</p>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="badge l1">L1</div>
+        <div>
+          <div class="level-label">Requires own processing loop</div>
+          <p>Achievable — but you must build and maintain custom automation. Scripts, Lambda functions,
+          CI/CD guardrails, external tooling. The provider offers no managed path. Engineering cost is yours.</p>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="badge l2">L2</div>
+        <div>
+          <div class="level-label">Available managed, limited</div>
+          <p>A managed capability exists but with constrained scope or configurability.
+          You can enable it but cannot customize policy logic, algorithm, scope, or enforcement granularity.
+          Take it or leave it.</p>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="badge l3">L3</div>
+        <div>
+          <div class="level-label">Available managed, customizable</div>
+          <p>Full managed capability with tenant-configurable parameters. Define policies, set thresholds,
+          choose algorithms, scope to specific resources or OUs, integrate with external systems.
+          The target state for enterprise-grade controls.</p>
+        </div>
+      </div>
+      <div class="level-row">
+        <div class="badge lm">MIX</div>
+        <div>
+          <div class="level-label">Mixed composite — not a level</div>
+          <p>Capability varies across the provider's service portfolio. Contains per-service scores at L0–L3.
+          In scoring, you choose the aggregation function: <code>min</code>, <code>mean</code>,
+          <code>p20</code>, <code>threshold:L2:0.8</code> — matching your risk tolerance.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Architecture ─────────────────────────────────────────────────────── -->
+<section id="arch">
+  <div class="inner">
+    <div class="label">Architecture</div>
+    <h2>Data-first, schema-validated, open</h2>
+    <p>
+      Controls, provider assessments, and framework mappings are YAML data validated by JSON Schemas.
+      The scoring engine and CLI are the tooling layer <em>around</em> the data.
+      The data is the primary artifact.
+    </p>
+    <div class="arch-cols">
+      <div>
+        <pre class="arch-tree"><span class="dir">tenant-sec/</span>
+├── <span class="dir">schema/</span>            <span class="note"># JSON Schemas (draft 2020-12)</span>
+│   ├── control.schema.json
+│   ├── provider.schema.json
+│   ├── scoring-profile.schema.json
+│   └── service-catalog.yaml   <span class="note"># 24 canonical categories</span>
+│
+├── <span class="dir">controls/</span>          <span class="note"># 60 control definitions</span>
+│   ├── _index.yaml            <span class="note"># master index</span>
+│   ├── iam/                   <span class="note"># 8 controls</span>
+│   ├── governance/            <span class="note"># 6 controls</span>
+│   ├── encryption/            <span class="note"># 8 controls</span>
+│   ├── network/               <span class="note"># 8 controls</span>
+│   ├── logging/               <span class="note"># 6 controls</span>
+│   ├── data/                  <span class="note"># 6 controls</span>
+│   ├── compute/               <span class="note"># 6 controls</span>
+│   ├── incident/              <span class="note"># 5 controls</span>
+│   └── supply-chain/          <span class="note"># 7 controls</span>
+│
+├── <span class="dir">providers/</span>         <span class="note"># Assessments</span>
+│   ├── aws.yaml               <span class="note"># all 60 controls</span>
+│   ├── gcp.yaml               <span class="note"># all 60 controls</span>
+│   └── scaleway.yaml          <span class="note"># all 60 controls</span>
+│
+├── <span class="dir">mappings/</span>
+│   ├── ccm-v4.1.yaml
+│   └── nist-800-53-r5.yaml
+│
+├── <span class="dir">profiles/</span>          <span class="note"># Example scoring profiles</span>
+│   ├── eu-regulated-fintech.yaml
+│   ├── general-enterprise.yaml
+│   └── data-sovereignty.yaml
+│
+└── <span class="dir">src/tenant_sec/</span>    <span class="note"># Python CLI (Apache 2.0)</span>
+    ├── cli/                   <span class="note"># validate / score / detail / compare / export</span>
+    ├── core/                  <span class="note"># loader, registry, staleness</span>
+    └── scoring/               <span class="note"># engine, aggregation, ranking</span></pre>
+      </div>
+      <div>
+        <ul class="layer-list">
+          <li>
+            <strong>Schemas</strong>
+            <span>JSON Schema draft 2020-12 validates every YAML file.
+            Controls, provider profiles, and scoring profiles each have their own schema.
+            <code>tenant-sec validate</code> runs schema + cross-reference checks.</span>
+          </li>
+          <li>
+            <strong>Control taxonomy</strong>
+            <span>60 controls across 9 domains. Each control has L0–L3 criteria written
+            to be assessor-actionable, plus CCM and NIST 800-53 mappings.
+            Adding a control is a data change — not a code change.</span>
+          </li>
+          <li>
+            <strong>Provider profiles</strong>
+            <span>One YAML file per provider. Every score has evidence text.
+            Mixed composites include a full per-service breakdown. Assessor tier
+            (self / community / accredited) is declared and drives staleness thresholds.</span>
+          </li>
+          <li>
+            <strong>Scoring engine</strong>
+            <span>Weighted domain scores, configurable mixed aggregation,
+            must-have filters, weight redistribution for unassessed domains.
+            Pluggable: CLI, Python library, or browser JS port.</span>
+          </li>
+          <li>
+            <strong>Dual license</strong>
+            <span>Data (controls, providers, mappings) → CC BY 4.0.
+            Code (CLI, engine) → Apache 2.0.</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Control domains ──────────────────────────────────────────────────── -->
+<section id="controls">
+  <div class="inner">
+    <div class="label">Coverage</div>
+    <h2>60 controls across 9 domains</h2>
+    <p>Every control has assessor-actionable L0–L3 criteria.
+    <code>service_scoped: true</code> signals that per-service mixed composites are expected.</p>
+    <div class="domain-grid">
+      <div class="domain-card">
+        <div class="dname">IAM</div>
+        <div class="count">8 controls</div>
+        <div class="controls-list">External IdP federation · Directory integration · Privileged access · Service identity · ABAC · Permission boundaries · Credential management · Multi-tenancy isolation</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Governance &amp; Policy</div>
+        <div class="count">6 controls</div>
+        <div class="controls-list">Preventive policy engine · Detective compliance · Tagging governance · Hierarchy &amp; delegation · Account lifecycle · Quotas &amp; service control</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Encryption &amp; Key Mgmt</div>
+        <div class="count">8 controls</div>
+        <div class="controls-list">Encryption at rest default · CMK · BYOK · External KMS (HYOK) · Key lifecycle · HSM backing · Encryption in transit · Confidential computing</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Network Security</div>
+        <div class="count">8 controls</div>
+        <div class="controls-list">Isolation model · Cross-env connectivity · Firewall/SGs · Private service endpoints · DNS security · DDoS protection · WAF · Egress control</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Logging &amp; Audit</div>
+        <div class="count">6 controls</div>
+        <div class="controls-list">Control plane audit · Data plane logging · Log immutability · SIEM export · Threat detection · Resource inventory</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Data Security &amp; Residency</div>
+        <div class="count">6 controls</div>
+        <div class="controls-list">Residency guarantees · Sovereignty controls · Data classification · DLP · Backup governance · Deletion guarantees</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Compute &amp; Workloads</div>
+        <div class="count">6 controls</div>
+        <div class="controls-list">Image management · Runtime security · Container orchestration · Serverless security · Patch management · Secrets management</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Incident Response</div>
+        <div class="count">5 controls</div>
+        <div class="controls-list">Forensic data access · Notification SLA · Automated response · Availability zones · Resilience testing</div>
+      </div>
+      <div class="domain-card">
+        <div class="dname">Supply Chain</div>
+        <div class="count">7 controls</div>
+        <div class="controls-list">Infrastructure encryption · Physical security · Hardware supply chain · Personnel security · Compliance certifications · Transparency reports · Dependency disclosure</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Sample comparison ─────────────────────────────────────────────────── -->
+<section id="sample">
+  <div class="inner" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;">
+    <div class="label">Sample output</div>
+    <h2 style="font-size:1.25rem">EU Regulated Fintech profile — AWS vs GCP vs Scaleway</h2>
+    <div class="cmp-wrap">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th>Domain</th>
+            <th>Amazon Web Services</th>
+            <th>Google Cloud</th>
+            <th>Scaleway</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>IAM</strong></td><td><span class="tag-l3">L3</span> · JIT, SCIM, ABAC, boundaries</td><td><span class="tag-l3">L3</span> · PAM, Workload Identity, PAB</td><td><span class="tag-l1">L1–L2</span> · OIDC federation, no JIT</td></tr>
+          <tr><td><strong>Governance</strong></td><td><span class="tag-l3">L3</span> · SCPs, RCPs, Control Tower</td><td><span class="tag-l3">L3</span> · Org Policy (CEL), SCC</td><td><span class="tag-l0">L0–L1</span> · IAM boundary only</td></tr>
+          <tr><td><strong>Encryption</strong></td><td><span class="tag-mx">MIXED</span> → L3 avg · XKS, CloudHSM</td><td><span class="tag-mx">MIXED</span> → L3 avg · EKM, Cloud HSM</td><td><span class="tag-mx">MIXED</span> → L1 avg · No CMK most services</td></tr>
+          <tr><td><strong>Network</strong></td><td><span class="tag-l3">L3</span> · Network Firewall, PrivateLink</td><td><span class="tag-l3">L3</span> · Hierarchical FW, PSC</td><td><span class="tag-l2">L2</span> · VPC, no managed NGFW/WAF</td></tr>
+          <tr><td><strong>Logging</strong></td><td><span class="tag-l3">L3</span> · CloudTrail, Security Lake</td><td><span class="tag-l3">L3</span> · Audit Logs, locked buckets</td><td><span class="tag-l1">L1</span> · Cockpit, no immutability</td></tr>
+          <tr><td><strong>Must-Haves</strong></td><td><span class="tag-l3">✓ ALL PASS</span></td><td><span class="tag-l3">✓ ALL PASS</span></td><td><span class="tag-l0">✗ 4 FAIL</span></td></tr>
+          <tr><td><strong>Overall</strong></td><td><span class="tag-l3">98.1 / 100</span></td><td><span class="tag-l3">98.9 / 100</span></td><td><span class="tag-l1">34.2 / 100</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:1rem;font-size:.8rem">
+      Run your own weights and must-haves →
+      <a href="evaluate.html" style="color:var(--accent2)">open the in-browser evaluator</a>
+    </p>
+  </div>
+</section>
+
+<!-- ── CLI ──────────────────────────────────────────────────────────────── -->
+<section id="cli">
+  <div class="inner">
+    <div class="label">CLI</div>
+    <h2>Five commands, full pipeline</h2>
+    <p>Install with pip, point at your scoring profile, and get ranked output in seconds.</p>
+
+    <div class="cmd-tabs">
+      <div class="cmd-tab active" onclick="showCmd('install')">Install</div>
+      <div class="cmd-tab" onclick="showCmd('validate')">validate</div>
+      <div class="cmd-tab" onclick="showCmd('score')">score</div>
+      <div class="cmd-tab" onclick="showCmd('detail')">detail</div>
+      <div class="cmd-tab" onclick="showCmd('compare')">compare</div>
+      <div class="cmd-tab" onclick="showCmd('export')">export</div>
+    </div>
+
+    <div id="cmd-install" class="cmd-block active">
+<pre><span class="cmt"># Install</span>
+<span class="cmd">pip install tenant-sec</span>
+
+<span class="cmt"># Or clone and install in editable mode</span>
+<span class="cmd">git clone https://github.com/your-org/tenant-sec</span>
+<span class="cmd">pip install -e ".[dev]"</span></pre>
+    </div>
+
+    <div id="cmd-validate" class="cmd-block">
+<pre><span class="cmt"># Validate any YAML file against its schema</span>
+<span class="cmd">tenant-sec validate</span> <span class="path">providers/scaleway.yaml</span>
+<span class="cmt">✓ providers/scaleway.yaml is valid</span>
+
+<span class="cmd">tenant-sec validate</span> <span class="path">controls/iam/abac.yaml</span> <span class="flag">--type control</span>
+<span class="cmt">✓ controls/iam/abac.yaml is valid</span>
+
+<span class="cmt"># Also cross-validates: unknown control IDs, unresolved service catalog aliases</span></pre>
+    </div>
+
+    <div id="cmd-score" class="cmd-block">
+<pre><span class="cmt"># Score and rank providers against your scoring profile</span>
+<span class="cmd">tenant-sec score</span> \
+  <span class="flag">--profile</span> <span class="path">profiles/eu-regulated-fintech.yaml</span> \
+  <span class="flag">--providers</span> aws,gcp,scaleway
+
+<span class="cmt">Rank  Provider              Overall  IAM   Enc   Net   ...  Must-Haves</span>
+<span class="cmt">   1  Google Cloud           98.9   100   98.3  100   ...  PASS</span>
+<span class="cmt">   2  Amazon Web Services    98.1   100   95.8  100   ...  PASS</span>
+<span class="cmt">   3  Scaleway               34.2    41.7  24.2  40.8  ...  FAIL (4)</span>
+
+<span class="cmt"># JSON and CSV output also available</span>
+<span class="cmd">tenant-sec score</span> <span class="flag">--profile</span> <span class="path">profiles/eu-regulated-fintech.yaml</span> <span class="flag">--format json</span></pre>
+    </div>
+
+    <div id="cmd-detail" class="cmd-block">
+<pre><span class="cmt"># Per-control breakdown for a single provider</span>
+<span class="cmd">tenant-sec detail</span> <span class="flag">--provider</span> aws <span class="flag">--domain</span> encryption
+
+<span class="cmt">── ENCRYPTION ──────────────────────────────────</span>
+<span class="cmt">  enc.encryption-at-rest-default    MIXED  Encryption at rest — Default</span>
+<span class="cmt">    s3            L3   S3 encrypts all objects ...</span>
+<span class="cmt">    ebs           L3   EBS default encryption ...</span>
+<span class="cmt">    rds           L2   Must be enabled at creation ...</span>
+<span class="cmt">  enc.cmk                           MIXED  Customer-Managed Keys</span>
+<span class="cmt">  enc.byok                          L3     Bring Your Own Key</span>
+<span class="cmt">  enc.external-key-management       L3     External KMS (XKS)</span></pre>
+    </div>
+
+    <div id="cmd-compare" class="cmd-block">
+<pre><span class="cmt"># Side-by-side comparison</span>
+<span class="cmd">tenant-sec compare</span> \
+  <span class="flag">--providers</span> aws,gcp,scaleway \
+  <span class="flag">--domain</span> iam
+
+<span class="cmt">── IAM ───────────────────────────────────────────</span>
+<span class="cmt">Control                       AWS      GCP      Scaleway</span>
+<span class="cmt">iam.external-idp-federation   L3       L3       L2</span>
+<span class="cmt">iam.privileged-access         L3       L3       L0</span>
+<span class="cmt">iam.abac                      L3       L3       L1</span>
+<span class="cmt">iam.permission-boundaries     L3       L3       L0</span>
+<span class="cmt">...</span></pre>
+    </div>
+
+    <div id="cmd-export" class="cmd-block">
+<pre><span class="cmt"># Export a provider profile as HTML, JSON, or CSV</span>
+<span class="cmd">tenant-sec export</span> \
+  <span class="flag">--provider</span> aws \
+  <span class="flag">--format</span> html \
+  <span class="flag">-o</span> <span class="path">aws-report.html</span>
+
+<span class="cmd">tenant-sec export</span> \
+  <span class="flag">--provider</span> scaleway \
+  <span class="flag">--format</span> csv \
+  <span class="flag">-o</span> <span class="path">scaleway-controls.csv</span></pre>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── Scoring profile ──────────────────────────────────────────────────── -->
+<section id="scoring">
+  <div class="inner">
+    <div class="label">Scoring Profiles</div>
+    <h2>Your threat model, expressed as data</h2>
+    <p>
+      Scoring profiles are YAML files you create. They define which controls are mandatory,
+      how domains are weighted, and how mixed composites are aggregated.
+      No code changes required.
+    </p>
+    <div class="score-cols">
+      <div>
+        <pre><span class="cmt"># profiles/eu-regulated-fintech.yaml</span>
+name: "eu-regulated-fintech"
+description: >
+  European fintech under DORA &amp; GDPR.
+
+<span class="cmt"># Hard requirements — fail = flagged provider</span>
+must_have:
+  - control: "gov.preventive-policy"
+    min_level: 2
+  - control: "enc.cmk"
+    min_level: 2
+  - control: "log.immutability"
+    min_level: 2
+  - control: "data.residency-guarantees"
+    min_level: 2
+
+<span class="cmt"># Domain weights (must sum to 1.0)</span>
+weights:
+  iam:        0.20
+  governance: 0.15
+  encryption: 0.20
+  network:    0.10
+  logging:    0.15
+  data:       0.10
+  compute:    0.05
+  incident:   0.03
+  supply-chain: 0.02
+
+<span class="cmt"># How to aggregate mixed composites</span>
+<span class="cmt"># p20 = conservative but not worst-case</span>
+mixed_aggregation: "p20"</pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:1rem;color:var(--text)">Aggregation options for mixed composites</h3>
+        <div style="display:flex;flex-direction:column;gap:.75rem">
+          <div style="padding:.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+            <code>min</code>
+            <p style="margin:.25rem 0 0;font-size:.8rem">Worst-case. A single L0 service drags the control to L0. Appropriate for hard security requirements.</p>
+          </div>
+          <div style="padding:.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+            <code>mean</code> &nbsp; <code>median</code>
+            <p style="margin:.25rem 0 0;font-size:.8rem">Central tendency. Outliers averaged out. Good for general enterprise baselines.</p>
+          </div>
+          <div style="padding:.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+            <code>p10</code> &nbsp; <code>p20</code>
+            <p style="margin:.25rem 0 0;font-size:.8rem">Conservative percentiles. The 20th percentile score must meet your bar — 80% of services above doesn't matter.</p>
+          </div>
+          <div style="padding:.75rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+            <code>threshold:L2:0.8</code>
+            <p style="margin:.25rem 0 0;font-size:.8rem">Policy threshold: returns L2 if ≥80% of services are at L2 or above, otherwise L1. Expresses a quorum requirement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Use cases ─────────────────────────────────────────────────────────── -->
+<section id="usecases">
+  <div class="inner">
+    <div class="label">Use Cases</div>
+    <h2>Who is this for?</h2>
+    <div class="use-grid">
+      <div class="use-card">
+        <div class="icon">🏗️</div>
+        <h3>Cloud migration decisions</h3>
+        <p>You're evaluating providers for a multi-cloud or migration project.
+        Drop your security requirements into a scoring profile and get a ranked comparison
+        grounded in per-control evidence — not marketing material.</p>
+      </div>
+      <div class="use-card">
+        <div class="icon">🔍</div>
+        <h3>Security due diligence</h3>
+        <p>Clients adopting a new cloud provider. Auditors reviewing control coverage.
+        The structured evidence text makes it defensible — every score cites exactly
+        what was tested and why.</p>
+      </div>
+      <div class="use-card">
+        <div class="icon">🇪🇺</div>
+        <h3>EU regulatory compliance</h3>
+        <p>DORA, GDPR, NIS2 all demand evidence of supply chain security.
+        The <code>data.residency-guarantees</code> and <code>data.sovereignty-controls</code>
+        controls give you a structured basis for provider-selection justification.</p>
+      </div>
+      <div class="use-card">
+        <div class="icon">📊</div>
+        <h3>Provider roadmap benchmarking</h3>
+        <p>Cloud providers can use this as a structured external view of their
+        tenant-space capability gaps — grounded in what customers need,
+        not internal engineering self-assessment.</p>
+      </div>
+      <div class="use-card">
+        <div class="icon">🧑‍🔬</div>
+        <h3>Security research</h3>
+        <p>Structured, versioned, open data set covering capability maturity
+        across major providers. Researchers can track changes over time
+        via git history and build their own analyses on top of the data.</p>
+      </div>
+      <div class="use-card">
+        <div class="icon">🌐</div>
+        <h3>In-browser evaluation (no install)</h3>
+        <p>The scoring engine runs entirely client-side as a static page.
+        Paste your scoring profile, choose providers, and get ranked results —
+        no data leaves your browser.</p>
+        <a href="evaluate.html" style="color:var(--accent2);font-size:.875rem">→ Open evaluator</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Framework mappings ────────────────────────────────────────────────── -->
+<section id="frameworks" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div class="inner">
+    <div class="label">Framework Mappings</div>
+    <h2>Bridging existing frameworks</h2>
+    <p>
+      tenant-sec is not a replacement for CCM, CIS, or NIST 800-53 —
+      it augments them. Every control carries framework mappings in both directions:
+      forward (control → framework IDs) and reverse (framework ID → controls).
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1.5rem">
+      <div style="padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+        <strong style="color:var(--text)">CSA CCM v4.1</strong>
+        <p style="margin:.35rem 0 0;font-size:.8rem">Full mapping included. GRM, EKM, IAM, LOG, IVS, DSP families covered.</p>
+      </div>
+      <div style="padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+        <strong style="color:var(--text)">NIST SP 800-53 Rev 5</strong>
+        <p style="margin:.35rem 0 0;font-size:.8rem">AC, AU, CA, CM, CP, IA, IR, SA, SC, SI families mapped.</p>
+      </div>
+      <div style="padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+        <strong style="color:var(--muted)">CIS Benchmarks</strong>
+        <p style="margin:.35rem 0 0;font-size:.8rem">Post-v1. AWS v5, Azure v5, GCP v4 planned.</p>
+      </div>
+      <div style="padding:1rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--code-bg)">
+        <strong style="color:var(--muted)">MITRE ATT&amp;CK Cloud</strong>
+        <p style="margin:.35rem 0 0;font-size:.8rem">Post-v1. Technique-level mappings planned.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ───────────────────────────────────────────────────────────────── -->
+<section id="cta">
+  <div class="inner">
+    <div class="label">Get Started</div>
+    <h2>Start evaluating — right now</h2>
+    <p>
+      No account. No install required for the browser evaluator.
+      The data is CC BY 4.0 — take it, fork it, build on it.
+    </p>
+    <div class="btn-row">
+      <a href="evaluate.html" class="btn btn-primary">Open in-browser evaluator →</a>
+      <a href="#cli" class="btn btn-secondary">Install the CLI</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <p>
+    <strong>tenant-sec</strong> — open source cloud provider security assessment framework &nbsp;·&nbsp;
+    Code: <a href="#">Apache 2.0</a> &nbsp;·&nbsp;
+    Data: <a href="#">CC BY 4.0</a>
+  </p>
+</footer>
+
+<script>
+  function showCmd(name) {
+    document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.cmd-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('cmd-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

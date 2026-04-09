@@ -15,6 +15,7 @@ domains:
       - iam.multi-tenancy-isolation
       - iam.mfa-enforcement
       - iam.identity-lifecycle
+      - iam.session-management
 
   governance:
     name: "Organization Governance & Policy"
@@ -71,6 +72,7 @@ domains:
       - data.backup-governance
       - data.deletion-guarantees
       - data.object-retention-immutability
+      - data.portability-export
 
   compute:
     name: "Compute & Workload Security"

@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controls Explorer — tenant-sec</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2128;
+    --border:   #21262d;
+    --accent:   #2ea043;
+    --accent2:  #388bfd;
+    --warn:     #d29922;
+    --danger:   #f85149;
+    --purple:   #bc8cff;
+    --text:     #e6edf3;
+    --muted:    #7d8590;
+    --radius:   8px;
+
+    --l0: #f85149; --l0-bg: #2d0a0a;
+    --l1: #d29922; --l1-bg: #2d1f0a;
+    --l2: #388bfd; --l2-bg: #0a1a2d;
+    --l3: #2ea043; --l3-bg: #0a2d14;
+    --mix: #bc8cff; --mix-bg: #1a0a2d;
+    --na: #30363d; --na-bg: #161b22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 'Inter', system-ui, sans-serif; min-height: 100vh; }
+
+  nav {
+    position: sticky; top: 0; z-index: 200;
+    background: rgba(13,17,23,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem; height: 52px;
+  }
+  nav .logo { font-weight: 700; font-size: 1rem; color: var(--text); text-decoration: none; }
+  nav .logo span { color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; font-size: .875rem; }
+  nav a:hover { color: var(--text); }
+  .nav-title { font-weight: 600; color: var(--text); font-size: .875rem; }
+  .gh-icon { margin-left: auto; display: flex; align-items: center; }
+  .gh-icon svg { width: 20px; height: 20px; fill: var(--muted); transition: fill .15s; }
+  .gh-icon:hover svg { fill: var(--text); }
+
+  .toolbar {
+    position: sticky; top: 52px; z-index: 150;
+    background: rgba(13,17,23,.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: .65rem 1.5rem;
+    display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap;
+  }
+  .toolbar-label { font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+  .provider-pills { display: flex; gap: .35rem; }
+  .provider-pill {
+    padding: .3rem .7rem; border-radius: 20px; font-size: .78rem; font-weight: 600;
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all .15s; user-select: none;
+  }
+  .provider-pill:hover { border-color: var(--accent2); color: var(--text); }
+  .provider-pill.active { border-color: var(--accent2); background: var(--l2-bg); color: var(--accent2); }
+
+  .legend { display: flex; gap: .75rem; align-items: center; margin-left: auto; }
+  .legend-item { display: flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+  .stats-bar {
+    width: 100%; padding: .5rem 1.5rem;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    display: flex; gap: 2rem; align-items: center; font-size: .78rem; color: var(--muted);
+  }
+  .stat { display: flex; align-items: center; gap: .35rem; }
+  .stat-val { font-weight: 700; }
+
+  .matrix-wrap { padding: 1rem 1rem 2rem; overflow-x: auto; }
+  .matrix { display: flex; gap: 6px; }
+  .domain-col { display: flex; flex-direction: column; gap: 4px; min-width: 168px; flex: 1 1 0; }
+  .domain-header {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius) var(--radius) 4px 4px;
+    padding: .55rem .65rem; text-align: center;
+  }
+  .domain-header .dh-name { font-weight: 700; font-size: .82rem; color: var(--text); }
+  .domain-header .dh-full { font-size: .65rem; color: var(--muted); margin-top: 1px; }
+  .domain-header .dh-count { font-size: .65rem; color: var(--muted); }
+
+  .ctrl-cell {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: .45rem .55rem;
+    cursor: pointer; transition: all .12s; position: relative;
+    display: flex; flex-direction: column; gap: 3px;
+    border-left: 3px solid var(--border);
+  }
+  .ctrl-cell:hover { border-color: var(--accent2); background: var(--surface2); transform: translateY(-1px); }
+  .ctrl-cell.active { border-color: var(--accent2); background: var(--surface2); box-shadow: 0 0 0 1px var(--accent2); }
+  .ctrl-cell.focused-l0 { border-left-color: var(--l0); background: var(--l0-bg); }
+  .ctrl-cell.focused-l1 { border-left-color: var(--l1); background: var(--l1-bg); }
+  .ctrl-cell.focused-l2 { border-left-color: var(--l2); background: var(--l2-bg); }
+  .ctrl-cell.focused-l3 { border-left-color: var(--l3); background: var(--l3-bg); }
+  .ctrl-cell.focused-mix { border-left-color: var(--mix); background: var(--mix-bg); }
+
+  .ctrl-name { font-size: .75rem; color: var(--text); line-height: 1.3; font-weight: 500;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ctrl-id { font-size: .62rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+
+  .score-dots { display: flex; gap: 3px; align-items: center; margin-top: 1px; }
+  .score-dot {
+    width: 14px; height: 14px; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .5rem; font-weight: 800; color: rgba(0,0,0,.6);
+    position: relative; flex-shrink: 0;
+  }
+  .score-dot[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 3px 7px; border-radius: 4px; font-size: .68rem; font-weight: 500;
+    white-space: nowrap; z-index: 50; pointer-events: none;
+  }
+  .dot-l0  { background: var(--l0); }
+  .dot-l1  { background: var(--l1); }
+  .dot-l2  { background: var(--l2); }
+  .dot-l3  { background: var(--l3); }
+  .dot-mix { background: var(--mix); }
+  .dot-na  { background: var(--na); }
+
+  /* MIX micro-visualization: replaces plain purple dot */
+  .mix-bar {
+    display: flex; height: 14px; border-radius: 3px; overflow: hidden;
+    min-width: 24px; max-width: 32px; position: relative; flex-shrink: 0;
+    border: 1px solid rgba(188,140,255,.25);
+  }
+  .mix-bar[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 3px 7px; border-radius: 4px; font-size: .68rem; font-weight: 500;
+    white-space: nowrap; z-index: 50; pointer-events: none;
+  }
+  .mix-pct {
+    font-size: .55rem; color: var(--muted); line-height: 1.2;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    display: none; margin-top: 1px;
+  }
+  .ctrl-cell.focused-mix .mix-pct { display: block; }
+
+  /* Detail overlay */
+  .detail-backdrop {
+    display: none; position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,.5); backdrop-filter: blur(2px);
+  }
+  .detail-backdrop.open { display: block; }
+  .detail-panel {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 310;
+    width: min(700px, 92vw); background: var(--bg);
+    border-left: 1px solid var(--border);
+    overflow-y: auto; transform: translateX(100%);
+    transition: transform .2s ease; padding: 1.5rem;
+  }
+  .detail-panel.open { transform: translateX(0); }
+  .detail-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); width: 32px; height: 32px; border-radius: 50%;
+    cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+  }
+  .detail-close:hover { color: var(--text); border-color: var(--accent2); }
+
+  .detail-id { font-family: 'Fira Code', monospace; font-size: .78rem; color: var(--accent2); margin-bottom: .25rem; }
+  .detail-title { font-size: 1.35rem; font-weight: 700; margin-bottom: .25rem; }
+  .detail-flags { display: flex; gap: .4rem; margin-bottom: .75rem; flex-wrap: wrap; }
+  .detail-flag {
+    font-size: .68rem; font-weight: 600; padding: .15rem .5rem;
+    border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  }
+  .detail-desc { font-size: .875rem; color: var(--text); line-height: 1.6; margin-bottom: 1rem;
+    border-left: 3px solid var(--border); padding-left: .75rem; }
+
+  .section-title {
+    font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--muted); margin: 1.25rem 0 .5rem;
+    padding-bottom: .35rem; border-bottom: 1px solid var(--border);
+  }
+
+  .criteria-list { display: flex; flex-direction: column; gap: .5rem; }
+  .criteria-item { display: flex; gap: .6rem; align-items: flex-start; }
+  .criteria-badge {
+    flex-shrink: 0; width: 32px; height: 22px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 800; color: #000;
+  }
+  .criteria-text { font-size: .8rem; color: var(--text); line-height: 1.5; }
+
+  .mapping-row { display: flex; gap: .4rem; align-items: center; margin-bottom: .35rem; flex-wrap: wrap; }
+  .mapping-label { font-size: .72rem; font-weight: 600; color: var(--muted); min-width: 80px; }
+  .mapping-tag {
+    font-size: .68rem; padding: .1rem .4rem; border-radius: 4px;
+    background: var(--surface2); border: 1px solid var(--border); color: var(--accent2);
+    font-family: 'Fira Code', monospace;
+  }
+
+  .provider-score-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    margin-bottom: .65rem; overflow: hidden;
+  }
+  .psc-header {
+    display: flex; align-items: center; gap: .75rem; padding: .65rem .85rem;
+    border-bottom: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .psc-name { font-weight: 700; font-size: .9rem; }
+  .psc-score {
+    margin-left: auto; font-size: .82rem; font-weight: 800;
+    padding: .15rem .55rem; border-radius: 4px;
+  }
+  .psc-verified { font-size: .68rem; color: var(--muted); }
+  .psc-body { padding: .65rem .85rem; }
+  .psc-evidence { font-size: .8rem; color: var(--text); line-height: 1.55; }
+  .psc-summary { font-size: .8rem; color: var(--accent2); font-style: italic; margin-bottom: .5rem; }
+
+  .svc-table { width: 100%; border-collapse: collapse; margin-top: .5rem; }
+  .svc-table th {
+    font-size: .68rem; font-weight: 600; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .04em; padding: .35rem .5rem; border-bottom: 1px solid var(--border); text-align: left;
+  }
+  .svc-table td { padding: .4rem .5rem; border-bottom: 1px solid var(--border); font-size: .78rem; vertical-align: top; }
+  .svc-table tr:last-child td { border-bottom: none; }
+  .svc-name { font-family: 'Fira Code', monospace; color: var(--accent2); }
+  .svc-score { font-weight: 700; }
+  .svc-evidence { color: var(--text); line-height: 1.4; }
+
+  .score-badge-l0 { background: var(--l0-bg); color: var(--l0); }
+  .score-badge-l1 { background: var(--l1-bg); color: var(--l1); }
+  .score-badge-l2 { background: var(--l2-bg); color: var(--l2); }
+  .score-badge-l3 { background: var(--l3-bg); color: var(--l3); }
+  .score-badge-mix { background: var(--mix-bg); color: var(--mix); }
+  .score-badge-na { background: var(--na); color: var(--muted); }
+
+  /* Provider-focused assessment */
+  .provider-assessment {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: .85rem; margin-bottom: .5rem;
+  }
+  .pa-score-row { display: flex; align-items: center; gap: .75rem; margin-bottom: .65rem; }
+  .pa-compensating {
+    margin-top: .65rem; padding: .55rem .75rem; font-size: .8rem;
+    background: var(--l1-bg); border-left: 3px solid var(--l1); border-radius: 0 4px 4px 0;
+    color: var(--text); line-height: 1.5;
+  }
+  .pa-empty {
+    color: var(--muted); font-size: .85rem; padding: .75rem;
+    background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius);
+  }
+  .pa-refs-section { margin-top: .75rem; padding-top: .5rem; border-top: 1px solid var(--border); }
+  .pa-refs-label {
+    font-size: .68rem; font-weight: 600; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .04em; margin-bottom: .35rem;
+  }
+  .pa-no-refs { font-size: .78rem; color: var(--muted); font-style: italic; }
+  .ref-link {
+    display: flex; align-items: center; gap: .4rem; font-size: .78rem;
+    color: var(--accent2); text-decoration: none; padding: .15rem 0;
+  }
+  .ref-link:hover { text-decoration: underline; }
+  .ref-link::before { content: '\2192'; color: var(--muted); }
+
+  /* Expandable service rows (provider focus) */
+  .svc-expandable { display: flex; flex-direction: column; gap: 2px; margin-top: .5rem; }
+  .svc-expand-row {
+    display: flex; align-items: center; gap: .5rem; padding: .45rem .6rem;
+    background: var(--surface2); border-radius: 4px; cursor: pointer;
+    font-size: .78rem; transition: background .1s;
+  }
+  .svc-expand-row:hover { background: var(--border); }
+  .svc-expand-row.expanded { background: var(--border); }
+  .svc-arrow { color: var(--muted); font-size: .65rem; flex-shrink: 0; width: 14px; text-align: center; }
+  .svc-preview { color: var(--muted); font-size: .72rem; flex: 1; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; }
+  .svc-expand-detail {
+    padding: .55rem .75rem .55rem 1.8rem;
+    border-left: 2px solid var(--accent2); margin: 0 0 .35rem .65rem;
+  }
+
+  /* Other providers (collapsed) */
+  .other-toggle {
+    cursor: pointer; user-select: none; display: flex; align-items: center; gap: .4rem;
+  }
+  .other-toggle .arrow { font-size: .7rem; color: var(--muted); transition: transform .15s; display: inline-block; }
+  .other-toggle.open .arrow { transform: rotate(90deg); }
+  .other-summary { display: flex; gap: .6rem; flex-wrap: wrap; margin-left: auto; }
+  .other-inline { display: flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); }
+  .other-body { display: none; margin-top: .5rem; }
+  .other-body.open { display: block; }
+
+  .loading-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 60vh; gap: 1rem; color: var(--muted); text-align: center;
+  }
+  .spinner {
+    display: inline-block; width: 20px; height: 20px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-banner {
+    background: #2d0a0a; border: 1px solid var(--danger); border-radius: var(--radius);
+    padding: .85rem 1rem; color: var(--danger); font-size: .875rem; margin: 1rem 1.5rem;
+  }
+
+  @media (max-width: 1100px) { .legend { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">tenant<span>-sec</span></a>
+  <a href="index.html" style="color:var(--muted);font-size:.8rem">Contribute</a>
+  <span class="nav-title">Controls Explorer</span>
+  <a href="evaluate.html">Evaluator</a>
+  <a href="index.html" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+</nav>
+
+<div class="toolbar" id="toolbar">
+  <span class="toolbar-label">Providers</span>
+  <div class="provider-pills" id="providerPills"></div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--l3)"></div>L3</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--l2)"></div>L2</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--l1)"></div>L1</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--l0)"></div>L0</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--mix)"></div>Mixed</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--na)"></div>N/A</div>
+  </div>
+</div>
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="matrix-wrap">
+  <div class="matrix" id="matrix">
+    <div class="loading-state" id="loadingState">
+      <span class="spinner"></span>
+      <span>Loading controls and provider data&hellip;</span>
+    </div>
+  </div>
+</div>
+
+<div class="detail-backdrop" id="detailBackdrop"></div>
+<div class="detail-panel" id="detailPanel">
+  <button class="detail-close" id="detailClose">&times;</button>
+  <div id="detailContent"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+<script>
+const DATA_BASE = '../';
+const KNOWN_PROVIDERS = ['aws', 'gcp', 'scaleway', 'azure'];
+
+const DOMAIN_LABELS = {
+  'iam': 'IAM', 'governance': 'Governance', 'encryption': 'Encryption',
+  'network': 'Network', 'logging': 'Logging', 'data': 'Data',
+  'compute': 'Compute', 'incident': 'Incident', 'supply-chain': 'Supply Chain',
+};
+const DOMAIN_FULL = {
+  'iam': 'Identity & Access Management', 'governance': 'Organization Governance & Policy',
+  'encryption': 'Encryption & Key Management', 'network': 'Network Security',
+  'logging': 'Logging, Monitoring & Audit', 'data': 'Data Security & Residency',
+  'compute': 'Compute & Workload Security', 'incident': 'Incident Response & Resilience',
+  'supply-chain': 'Supply Chain & Platform Transparency',
+};
+
+const SCORE_COLORS = { 0: 'l0', 1: 'l1', 2: 'l2', 3: 'l3', 'mixed': 'mix', null: 'na', undefined: 'na' };
+
+let controlIndex = null;
+let providers = {};
+let controlDefs = {};
+let focusedProvider = null;
+let activeCtrlId = null;
+let expandedService = null;
+
+function parseHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return {};
+  const parts = h.split('/');
+  if (parts.length >= 3) return { provider: parts[0], control: parts[1], service: parts[2] };
+  if (parts.length === 2) return { provider: parts[0], control: parts[1] };
+  return { control: parts[0] };
+}
+
+function buildHash(provider, control, service) {
+  if (!control) return '';
+  let h = '#';
+  if (provider) h += provider + '/';
+  h += control;
+  if (service) h += '/' + service;
+  return h;
+}
+
+// ── MIX distribution helper
+
+function getMixDist(providerId, ctrlId) {
+  const ctrl = providers[providerId]?.controls?.[ctrlId];
+  if (!ctrl || ctrl.score !== 'mixed' || !ctrl.services) return null;
+  const dist = {0:0, 1:0, 2:0, 3:0};
+  let total = 0;
+  for (const svc of Object.values(ctrl.services)) {
+    const s = svc.score;
+    if (s !== null && s !== undefined && dist.hasOwnProperty(s)) { dist[s]++; total++; }
+  }
+  if (!total) return null;
+  return { dist, total };
+}
+
+function renderMixDot(providerId, prov, ctrlId) {
+  const md = getMixDist(providerId, ctrlId);
+  if (!md) {
+    const tip = `${prov.display_name || providerId}: MIX`;
+    return `<div class="score-dot dot-mix" data-tip="${tip}">M</div>`;
+  }
+
+  const colors = [[3,'var(--l3)'],[2,'var(--l2)'],[1,'var(--l1)'],[0,'var(--l0)']];
+  const segs = colors
+    .filter(([lvl]) => md.dist[lvl] > 0)
+    .map(([lvl, col]) => `<div style="flex:${md.dist[lvl]};background:${col}"></div>`)
+    .join('');
+
+  const pcts = colors
+    .filter(([lvl]) => md.dist[lvl] > 0)
+    .map(([lvl]) => `${Math.round(md.dist[lvl]/md.total*100)}% L${lvl}`)
+    .join(' \u00b7 ');
+
+  const tip = `${prov.display_name || providerId}: MIX (${pcts})`;
+  return `<div class="mix-bar" data-tip="${tip}">${segs}</div>`;
+}
+
+function renderMixPctText(providerId, ctrlId) {
+  const md = getMixDist(providerId, ctrlId);
+  if (!md) return '';
+  const colors = [[3,'l3'],[2,'l2'],[1,'l1'],[0,'l0']];
+  const parts = colors
+    .filter(([lvl]) => md.dist[lvl] > 0)
+    .map(([lvl, cls]) => `<span style="color:var(--${cls})">${Math.round(md.dist[lvl]/md.total*100)}%</span>`)
+    .join(' ');
+  return `<div class="mix-pct" data-provider="${providerId}">${parts}</div>`;
+}
+
+// ── Data loading
+
+async function fetchYaml(path) {
+  const res = await fetch(DATA_BASE + path);
+  if (!res.ok) throw new Error(`${path}: ${res.status}`);
+  return jsyaml.load(await res.text());
+}
+
+async function init() {
+  try {
+    controlIndex = await fetchYaml('controls/_index.yaml');
+  } catch (e) {
+    showError('Could not load control index: ' + e.message);
+    return;
+  }
+
+  const provResults = await Promise.allSettled(
+    KNOWN_PROVIDERS.map(id => fetchYaml('providers/' + id + '.yaml'))
+  );
+  KNOWN_PROVIDERS.forEach((id, i) => {
+    if (provResults[i].status === 'fulfilled') providers[id] = provResults[i].value;
+  });
+
+  if (!Object.keys(providers).length) {
+    showError('No provider YAML files found. Serve from the repo root.');
+    return;
+  }
+
+  const allCtrlPaths = [];
+  for (const [domKey, domInfo] of Object.entries(controlIndex.domains)) {
+    for (const ctrlId of domInfo.controls) {
+      const slug = ctrlId.substring(ctrlId.indexOf('.') + 1);
+      allCtrlPaths.push({ id: ctrlId, path: `controls/${domKey}/${slug}.yaml` });
+    }
+  }
+
+  const ctrlResults = await Promise.allSettled(
+    allCtrlPaths.map(c => fetchYaml(c.path))
+  );
+  allCtrlPaths.forEach((c, i) => {
+    if (ctrlResults[i].status === 'fulfilled') controlDefs[c.id] = ctrlResults[i].value;
+  });
+
+  buildProviderPills();
+  renderMatrix();
+  updateStats();
+
+  const h = parseHash();
+  if (h.provider && providers[h.provider]) {
+    focusedProvider = h.provider;
+    document.querySelectorAll('.provider-pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.id === focusedProvider));
+    applyCellFocus();
+    updateStats();
+  }
+  if (h.control) {
+    expandedService = h.service || null;
+    openDetail(h.control);
+  }
+}
+
+function buildProviderPills() {
+  const wrap = document.getElementById('providerPills');
+  wrap.innerHTML = '';
+  for (const [id, prov] of Object.entries(providers)) {
+    const pill = document.createElement('button');
+    pill.className = 'provider-pill';
+    pill.textContent = prov.display_name || id;
+    pill.dataset.id = id;
+    pill.onclick = () => toggleFocus(id);
+    wrap.appendChild(pill);
+  }
+}
+
+function toggleFocus(id) {
+  focusedProvider = focusedProvider === id ? null : id;
+  document.querySelectorAll('.provider-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.id === focusedProvider);
+  });
+  applyCellFocus();
+  updateStats();
+  if (activeCtrlId) {
+    expandedService = null;
+    openDetail(activeCtrlId);
+  }
+}
+
+function getProviderScore(providerId, ctrlId) {
+  const prov = providers[providerId];
+  if (!prov?.controls?.[ctrlId]) return undefined;
+  return prov.controls[ctrlId].score;
+}
+
+function scoreClass(score) {
+  if (score === 'mixed') return 'mix';
+  if (score === null || score === undefined) return 'na';
+  return SCORE_COLORS[score] ?? 'na';
+}
+
+function scoreLabel(score) {
+  if (score === 'mixed') return 'MIX';
+  if (score === null || score === undefined) return '\u2014';
+  return 'L' + score;
+}
+
+// ── Matrix rendering
+
+function renderMatrix() {
+  const matrix = document.getElementById('matrix');
+  matrix.innerHTML = '';
+
+  for (const [domKey, domInfo] of Object.entries(controlIndex.domains)) {
+    const col = document.createElement('div');
+    col.className = 'domain-col';
+
+    const header = document.createElement('div');
+    header.className = 'domain-header';
+    header.innerHTML = `
+      <div class="dh-name">${DOMAIN_LABELS[domKey] ?? domKey}</div>
+      <div class="dh-full">${DOMAIN_FULL[domKey] ?? ''}</div>
+      <div class="dh-count">${domInfo.controls.length} controls</div>
+    `;
+    col.appendChild(header);
+
+    for (const ctrlId of domInfo.controls) {
+      const def = controlDefs[ctrlId];
+      const cell = document.createElement('div');
+      cell.className = 'ctrl-cell';
+      cell.dataset.ctrl = ctrlId;
+      cell.onclick = () => openDetail(ctrlId);
+
+      const name = def?.name ?? formatIdAsName(ctrlId);
+      const dots = Object.entries(providers).map(([pid, prov]) => {
+        const s = getProviderScore(pid, ctrlId);
+        if (s === 'mixed') return renderMixDot(pid, prov, ctrlId);
+        const cls = scoreClass(s);
+        const abbr = (prov.display_name || pid).substring(0, 3).toUpperCase();
+        const tip = `${prov.display_name || pid}: ${scoreLabel(s)}`;
+        return `<div class="score-dot dot-${cls}" data-tip="${tip}">${abbr[0]}</div>`;
+      }).join('');
+
+      const mixPcts = Object.entries(providers).map(([pid]) => {
+        const s = getProviderScore(pid, ctrlId);
+        if (s !== 'mixed') return '';
+        return renderMixPctText(pid, ctrlId);
+      }).join('');
+
+      cell.innerHTML = `
+        <div class="ctrl-name">${escHtml(name)}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="ctrl-id">${ctrlId}</div>
+          <div class="score-dots">${dots}</div>
+        </div>
+        ${mixPcts}
+      `;
+      col.appendChild(cell);
+    }
+    matrix.appendChild(col);
+  }
+  applyCellFocus();
+}
+
+function applyCellFocus() {
+  document.querySelectorAll('.ctrl-cell').forEach(cell => {
+    cell.classList.remove('focused-l0','focused-l1','focused-l2','focused-l3','focused-mix');
+    if (!focusedProvider) {
+      cell.querySelectorAll('.mix-pct').forEach(el => el.style.display = 'none');
+      return;
+    }
+    const s = getProviderScore(focusedProvider, cell.dataset.ctrl);
+    const cls = scoreClass(s);
+    if (cls !== 'na') cell.classList.add('focused-' + cls);
+    cell.querySelectorAll('.mix-pct').forEach(el => {
+      el.style.display = (el.dataset.provider === focusedProvider && s === 'mixed') ? 'block' : 'none';
+    });
+  });
+}
+
+function updateStats() {
+  const bar = document.getElementById('statsBar');
+  if (!focusedProvider) {
+    const total = Object.values(controlIndex.domains).reduce((a, d) => a + d.controls.length, 0);
+    bar.innerHTML = `<span class="stat"><span class="stat-val">${total}</span> controls across
+      <span class="stat-val">${Object.keys(controlIndex.domains).length}</span> domains &middot;
+      <span class="stat-val">${Object.keys(providers).length}</span> providers loaded</span>`;
+    return;
+  }
+  const prov = providers[focusedProvider];
+  const counts = { 0: 0, 1: 0, 2: 0, 3: 0, mixed: 0, na: 0 };
+  let total = 0;
+  for (const domInfo of Object.values(controlIndex.domains)) {
+    for (const ctrlId of domInfo.controls) {
+      total++;
+      const s = getProviderScore(focusedProvider, ctrlId);
+      if (s === 'mixed') counts.mixed++;
+      else if (s === null || s === undefined) counts.na++;
+      else counts[s]++;
+    }
+  }
+  bar.innerHTML = `
+    <span class="stat" style="font-weight:700;color:var(--text)">${prov.display_name || focusedProvider}</span>
+    <span class="stat"><span class="stat-val" style="color:var(--l3)">${counts[3]}</span> L3</span>
+    <span class="stat"><span class="stat-val" style="color:var(--l2)">${counts[2]}</span> L2</span>
+    <span class="stat"><span class="stat-val" style="color:var(--l1)">${counts[1]}</span> L1</span>
+    <span class="stat"><span class="stat-val" style="color:var(--l0)">${counts[0]}</span> L0</span>
+    <span class="stat"><span class="stat-val" style="color:var(--mix)">${counts.mixed}</span> Mixed</span>
+    <span class="stat"><span class="stat-val" style="color:var(--muted)">${counts.na}</span> N/A</span>
+    <span class="stat" style="color:var(--muted)">&middot; ${total} total</span>
+  `;
+}
+
+// ── Detail panel
+
+function openDetail(ctrlId) {
+  activeCtrlId = ctrlId;
+  location.hash = buildHash(focusedProvider, ctrlId, expandedService);
+  document.querySelectorAll('.ctrl-cell').forEach(c =>
+    c.classList.toggle('active', c.dataset.ctrl === ctrlId));
+
+  const def = controlDefs[ctrlId];
+  const el = document.getElementById('detailContent');
+
+  const flags = [];
+  if (def?.service_scoped) flags.push('service-scoped');
+  if (def?.domain) flags.push(def.domain);
+
+  const criteriaHtml = buildCriteriaHtml(def);
+  const mappingsHtml = buildMappingsHtml(def);
+  const descHtml = def?.description
+    ? `<div class="detail-desc">${escHtml(def.description.trim())}</div>` : '';
+
+  let assessmentHtml, otherHtml = '';
+
+  if (focusedProvider && providers[focusedProvider]) {
+    assessmentHtml = renderFocusedProvider(focusedProvider, ctrlId);
+    otherHtml = renderOtherProviders(ctrlId, focusedProvider);
+  } else {
+    assessmentHtml = '<div class="section-title">Provider scores</div>' +
+      renderAllProviders(ctrlId);
+  }
+
+  const provLabel = focusedProvider
+    ? ` &middot; <span style="color:var(--accent2)">${escHtml(providers[focusedProvider]?.display_name || focusedProvider)}</span>` : '';
+
+  el.innerHTML = `
+    <div class="detail-id">${ctrlId}${provLabel}${def?.service_scoped ? ' &middot; <span style="color:var(--purple)">service-scoped</span>' : ''}</div>
+    <div class="detail-title">${escHtml(def?.name ?? formatIdAsName(ctrlId))}</div>
+    <div class="detail-flags">${flags.map(f => `<span class="detail-flag">${escHtml(f)}</span>`).join('')}</div>
+    ${assessmentHtml}
+    <div class="section-title">Control definition</div>
+    ${descHtml}
+    <div class="section-title" style="margin-top:.75rem">Maturity criteria</div>
+    <div class="criteria-list">${criteriaHtml}</div>
+    ${mappingsHtml ? `<div class="section-title">Framework mappings</div>${mappingsHtml}` : ''}
+    ${otherHtml}
+  `;
+
+  document.getElementById('detailBackdrop').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+  if (!expandedService) document.getElementById('detailPanel').scrollTop = 0;
+}
+
+function renderFocusedProvider(pid, ctrlId) {
+  const prov = providers[pid];
+  const ctrl = prov.controls?.[ctrlId];
+  const heading = `<div class="section-title">${escHtml(prov.display_name || pid)} assessment</div>`;
+
+  if (!ctrl) {
+    return heading + `<div class="pa-empty">Not yet assessed for this provider.</div>`;
+  }
+
+  const s = ctrl.score;
+  const cls = scoreClass(s);
+  const label = scoreLabel(s);
+  const verified = ctrl.verified_at
+    ? `<span class="psc-verified">Verified: ${ctrl.verified_at}</span>` : '';
+
+  let bodyHtml = '';
+  if (s === 'mixed' && ctrl.services) {
+    bodyHtml = (ctrl.summary ? `<div class="psc-summary">${escHtml(ctrl.summary)}</div>` : '') +
+      '<div class="svc-expandable">' +
+      Object.entries(ctrl.services).map(([svcId, svc]) => {
+        const sCls = scoreClass(svc.score);
+        const isExp = expandedService === svcId;
+        const ev = (svc.evidence || '').trim();
+        const preview = ev.length > 100 ? ev.substring(0, 100) + '\u2026' : ev;
+        let html = `<div class="svc-expand-row${isExp ? ' expanded' : ''}" onclick="toggleServiceExpand('${svcId}')">
+          <span class="svc-arrow">${isExp ? '\u25BC' : '\u25B6'}</span>
+          <span class="svc-name">${escHtml(svcId)}</span>
+          <span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score)}</span>
+          ${!isExp ? `<span class="svc-preview">${escHtml(preview)}</span>` : ''}
+        </div>`;
+        if (isExp) {
+          html += `<div class="svc-expand-detail">
+            <div class="psc-evidence">${escHtml(ev)}</div>
+            ${renderRefs(svc.references)}
+          </div>`;
+        }
+        return html;
+      }).join('') + '</div>';
+  } else {
+    bodyHtml = `<div class="psc-evidence">${escHtml((ctrl.evidence || '').trim())}</div>`;
+    if (ctrl.compensating_controls) {
+      bodyHtml += `<div class="pa-compensating"><strong>Compensating controls:</strong> ${escHtml(ctrl.compensating_controls.trim())}</div>`;
+    }
+  }
+
+  const refsHtml = ctrl.references
+    ? renderRefs(ctrl.references)
+    : '<div class="pa-no-refs">No reference links yet</div>';
+
+  return heading + `<div class="provider-assessment">
+    <div class="pa-score-row">
+      <span class="psc-score score-badge-${cls}">${label}</span>
+      ${verified}
+    </div>
+    ${bodyHtml}
+    <div class="pa-refs-section">
+      <div class="pa-refs-label">Documentation references</div>
+      ${refsHtml}
+    </div>
+  </div>`;
+}
+
+function renderOtherProviders(ctrlId, excludeId) {
+  const others = Object.entries(providers).filter(([id]) => id !== excludeId);
+  if (!others.length) return '';
+
+  const badges = others.map(([pid, prov]) => {
+    const s = getProviderScore(pid, ctrlId);
+    const cls = scoreClass(s);
+    return `<span class="other-inline">${escHtml(prov.display_name || pid)}
+      <span class="score-badge-${cls}" style="padding:0 .35rem;border-radius:3px;font-size:.7rem;font-weight:700">${scoreLabel(s)}</span></span>`;
+  }).join('');
+
+  const cards = others.map(([pid, prov]) => renderProviderCard(pid, prov, ctrlId)).join('');
+
+  return `<div class="section-title other-toggle" onclick="this.classList.toggle('open');document.getElementById('otherProvidersBody').classList.toggle('open')">
+    <span class="arrow">&#x25B6;</span> Other providers
+    <div class="other-summary">${badges}</div>
+  </div>
+  <div class="other-body" id="otherProvidersBody">${cards}</div>`;
+}
+
+function renderAllProviders(ctrlId) {
+  return Object.entries(providers).map(([pid, prov]) =>
+    renderProviderCard(pid, prov, ctrlId)).join('');
+}
+
+function renderProviderCard(pid, prov, ctrlId) {
+  const ctrl = prov.controls?.[ctrlId];
+  if (!ctrl) return `<div class="provider-score-card">
+    <div class="psc-header">
+      <span class="psc-name">${escHtml(prov.display_name || pid)}</span>
+      <span class="psc-score score-badge-na">Not assessed</span>
+    </div></div>`;
+
+  const s = ctrl.score;
+  const cls = scoreClass(s);
+  const label = scoreLabel(s);
+  const verified = ctrl.verified_at
+    ? `<span class="psc-verified">Verified: ${ctrl.verified_at}</span>` : '';
+
+  let body;
+  if (s === 'mixed' && ctrl.services) {
+    body = `<div class="psc-body">
+      ${ctrl.summary ? `<div class="psc-summary">${escHtml(ctrl.summary)}</div>` : ''}
+      <table class="svc-table">
+        <thead><tr><th>Service</th><th>Score</th><th>Evidence</th></tr></thead>
+        <tbody>${Object.entries(ctrl.services).map(([svcId, svc]) => {
+          const sCls = scoreClass(svc.score);
+          return `<tr>
+            <td class="svc-name">${escHtml(svcId)}</td>
+            <td><span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score)}</span></td>
+            <td class="svc-evidence">${escHtml((svc.evidence || '').trim())}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  } else {
+    body = `<div class="psc-body">
+      <div class="psc-evidence">${escHtml((ctrl.evidence || '').trim())}</div>
+    </div>`;
+  }
+
+  return `<div class="provider-score-card">
+    <div class="psc-header">
+      <span class="psc-name">${escHtml(prov.display_name || pid)}</span>
+      ${verified}
+      <span class="psc-score score-badge-${cls}">${label}</span>
+    </div>
+    ${body}
+  </div>`;
+}
+
+function buildCriteriaHtml(def) {
+  if (!def?.criteria) return '<div style="color:var(--muted);font-size:.8rem">Control definition not loaded</div>';
+  return ['L0','L1','L2','L3'].map(lvl => {
+    const text = def.criteria[lvl];
+    if (!text) return '';
+    const cls = scoreClass(parseInt(lvl[1]));
+    return `<div class="criteria-item">
+      <div class="criteria-badge" style="background:var(--${cls})">${lvl}</div>
+      <div class="criteria-text">${escHtml(text.trim())}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildMappingsHtml(def) {
+  if (!def?.framework_mappings) return '';
+  return Object.entries(def.framework_mappings)
+    .filter(([, ids]) => ids && ids.length)
+    .map(([fw, ids]) => `<div class="mapping-row">
+      <span class="mapping-label">${escHtml(fw)}</span>
+      ${ids.map(id => `<span class="mapping-tag">${escHtml(id)}</span>`).join('')}
+    </div>`).join('');
+}
+
+function renderRefs(refs) {
+  if (!refs || !refs.length) return '';
+  return refs.map(r =>
+    `<a class="ref-link" href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.title || r.url)}</a>`
+  ).join('');
+}
+
+function toggleServiceExpand(svcId) {
+  expandedService = expandedService === svcId ? null : svcId;
+  const scrollY = document.getElementById('detailPanel').scrollTop;
+  openDetail(activeCtrlId);
+  document.getElementById('detailPanel').scrollTop = scrollY;
+}
+
+function closeDetail() {
+  document.getElementById('detailBackdrop').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+  document.querySelectorAll('.ctrl-cell.active').forEach(c => c.classList.remove('active'));
+  activeCtrlId = null;
+  expandedService = null;
+  history.replaceState(null, '', location.pathname + location.search);
+}
+
+function formatIdAsName(ctrlId) {
+  const slug = ctrlId.substring(ctrlId.indexOf('.') + 1);
+  return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str ?? '';
+  return d.innerHTML;
+}
+
+function showError(msg) {
+  const matrix = document.getElementById('matrix');
+  matrix.innerHTML = `<div class="error-banner">&starf; ${msg}</div>`;
+}
+
+document.getElementById('detailClose').onclick = closeDetail;
+document.getElementById('detailBackdrop').onclick = closeDetail;
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+window.toggleServiceExpand = toggleServiceExpand;
+
+init();
+</script>
+</body>
+</html>

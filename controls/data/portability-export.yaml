@@ -1,0 +1,52 @@
+---
+id: data.portability-export
+domain: data
+name: "Data Portability & Export"
+description: >
+  The ability to extract all tenant data — application data, configuration,
+  metadata, and infrastructure-as-code definitions — in standard, documented,
+  machine-readable formats through programmatic interfaces. Covers bulk export
+  tooling, format standardization, metadata completeness (including IAM and
+  network configuration), contractual right to data return, and
+  post-termination retrieval windows. Distinct from backup (recovery from
+  failure) and deletion (data destruction); this control evaluates the
+  tenant's ability to leave the provider with their data intact.
+
+criteria:
+  L0: >
+    No export capability beyond live API access. If the service is
+    terminated, data is deleted with no retrieval mechanism. No documented
+    export formats. No contractual guarantee of data return.
+  L1: >
+    Data export is achievable through per-resource API calls and manual
+    scripting (e.g., downloading objects one by one, exporting database
+    dumps via native tooling). No bulk export. Some data types use
+    proprietary formats. Infrastructure configuration (IAM policies,
+    network rules, encryption settings) is not exportable in a
+    machine-readable format.
+  L2: >
+    Documented export tools or APIs exist for major services (object
+    storage, databases, compute images) in standard formats (JSON, CSV,
+    native dump formats). Contractual commitment to data return exists
+    with a defined post-termination retrieval window. However,
+    infrastructure configuration (IAM, network, governance policies) is
+    not exportable, or bulk export across all services requires significant
+    manual orchestration.
+  L3: >
+    Comprehensive data portability: all application data and infrastructure
+    configuration exportable in standard, documented formats via bulk APIs
+    or managed export tools. IAM policies, network rules, encryption key
+    metadata, and resource tags are included. Contractual guarantee of
+    data return timeline. Post-termination retrieval window of at least
+    30 days. Migration documentation or tooling available. Export operates
+    without service disruption.
+
+framework_mappings:
+  ccm: ["STA-05", "STA-06"]
+  nist_800_53_r5: ["SI-12"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

@@ -1,0 +1,48 @@
+---
+id: iam.session-management
+domain: iam
+name: "Session Lifecycle Management"
+description: >
+  Tenant control over active session parameters after authentication succeeds:
+  maximum session duration, idle timeout, token lifetime for temporary
+  credentials, concurrent session limits, and immediate session invalidation
+  when privileges are changed or revoked. Distinct from authentication
+  (how you prove identity) and credential management (key rotation/expiry);
+  this control evaluates the lifecycle of an active, authenticated session.
+
+criteria:
+  L0: >
+    No configurable session controls. Sessions have a fixed, provider-defined
+    timeout that tenants cannot change. No idle timeout. No concurrent session
+    limits. When a user's permissions are revoked, existing sessions continue
+    with stale permissions until natural expiry.
+  L1: >
+    Session management is achievable through tenant-built compensating
+    controls: deploying a reverse proxy that enforces session timeout, or
+    using short-lived tokens with custom refresh logic. The provider offers
+    no native session policy configuration. Idle timeout and concurrent
+    session limits require external tooling.
+  L2: >
+    Configurable maximum session duration and token lifetime for temporary
+    credentials (e.g., STS/AssumeRole sessions). Console session timeout
+    is adjustable. However, idle timeout is not configurable independently,
+    concurrent session limits are not available, or session invalidation
+    on privilege change is not immediate (sessions run to natural expiry
+    with stale permissions).
+  L3: >
+    Full session lifecycle control: configurable maximum session duration,
+    idle timeout (re-authenticate after inactivity), concurrent session
+    limits per user, immediate session invalidation when permissions are
+    changed or credentials are revoked, session IP binding (restrict session
+    to originating network), and org-level session policies that apply to
+    all accounts/projects.
+
+framework_mappings:
+  ccm: ["IAM-12"]
+  nist_800_53_r5: ["AC-12", "SC-10", "SC-23"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: ["T1550"]
+
+service_scoped: false

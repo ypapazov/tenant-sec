@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluator — tenant-sec</title>
+<style>
+  :root {
+    --bg:       #0d1117;
+    --surface:  #161b22;
+    --surface2: #1c2128;
+    --border:   #21262d;
+    --accent:   #2ea043;
+    --accent2:  #388bfd;
+    --warn:     #d29922;
+    --danger:   #f85149;
+    --text:     #e6edf3;
+    --muted:    #7d8590;
+    --radius:   8px;
+    --sidebar:  340px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.6 'Inter', system-ui, sans-serif; min-height: 100vh; }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(13,17,23,.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1.5rem; height: 52px;
+  }
+  nav .logo { font-weight: 700; font-size: 1rem; color: var(--text); text-decoration: none; }
+  nav .logo span { color: var(--accent); }
+  nav a { color: var(--muted); text-decoration: none; font-size: .875rem; }
+  nav a:hover { color: var(--text); }
+  .back { margin-right: auto; }
+  .nav-title { color: var(--muted); font-size: .875rem; }
+
+  /* ── Layout ── */
+  .layout {
+    display: grid;
+    grid-template-columns: var(--sidebar) 1fr;
+    min-height: calc(100vh - 52px);
+  }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 1.5rem;
+  }
+  .sidebar h2 { font-size: 1rem; color: var(--text); margin-bottom: .75rem; }
+  .section-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: .5rem;
+  }
+
+  /* ── Providers checkboxes ── */
+  .provider-check {
+    display: flex; flex-direction: column; gap: .4rem;
+  }
+  .provider-check label {
+    display: flex; align-items: center; gap: .6rem;
+    padding: .4rem .6rem; border-radius: 6px;
+    cursor: pointer; font-size: .875rem;
+    border: 1px solid transparent;
+    transition: border-color .1s;
+  }
+  .provider-check label:hover { border-color: var(--border); background: var(--surface2); }
+  .provider-check input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; }
+
+  /* ── Domain weight sliders ── */
+  .weight-rows { display: flex; flex-direction: column; gap: .6rem; }
+  .weight-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 38px;
+    align-items: center; gap: .5rem;
+  }
+  .weight-row label { font-size: .8rem; color: var(--text); }
+  input[type=range] {
+    width: 100%; accent-color: var(--accent2);
+    cursor: pointer;
+  }
+  .weight-val { font-size: .75rem; color: var(--accent2); text-align: right; font-weight: 600; }
+  .weight-sum {
+    font-size: .78rem; text-align: right; padding-top: .35rem;
+  }
+  .weight-sum.ok   { color: var(--accent); }
+  .weight-sum.warn { color: var(--warn); }
+
+  /* ── Aggregation ── */
+  select {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    padding: .4rem .75rem; font-size: .875rem; width: 100%;
+    cursor: pointer;
+  }
+  select:focus { outline: 1px solid var(--accent2); }
+
+  /* ── Must-haves ── */
+  .must-list { display: flex; flex-direction: column; gap: .4rem; }
+  .must-row {
+    display: flex; align-items: center; gap: .4rem;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; padding: .4rem .6rem;
+  }
+  .must-row .must-id  { flex: 1; font-size: .78rem; font-family: monospace; color: var(--accent2); }
+  .must-row .must-lvl { font-size: .78rem; color: var(--muted); }
+  .must-row button {
+    background: none; border: none; color: var(--danger); cursor: pointer;
+    font-size: .85rem; line-height: 1; padding: 0 .2rem;
+  }
+  .must-add { display: flex; gap: .4rem; margin-top: .4rem; }
+  .must-add input, .must-add select {
+    font-size: .8rem; padding: .3rem .5rem; flex: 1;
+  }
+  .must-add select { flex: 0 0 70px; }
+  .btn-add {
+    flex: 0 0 auto; background: var(--accent2); color: #fff;
+    border: none; border-radius: var(--radius);
+    padding: .3rem .7rem; font-size: .8rem; cursor: pointer;
+  }
+  .btn-add:hover { background: #58a6ff; }
+
+  /* ── Run button ── */
+  .run-btn {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius); padding: .65rem 1rem;
+    font-size: .9rem; font-weight: 700; cursor: pointer;
+    width: 100%; transition: background .15s;
+    display: flex; align-items: center; justify-content: center; gap: .4rem;
+  }
+  .run-btn:hover { background: #3fb950; }
+  .run-btn:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* ── Profile YAML paste ── */
+  textarea {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: 'Fira Code', monospace; font-size: .78rem;
+    width: 100%; resize: vertical; padding: .75rem;
+    line-height: 1.5; min-height: 160px;
+  }
+  textarea:focus { outline: 1px solid var(--accent2); }
+  .yaml-status { font-size: .75rem; margin-top: .3rem; }
+  .yaml-status.ok   { color: var(--accent); }
+  .yaml-status.err  { color: var(--danger); }
+
+  /* ── Main ── */
+  .main-panel {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 2rem;
+  }
+
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; gap: 1rem; color: var(--muted); padding: 4rem 2rem; text-align: center;
+  }
+  .empty-state .icon { font-size: 3rem; }
+  .empty-state h2 { font-size: 1.25rem; color: var(--text); }
+
+  /* ── Results ── */
+  .result-header {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .result-header h2 { font-size: 1.1rem; }
+  .result-meta { color: var(--muted); font-size: .8rem; }
+
+  /* ── Score cards ── */
+  .score-cards { display: flex; flex-direction: column; gap: 1rem; }
+  .score-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+  }
+  .score-card.fail { border-color: #6e2020; }
+  .score-card.stale { border-color: #5a4200; }
+  .card-header {
+    display: flex; align-items: center; gap: 1rem;
+    padding: .85rem 1.1rem; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .rank-badge {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: .8rem; color: var(--muted);
+  }
+  .rank-badge.gold   { background: #3d2a0a; border-color: var(--warn); color: var(--warn); }
+  .rank-badge.silver { background: #1c2230; border-color: #8b949e; color: #8b949e; }
+  .rank-badge.bronze { background: #2a1a0a; border-color: #a0522d; color: #cd7f32; }
+  .provider-name { font-weight: 700; font-size: 1rem; }
+  .overall-score { font-size: 1.6rem; font-weight: 800; margin-left: auto; }
+  .overall-score.pass { color: var(--accent); }
+  .overall-score.fail { color: var(--danger); }
+  .must-badge {
+    font-size: .72rem; font-weight: 700; padding: .2rem .55rem;
+    border-radius: 12px;
+  }
+  .must-badge.pass { background: #0a2d14; color: var(--accent); }
+  .must-badge.fail { background: #3d1010; color: var(--danger); }
+  .stale-badge {
+    font-size: .72rem; font-weight: 700; padding: .2rem .55rem;
+    border-radius: 12px; background: #3d2a0a; color: var(--warn);
+  }
+
+  /* ── Domain bar charts ── */
+  .card-body { padding: .85rem 1.1rem; }
+  .domain-bars { display: flex; flex-direction: column; gap: .5rem; }
+  .domain-bar-row { display: grid; grid-template-columns: 130px 1fr 42px; align-items: center; gap: .75rem; }
+  .domain-name { font-size: .78rem; color: var(--text); }
+  .bar-track {
+    height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%; border-radius: 4px; transition: width .4s ease;
+  }
+  .domain-val { font-size: .75rem; text-align: right; font-weight: 600; }
+
+  /* ── Must-have detail ── */
+  .must-detail {
+    margin-top: .75rem; padding: .75rem;
+    background: var(--surface2); border-radius: 6px;
+    display: flex; flex-direction: column; gap: .35rem;
+  }
+  .must-detail-label { font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .25rem; }
+  .must-detail-row {
+    display: flex; align-items: center; gap: .5rem; font-size: .8rem;
+  }
+  .must-detail-row .ctrl-id { font-family: monospace; color: var(--accent2); flex: 1; }
+  .must-detail-row .req { color: var(--muted); }
+  .must-detail-row .actual.pass { color: var(--accent); font-weight: 700; }
+  .must-detail-row .actual.fail { color: var(--danger); font-weight: 700; }
+  .must-detail-row .mark { font-weight: 800; }
+  .must-detail-row .mark.pass { color: var(--accent); }
+  .must-detail-row .mark.fail { color: var(--danger); }
+
+  /* ── Export buttons ── */
+  .export-row { display: flex; gap: .5rem; margin-top: .5rem; flex-wrap: wrap; }
+  .btn-export {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); border-radius: var(--radius);
+    padding: .35rem .75rem; font-size: .78rem; cursor: pointer;
+    transition: border-color .15s;
+  }
+  .btn-export:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ── Error banner ── */
+  .error-banner {
+    background: #2d0a0a; border: 1px solid var(--danger);
+    border-radius: var(--radius); padding: .85rem 1rem;
+    color: var(--danger); font-size: .875rem;
+  }
+
+  /* ── Tabs ── */
+  .tab-row { display: flex; gap: .25rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .tab-btn {
+    background: none; border: none; border-bottom: 2px solid transparent;
+    color: var(--muted); padding: .5rem .85rem; cursor: pointer; font-size: .875rem;
+    transition: all .15s; margin-bottom: -1px;
+  }
+  .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ── Raw scores table ── */
+  .raw-table-wrap { overflow-x: auto; }
+  .raw-table { border-collapse: collapse; width: 100%; font-size: .78rem; white-space: nowrap; }
+  .raw-table th {
+    background: var(--surface2); padding: .45rem .75rem;
+    border: 1px solid var(--border); font-weight: 600;
+    position: sticky; top: 0;
+  }
+  .raw-table td {
+    padding: .4rem .75rem; border: 1px solid var(--border); font-family: monospace;
+  }
+  .raw-table tr:nth-child(even) td { background: var(--surface2); }
+  .l0 { color: var(--danger); }
+  .l1 { color: var(--warn); }
+  .l2 { color: var(--accent2); }
+  .l3 { color: var(--accent); }
+  .ln { color: var(--muted); }
+
+  /* ── Loader ── */
+  .spinner {
+    display: inline-block; width: 16px; height: 16px;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  code { font-family: 'Fira Code', monospace; font-size: .85em; color: var(--accent2); }
+  a { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">tenant<span>-sec</span></a>
+  <a href="controls.html">Controls Explorer</a>
+  <span class="nav-title" style="margin-left:auto">In-browser Evaluator</span>
+  <a href="index.html" class="gh-icon" title="GitHub" style="display:flex;align-items:center"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+</nav>
+
+<div class="layout">
+
+  <!-- ════════════════════════════════ SIDEBAR ══════════════════════════ -->
+  <aside class="sidebar">
+
+    <!-- Providers -->
+    <div>
+      <div class="section-label">Providers to evaluate</div>
+      <div class="provider-check" id="providerList">
+        <div style="color:var(--muted);font-size:.8rem;display:flex;align-items:center;gap:.4rem">
+          <span class="spinner"></span> Loading…
+        </div>
+      </div>
+    </div>
+
+    <!-- Aggregation -->
+    <div>
+      <div class="section-label">Mixed composite aggregation</div>
+      <select id="aggSelect">
+        <option value="mean">mean — arithmetic average</option>
+        <option value="min">min — worst case</option>
+        <option value="median">median</option>
+        <option value="p10">p10 — 10th percentile</option>
+        <option value="p20" selected>p20 — 20th percentile (default)</option>
+        <option value="threshold:L2:0.8">threshold:L2:0.8 — 80% ≥ L2</option>
+        <option value="threshold:L2:0.5">threshold:L2:0.5 — 50% ≥ L2</option>
+        <option value="threshold:L3:0.8">threshold:L3:0.8 — 80% ≥ L3</option>
+      </select>
+    </div>
+
+    <!-- Domain weights -->
+    <div>
+      <div class="section-label">Domain weights</div>
+      <div class="weight-rows" id="weightRows"><!-- populated by JS --></div>
+      <div class="weight-sum ok" id="weightSum">Sum: 1.00</div>
+    </div>
+
+    <!-- Must-haves -->
+    <div>
+      <div class="section-label">Must-have controls</div>
+      <div class="must-list" id="mustList"></div>
+      <div class="must-add">
+        <input id="mustCtrlInput" type="text" placeholder="e.g. enc.cmk" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:.3rem .5rem;font-size:.78rem;flex:1;font-family:monospace">
+        <select id="mustLvlSelect">
+          <option value="0">≥ L0</option>
+          <option value="1">≥ L1</option>
+          <option value="2" selected>≥ L2</option>
+          <option value="3">≥ L3</option>
+        </select>
+        <button class="btn-add" onclick="addMustHave()">+ Add</button>
+      </div>
+    </div>
+
+    <!-- YAML paste (advanced) -->
+    <div>
+      <div class="section-label">Or paste a scoring profile YAML</div>
+      <textarea id="yamlPaste" placeholder="name: my-profile&#10;mixed_aggregation: mean&#10;weights:&#10;  iam: 0.2&#10;  encryption: 0.3&#10;  ...&#10;must_have:&#10;  - control: enc.cmk&#10;    min_level: 2" spellcheck="false"></textarea>
+      <div class="yaml-status" id="yamlStatus"></div>
+    </div>
+
+    <button class="run-btn" id="runBtn" onclick="runEvaluation()">
+      ▶ Run evaluation
+    </button>
+  </aside>
+
+  <!-- ══════════════════════════════ MAIN PANEL ═════════════════════════ -->
+  <main class="main-panel" id="mainPanel">
+    <div class="empty-state" id="emptyState">
+      <div class="icon">🔬</div>
+      <h2>Configure your scoring profile</h2>
+      <p>Select providers, set domain weights and any must-have controls, then click Run evaluation.<br>
+      All scoring happens in your browser — no data is sent anywhere.</p>
+    </div>
+  </main>
+
+</div>
+
+<!-- js-yaml from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+
+<script type="module">
+  import { scoreProviders } from './scoring-engine.js';
+  window._scoreProviders = scoreProviders;
+</script>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+
+const DOMAINS = ['iam','governance','encryption','network','logging','data','compute','incident','supply-chain'];
+const DOMAIN_LABELS = {
+  'iam': 'IAM', 'governance': 'Governance', 'encryption': 'Encryption',
+  'network': 'Network', 'logging': 'Logging', 'data': 'Data / Residency',
+  'compute': 'Compute', 'incident': 'Incident Response', 'supply-chain': 'Supply Chain'
+};
+const DEFAULT_WEIGHTS = {
+  iam:0.15, governance:0.12, encryption:0.18, network:0.12,
+  logging:0.12, data:0.12, compute:0.09, incident:0.05, 'supply-chain':0.05
+};
+const BAR_COLORS = ['#388bfd','#3fb950','#d29922','#f78166','#bc8cff','#39d353','#79c0ff','#ff7b72','#a5d6ff'];
+
+let loadedProviders = {};   // {id: parsedYaml}
+let controlIndex    = null; // parsed _index.yaml
+let mustHaves       = [];   // [{control, min_level}]
+
+// ── Load data ─────────────────────────────────────────────────────────────
+
+const DATA_BASE = '../';  // relative to docs/
+
+async function fetchYaml(path) {
+  const res = await fetch(DATA_BASE + path);
+  if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
+  return jsyaml.load(await res.text());
+}
+
+async function init() {
+  // Load control index and discover provider list
+  let indexData, serviceList;
+  try {
+    [indexData, serviceList] = await Promise.all([
+      fetchYaml('controls/_index.yaml'),
+      fetchYaml('providers/').catch(() => null),
+    ]);
+    controlIndex = indexData;
+  } catch(e) {
+    showError('Could not load control index: ' + e.message);
+    return;
+  }
+
+  // Try to detect available providers by attempting known filenames
+  const knownProviders = ['aws', 'gcp', 'scaleway', 'azure'];
+  const providerResults = await Promise.allSettled(
+    knownProviders.map(id => fetchYaml('providers/' + id + '.yaml'))
+  );
+
+  const listEl = document.getElementById('providerList');
+  listEl.innerHTML = '';
+
+  knownProviders.forEach((id, i) => {
+    const r = providerResults[i];
+    if (r.status === 'fulfilled') {
+      loadedProviders[id] = r.value;
+      const label = document.createElement('label');
+      const name  = r.value.provider || id;
+      label.innerHTML = `<input type="checkbox" value="${id}" checked> ${name}`;
+      listEl.appendChild(label);
+    }
+  });
+
+  if (Object.keys(loadedProviders).length === 0) {
+    listEl.innerHTML = '<span style="color:var(--danger);font-size:.8rem">No provider YAML files found. Serve from the repo root.</span>';
+  }
+
+  buildWeightSliders();
+  buildDefaultMustHaves();
+}
+
+// ── Build UI ──────────────────────────────────────────────────────────────
+
+function buildWeightSliders() {
+  const container = document.getElementById('weightRows');
+  container.innerHTML = '';
+  DOMAINS.forEach((d, i) => {
+    const val = DEFAULT_WEIGHTS[d] ?? 0.05;
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `
+      <label>${DOMAIN_LABELS[d]}</label>
+      <input type="range" min="0" max="0.5" step="0.01" value="${val}"
+        id="w-${d}" oninput="onWeightChange()">
+      <div class="weight-val" id="wv-${d}">${val.toFixed(2)}</div>
+    `;
+    container.appendChild(row);
+  });
+  updateWeightSum();
+}
+
+function onWeightChange() {
+  DOMAINS.forEach(d => {
+    const v = parseFloat(document.getElementById('w-'+d).value);
+    document.getElementById('wv-'+d).textContent = v.toFixed(2);
+  });
+  updateWeightSum();
+}
+
+function updateWeightSum() {
+  const sum = DOMAINS.reduce((a,d) => a + parseFloat(document.getElementById('w-'+d)?.value ?? 0), 0);
+  const el = document.getElementById('weightSum');
+  el.textContent = 'Sum: ' + sum.toFixed(2);
+  el.className = 'weight-sum ' + (Math.abs(sum - 1.0) < 0.005 ? 'ok' : 'warn');
+}
+
+function buildDefaultMustHaves() {
+  mustHaves = [
+    {control:'enc.cmk',           min_level: 2},
+    {control:'log.immutability',  min_level: 2},
+    {control:'data.residency-guarantees', min_level: 2},
+  ];
+  renderMustHaves();
+}
+
+function renderMustHaves() {
+  const el = document.getElementById('mustList');
+  el.innerHTML = '';
+  mustHaves.forEach((mh, i) => {
+    const row = document.createElement('div');
+    row.className = 'must-row';
+    row.innerHTML = `
+      <span class="must-id">${mh.control}</span>
+      <span class="must-lvl">≥ L${mh.min_level}</span>
+      <button onclick="removeMustHave(${i})">✕</button>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function addMustHave() {
+  const ctrl = document.getElementById('mustCtrlInput').value.trim();
+  const lvl  = parseInt(document.getElementById('mustLvlSelect').value);
+  if (!ctrl) return;
+  if (mustHaves.find(m => m.control === ctrl)) {
+    mustHaves = mustHaves.filter(m => m.control !== ctrl);
+  }
+  mustHaves.push({control: ctrl, min_level: lvl});
+  renderMustHaves();
+  document.getElementById('mustCtrlInput').value = '';
+}
+
+function removeMustHave(i) {
+  mustHaves.splice(i, 1);
+  renderMustHaves();
+}
+
+// ── YAML paste handler ────────────────────────────────────────────────────
+
+let yamlProfileOverride = null;
+
+document.getElementById('yamlPaste').addEventListener('input', function() {
+  const val = this.value.trim();
+  const status = document.getElementById('yamlStatus');
+  if (!val) { yamlProfileOverride = null; status.textContent = ''; return; }
+  try {
+    yamlProfileOverride = jsyaml.load(val);
+    status.textContent  = '✓ Parsed — will override sidebar settings';
+    status.className    = 'yaml-status ok';
+  } catch(e) {
+    yamlProfileOverride = null;
+    status.textContent  = '✗ ' + e.message;
+    status.className    = 'yaml-status err';
+  }
+});
+
+// ── Build profile from sidebar ────────────────────────────────────────────
+
+function buildProfileFromSidebar() {
+  const weights = {};
+  DOMAINS.forEach(d => {
+    weights[d] = parseFloat(document.getElementById('w-'+d).value);
+  });
+  return {
+    name: 'custom (browser)',
+    mixed_aggregation: document.getElementById('aggSelect').value,
+    weights,
+    must_have: mustHaves.map(m => ({control: m.control, min_level: m.min_level})),
+  };
+}
+
+// ── Run ───────────────────────────────────────────────────────────────────
+
+async function runEvaluation() {
+  if (!window._scoreProviders) {
+    showError('Scoring engine not yet loaded. Please wait a moment and try again.');
+    return;
+  }
+  if (!controlIndex) {
+    showError('Control index not loaded. Ensure the page is served from the repo root.');
+    return;
+  }
+
+  const checkedIds = [...document.querySelectorAll('#providerList input:checked')].map(el => el.value);
+  if (!checkedIds.length) { showError('Select at least one provider.'); return; }
+
+  const selectedProviders = checkedIds.map(id => loadedProviders[id]).filter(Boolean);
+  const profile = yamlProfileOverride ?? buildProfileFromSidebar();
+
+  const sum = Object.values(profile.weights ?? {}).reduce((a,b)=>a+b, 0);
+  if (Math.abs(sum - 1.0) > 0.015 && !yamlProfileOverride) {
+    showError(`Domain weights sum to ${sum.toFixed(3)} — they should sum to 1.00. Adjust the sliders.`);
+    return;
+  }
+
+  const btn = document.getElementById('runBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Running…';
+
+  try {
+    await new Promise(r => setTimeout(r, 0)); // allow repaint
+    const results = window._scoreProviders(selectedProviders, profile, controlIndex);
+    renderResults(results, profile);
+  } catch(e) {
+    showError('Scoring error: ' + e.message);
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '▶ Run evaluation';
+  }
+}
+
+// ── Render results ────────────────────────────────────────────────────────
+
+function renderResults(results, profile) {
+  const main = document.getElementById('mainPanel');
+  main.innerHTML = '';
+
+  // Header
+  const header = document.createElement('div');
+  header.className = 'result-header';
+  header.innerHTML = `
+    <h2>Results</h2>
+    <span class="result-meta">Profile: <strong>${profile.name ?? 'custom'}</strong> · 
+    Aggregation: <code>${profile.mixed_aggregation ?? 'mean'}</code> · 
+    ${results.length} provider${results.length !== 1 ? 's' : ''} evaluated</span>
+    <div style="margin-left:auto">
+      <div class="export-row">
+        <button class="btn-export" onclick="exportCSV()">↓ CSV</button>
+        <button class="btn-export" onclick="exportJSON()">↓ JSON</button>
+      </div>
+    </div>
+  `;
+  main.appendChild(header);
+
+  // Tabs
+  const tabWrap = document.createElement('div');
+  tabWrap.innerHTML = `
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('summary', this)">Summary</button>
+      <button class="tab-btn" onclick="switchTab('raw', this)">Raw scores</button>
+    </div>
+    <div class="tab-pane active" id="tab-summary"></div>
+    <div class="tab-pane"        id="tab-raw"></div>
+  `;
+  main.appendChild(tabWrap);
+
+  // Store results for export
+  window._lastResults = results;
+  window._lastProfile = profile;
+
+  renderSummaryTab(results, document.getElementById('tab-summary'));
+  renderRawTab(results, document.getElementById('tab-raw'));
+}
+
+function renderSummaryTab(results, container) {
+  const cards = document.createElement('div');
+  cards.className = 'score-cards';
+
+  results.forEach((r, i) => {
+    const passed   = r.must_have_passed;
+    const card     = document.createElement('div');
+    card.className = 'score-card' + (!passed ? ' fail' : r.stale ? ' stale' : '');
+
+    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+
+    // Build domain bars
+    const barRows = DOMAINS.map((d, idx) => {
+      const val = r.domain_scores[d];
+      if (val === null || val === undefined) return '';
+      const pct = Math.min(100, Math.round(val));
+      const color = BAR_COLORS[idx % BAR_COLORS.length];
+      const scoreClass = val >= 75 ? 'l3' : val >= 50 ? 'l2' : val >= 25 ? 'l1' : 'l0';
+      return `<div class="domain-bar-row">
+        <span class="domain-name">${DOMAIN_LABELS[d]}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="domain-val ${scoreClass}">${pct}</span>
+      </div>`;
+    }).join('');
+
+    // Must-have rows
+    const mhRows = (r.must_have_results ?? []).map(mh => {
+      const passClass = mh.passed ? 'pass' : 'fail';
+      const actual    = mh.actual_level !== null ? 'L'+mh.actual_level : '—';
+      return `<div class="must-detail-row">
+        <span class="mark ${passClass}">${mh.passed ? '✓' : '✗'}</span>
+        <span class="ctrl-id">${mh.control}</span>
+        <span class="req">≥ L${mh.min_level}</span>
+        <span class="actual ${passClass}">${actual}</span>
+      </div>`;
+    }).join('');
+
+    const mhDetail = mhRows ? `<div class="must-detail">
+      <div class="must-detail-label">Must-have control results</div>
+      ${mhRows}
+    </div>` : '';
+
+    card.innerHTML = `
+      <div class="card-header">
+        <div class="rank-badge ${rankClass}">${r.rank}</div>
+        <div>
+          <div class="provider-name">${r.display_name ?? r.provider}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${r.provider}</div>
+        </div>
+        ${r.stale ? '<span class="stale-badge">⏰ STALE DATA</span>' : ''}
+        <span class="must-badge ${passed ? 'pass' : 'fail'}">${passed ? '✓ Must-haves PASS' : '✗ Must-haves FAIL'}</span>
+        <div class="overall-score ${passed ? 'pass' : 'fail'}">${r.overall_score}</div>
+      </div>
+      <div class="card-body">
+        <div class="domain-bars">${barRows}</div>
+        ${mhDetail}
+      </div>
+    `;
+    cards.appendChild(card);
+  });
+
+  container.appendChild(cards);
+}
+
+function renderRawTab(results, container) {
+  // Collect all control IDs seen
+  const allControls = [];
+  if (controlIndex?.domains) {
+    for (const info of Object.values(controlIndex.domains)) {
+      allControls.push(...(info.controls ?? []));
+    }
+  }
+
+  const table = document.createElement('table');
+  table.className = 'raw-table';
+
+  const headers = ['Control', ...results.map(r => r.display_name ?? r.provider)].map(h => `<th>${h}</th>`).join('');
+  table.innerHTML = `<thead><tr>${headers}</tr></thead><tbody></tbody>`;
+
+  const tbody = table.querySelector('tbody');
+  allControls.forEach(cid => {
+    const tr = document.createElement('tr');
+    const cells = [`<td style="font-family:monospace;color:var(--accent2)">${cid}</td>`];
+    results.forEach(r => {
+      const v = r.effective_scores[cid];
+      if (v === null || v === undefined) {
+        cells.push(`<td class="ln">—</td>`);
+      } else {
+        const disp = Math.round(v * 10) / 10;
+        const cls  = v >= 3 ? 'l3' : v >= 2 ? 'l2' : v >= 1 ? 'l1' : 'l0';
+        const label = Number.isInteger(v) ? `L${v}` : `${disp}`;
+        cells.push(`<td class="${cls}">${label}</td>`);
+      }
+    });
+    tr.innerHTML = cells.join('');
+    tbody.appendChild(tr);
+  });
+
+  const wrap = document.createElement('div');
+  wrap.className = 'raw-table-wrap';
+  wrap.appendChild(table);
+  container.appendChild(wrap);
+}
+
+// ── Tabs ──────────────────────────────────────────────────────────────────
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Export ────────────────────────────────────────────────────────────────
+
+function exportCSV() {
+  const results = window._lastResults;
+  if (!results) return;
+  const rows = [['Rank','Provider','Overall',...DOMAINS.map(d=>DOMAIN_LABELS[d]),'Must-Haves Pass']];
+  results.forEach(r => {
+    rows.push([
+      r.rank, r.provider, r.overall_score,
+      ...DOMAINS.map(d => r.domain_scores[d] !== null ? Math.round(r.domain_scores[d]) : ''),
+      r.must_have_passed ? 'PASS' : 'FAIL',
+    ]);
+  });
+  const csv = rows.map(r => r.map(c => JSON.stringify(c ?? '')).join(',')).join('\n');
+  download('tenant-sec-results.csv', csv, 'text/csv');
+}
+
+function exportJSON() {
+  const results = window._lastResults;
+  if (!results) return;
+  const out = {
+    profile:     window._lastProfile?.name ?? 'custom',
+    evaluated_at: new Date().toISOString(),
+    results: results.map(r => ({
+      rank:             r.rank,
+      provider:         r.provider,
+      overall_score:    r.overall_score,
+      must_have_passed: r.must_have_passed,
+      domain_scores:    r.domain_scores,
+      must_have_results: r.must_have_results,
+    })),
+  };
+  download('tenant-sec-results.json', JSON.stringify(out, null, 2), 'application/json');
+}
+
+function download(filename, content, mime) {
+  const a   = document.createElement('a');
+  a.href    = URL.createObjectURL(new Blob([content], {type: mime}));
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Error display ─────────────────────────────────────────────────────────
+
+function showError(msg) {
+  const main = document.getElementById('mainPanel');
+  main.innerHTML = `<div class="error-banner">⚠ ${msg}</div>
+    <div class="empty-state" id="emptyState">
+      <div class="icon">🔬</div>
+      <h2>Configure your scoring profile</h2>
+      <p>Select providers, set domain weights and any must-have controls, then click Run evaluation.</p>
+    </div>`;
+}
+
+// ── Expose to onclick handlers ────────────────────────────────────────────
+window.onWeightChange      = onWeightChange;
+window.addMustHave         = addMustHave;
+window.removeMustHave      = removeMustHave;
+window.runEvaluation       = runEvaluation;
+window.switchTab           = switchTab;
+window.exportCSV           = exportCSV;
+window.exportJSON          = exportJSON;
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>

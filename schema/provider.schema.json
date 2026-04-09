@@ -68,6 +68,18 @@
               "score": { "type": "integer", "enum": [0, 1, 2, 3] },
               "evidence": { "type": "string", "minLength": 1 },
               "compensating_controls": { "type": "string" },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string", "format": "uri" },
+                    "title": { "type": "string" }
+                  },
+                  "required": ["url", "title"],
+                  "additionalProperties": false
+                }
+              },
               "verified_at": { "type": "string", "format": "date" }
             },
             "required": ["score", "evidence"],
@@ -78,6 +90,18 @@
             "properties": {
               "score": { "const": "mixed" },
               "summary": { "type": "string" },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string", "format": "uri" },
+                    "title": { "type": "string" }
+                  },
+                  "required": ["url", "title"],
+                  "additionalProperties": false
+                }
+              },
               "services": {
                 "type": "object",
                 "additionalProperties": {
@@ -89,7 +113,19 @@
                         { "type": "null" }
                       ]
                     },
-                    "evidence": { "type": "string", "minLength": 1 }
+                    "evidence": { "type": "string", "minLength": 1 },
+                    "references": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "url": { "type": "string", "format": "uri" },
+                          "title": { "type": "string" }
+                        },
+                        "required": ["url", "title"],
+                        "additionalProperties": false
+                      }
+                    }
                   },
                   "required": ["score", "evidence"],
                   "additionalProperties": false
