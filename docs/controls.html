@@ -76,6 +76,30 @@
   .stat { display: flex; align-items: center; gap: .35rem; }
   .stat-val { font-weight: 700; }
 
+  /* ── Filters ── */
+  .filter-bar {
+    width: 100%; padding: .4rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: .75rem; align-items: center; flex-wrap: wrap;
+  }
+  .filter-label { font-size: .68rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .filter-chips { display: flex; gap: .3rem; }
+  .filter-chip {
+    padding: .2rem .5rem; border-radius: 12px; font-size: .68rem; font-weight: 600;
+    border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all .12s; user-select: none;
+  }
+  .filter-chip:hover { border-color: var(--accent2); color: var(--text); }
+  .filter-chip.active { border-color: var(--accent2); background: var(--l2-bg); color: var(--accent2); }
+  .filter-search {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: .2rem .6rem; font-size: .72rem; color: var(--text); outline: none;
+    font-family: inherit; width: 160px; margin-left: auto;
+  }
+  .filter-search::placeholder { color: var(--muted); }
+  .filter-search:focus { border-color: var(--accent2); }
+  .ctrl-cell.dimmed { opacity: .15; pointer-events: none; }
+
   .matrix-wrap { padding: 1rem 1rem 2rem; overflow-x: auto; }
   .matrix { display: flex; gap: 6px; }
   .domain-col { display: flex; flex-direction: column; gap: 4px; min-width: 168px; flex: 1 1 0; }
@@ -107,7 +131,8 @@
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .ctrl-id { font-size: .62rem; color: var(--muted); font-family: 'Fira Code', monospace; }
 
-  .score-dots { display: flex; gap: 3px; align-items: center; margin-top: 1px; }
+  .score-row { display: flex; gap: 3px; align-items: center; flex-wrap: wrap; }
+  .score-dots { display: flex; gap: 3px; align-items: center; }
   .score-dot {
     width: 14px; height: 14px; border-radius: 3px;
     display: flex; align-items: center; justify-content: center;
@@ -130,10 +155,13 @@
 
   /* MIX micro-visualization: replaces plain purple dot */
   .mix-bar {
-    display: flex; height: 14px; border-radius: 3px; overflow: hidden;
+    display: flex; height: 14px; border-radius: 3px;
     min-width: 24px; max-width: 32px; position: relative; flex-shrink: 0;
     border: 1px solid rgba(188,140,255,.25);
   }
+  .mix-bar > div:first-child { border-radius: 2px 0 0 2px; }
+  .mix-bar > div:last-child  { border-radius: 0 2px 2px 0; }
+  .mix-bar > div:only-child  { border-radius: 2px; }
   .mix-bar[data-tip]:hover::after {
     content: attr(data-tip);
     position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
@@ -146,7 +174,25 @@
     overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
     display: none; margin-top: 1px;
   }
-  .ctrl-cell.focused-mix .mix-pct { display: block; }
+
+  /* Per-service squares shown in provider focus + mixed */
+  .svc-squares {
+    display: none; flex-wrap: wrap; gap: 2px; align-items: center;
+  }
+  .svc-sq {
+    width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+    position: relative;
+  }
+  .svc-sq[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    padding: 3px 7px; border-radius: 4px; font-size: .68rem; font-weight: 500;
+    white-space: nowrap; z-index: 50; pointer-events: none;
+  }
+  .svc-sq-pct {
+    font-size: .5rem; color: var(--muted); white-space: nowrap;
+  }
 
   /* Detail overlay */
   .detail-backdrop {
@@ -337,6 +383,18 @@
   </div>
 </div>
 <div class="stats-bar" id="statsBar"></div>
+<div class="filter-bar" id="filterBar">
+  <span class="filter-label">Filter</span>
+  <div class="filter-chips" id="filterChips">
+    <div class="filter-chip" data-level="l3">L3</div>
+    <div class="filter-chip" data-level="l2">L2</div>
+    <div class="filter-chip" data-level="l1">L1</div>
+    <div class="filter-chip" data-level="l0">L0</div>
+    <div class="filter-chip" data-level="mix">Mixed</div>
+    <div class="filter-chip" data-level="na">N/A</div>
+  </div>
+  <input type="text" class="filter-search" id="filterSearch" placeholder="Search controls…">
+</div>
 
 <div class="matrix-wrap">
   <div class="matrix" id="matrix">
@@ -379,23 +437,43 @@ let controlDefs = {};
 let focusedProvider = null;
 let activeCtrlId = null;
 let expandedService = null;
+let activeFilters = new Set();
+let searchQuery = '';
 
 function parseHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
-  if (!h) return {};
-  const parts = h.split('/');
-  if (parts.length >= 3) return { provider: parts[0], control: parts[1], service: parts[2] };
-  if (parts.length === 2) return { provider: parts[0], control: parts[1] };
-  return { control: parts[0] };
+  const raw = decodeURIComponent(location.hash.slice(1));
+  if (!raw) return {};
+  let h = raw, filters = null;
+  const fIdx = h.indexOf('?f=');
+  if (fIdx !== -1) {
+    filters = h.slice(fIdx + 3).split(',').filter(Boolean);
+    h = h.slice(0, fIdx);
+  }
+  const parts = h.split('/').filter(Boolean);
+  const result = {};
+  if (parts.length >= 3) { result.provider = parts[0]; result.control = parts[1]; result.service = parts[2]; }
+  else if (parts.length === 2) { result.provider = parts[0]; result.control = parts[1]; }
+  else if (parts.length === 1 && parts[0]) result.control = parts[0];
+  if (filters) result.filters = filters;
+  return result;
 }
 
 function buildHash(provider, control, service) {
-  if (!control) return '';
+  if (!control && !provider && activeFilters.size === 0) return '';
   let h = '#';
   if (provider) h += provider + '/';
-  h += control;
-  if (service) h += '/' + service;
+  if (control) {
+    h += control;
+    if (service) h += '/' + service;
+  }
+  if (activeFilters.size > 0) h += '?f=' + [...activeFilters].join(',');
   return h;
+}
+
+function updateHashForFilters() {
+  const h = buildHash(focusedProvider, activeCtrlId, expandedService);
+  if (h) history.replaceState(null, '', h);
+  else history.replaceState(null, '', location.pathname);
 }
 
 // ── MIX distribution helper
@@ -446,6 +524,28 @@ function renderMixPctText(providerId, ctrlId) {
   return `<div class="mix-pct" data-provider="${providerId}">${parts}</div>`;
 }
 
+function renderServiceSquares(providerId, ctrlId) {
+  const ctrl = providers[providerId]?.controls?.[ctrlId];
+  if (!ctrl || ctrl.score !== 'mixed' || !ctrl.services) return '';
+  const entries = Object.entries(ctrl.services)
+    .map(([svcId, svc]) => ({ svcId, score: svc.score ?? -1 }))
+    .sort((a, b) => b.score - a.score);
+  const squares = entries.map(({ svcId, score }) => {
+    const cls = scoreClass(score);
+    return `<div class="svc-sq dot-${cls}" data-tip="${svcId}: ${scoreLabel(score)}"></div>`;
+  }).join('');
+  const md = getMixDist(providerId, ctrlId);
+  let pctLabel = '';
+  if (md) {
+    const colors = [[3,'l3'],[2,'l2'],[1,'l1'],[0,'l0']];
+    pctLabel = colors
+      .filter(([lvl]) => md.dist[lvl] > 0)
+      .map(([lvl, cls]) => `<span style="color:var(--${cls})">${Math.round(md.dist[lvl]/md.total*100)}%</span>`)
+      .join(' ');
+  }
+  return `<div class="svc-squares" data-provider="${providerId}">${squares}${pctLabel ? ` <span class="svc-sq-pct">${pctLabel}</span>` : ''}</div>`;
+}
+
 // ── Data loading
 
 async function fetchYaml(path) {
@@ -491,6 +591,7 @@ async function init() {
 
   buildProviderPills();
   renderMatrix();
+  initFilters();
   updateStats();
 
   const h = parseHash();
@@ -500,6 +601,12 @@ async function init() {
       p.classList.toggle('active', p.dataset.id === focusedProvider));
     applyCellFocus();
     updateStats();
+  }
+  if (h.filters) {
+    h.filters.forEach(f => activeFilters.add(f));
+    document.querySelectorAll('.filter-chip').forEach(chip =>
+      chip.classList.toggle('active', activeFilters.has(chip.dataset.level)));
+    applyFilters();
   }
   if (h.control) {
     expandedService = h.service || null;
@@ -526,6 +633,7 @@ function toggleFocus(id) {
     p.classList.toggle('active', p.dataset.id === focusedProvider);
   });
   applyCellFocus();
+  applyFilters();
   updateStats();
   if (activeCtrlId) {
     expandedService = null;
@@ -587,19 +695,19 @@ function renderMatrix() {
         return `<div class="score-dot dot-${cls}" data-tip="${tip}">${abbr[0]}</div>`;
       }).join('');
 
-      const mixPcts = Object.entries(providers).map(([pid]) => {
+      const svcSquares = Object.entries(providers).map(([pid]) => {
         const s = getProviderScore(pid, ctrlId);
         if (s !== 'mixed') return '';
-        return renderMixPctText(pid, ctrlId);
+        return renderServiceSquares(pid, ctrlId);
       }).join('');
 
       cell.innerHTML = `
         <div class="ctrl-name">${escHtml(name)}</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <div class="ctrl-id">${ctrlId}</div>
+        <div class="ctrl-id">${ctrlId}</div>
+        <div class="score-row">
           <div class="score-dots">${dots}</div>
         </div>
-        ${mixPcts}
+        ${svcSquares}
       `;
       col.appendChild(cell);
     }
@@ -611,16 +719,65 @@ function renderMatrix() {
 function applyCellFocus() {
   document.querySelectorAll('.ctrl-cell').forEach(cell => {
     cell.classList.remove('focused-l0','focused-l1','focused-l2','focused-l3','focused-mix');
+    const dotsEl = cell.querySelector('.score-dots');
+    cell.querySelectorAll('.svc-squares').forEach(el => el.style.display = 'none');
     if (!focusedProvider) {
-      cell.querySelectorAll('.mix-pct').forEach(el => el.style.display = 'none');
+      if (dotsEl) dotsEl.style.display = 'flex';
       return;
     }
     const s = getProviderScore(focusedProvider, cell.dataset.ctrl);
     const cls = scoreClass(s);
     if (cls !== 'na') cell.classList.add('focused-' + cls);
-    cell.querySelectorAll('.mix-pct').forEach(el => {
-      el.style.display = (el.dataset.provider === focusedProvider && s === 'mixed') ? 'block' : 'none';
-    });
+    if (s === 'mixed') {
+      if (dotsEl) dotsEl.style.display = 'none';
+      const sq = cell.querySelector(`.svc-squares[data-provider="${focusedProvider}"]`);
+      if (sq) sq.style.display = 'flex';
+    } else {
+      if (dotsEl) dotsEl.style.display = 'flex';
+    }
+  });
+}
+
+function initFilters() {
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.onclick = () => {
+      const lvl = chip.dataset.level;
+      if (activeFilters.has(lvl)) activeFilters.delete(lvl);
+      else activeFilters.add(lvl);
+      chip.classList.toggle('active', activeFilters.has(lvl));
+      applyFilters();
+      updateHashForFilters();
+    };
+  });
+  const searchEl = document.getElementById('filterSearch');
+  searchEl.oninput = () => {
+    searchQuery = searchEl.value.trim().toLowerCase();
+    applyFilters();
+  };
+}
+
+function cellMatchesFilter(ctrlId) {
+  const nameMatch = !searchQuery ||
+    ctrlId.toLowerCase().includes(searchQuery) ||
+    (controlDefs[ctrlId]?.name || '').toLowerCase().includes(searchQuery);
+  if (!nameMatch) return false;
+  if (activeFilters.size === 0) return true;
+  if (focusedProvider) {
+    const sc = scoreClass(getProviderScore(focusedProvider, ctrlId));
+    return activeFilters.has(sc);
+  }
+  for (const pid of Object.keys(providers)) {
+    const sc = scoreClass(getProviderScore(pid, ctrlId));
+    if (activeFilters.has(sc)) return true;
+  }
+  return false;
+}
+
+function applyFilters() {
+  const hasFilter = activeFilters.size > 0 || searchQuery;
+  document.querySelectorAll('.ctrl-cell').forEach(cell => {
+    if (!hasFilter) { cell.classList.remove('dimmed'); return; }
+    cell.classList.toggle('dimmed', !cellMatchesFilter(cell.dataset.ctrl));
   });
 }
 

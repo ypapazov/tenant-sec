@@ -65,6 +65,7 @@ cover/
 *.html
 !docs/*.html
 *.png
+!docs/*.png
 *.csv
 !tests/fixtures/**/*.csv
 
