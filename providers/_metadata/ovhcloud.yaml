@@ -1,0 +1,118 @@
+vignette:
+  legal:
+    summary: >-
+      This profile covers OVHcloud Public Cloud in eu-west-par under OVHcloud's
+      published contracts and data-protection terms; Bare Metal and Hosted
+      Private Cloud are excluded.
+    facts:
+      offering_scope: OVHcloud Public Cloud only
+      excluded: Bare Metal and Hosted Private Cloud
+    references:
+      - { url: "https://www.ovhcloud.com/en/terms-and-conditions/contracts/", title: "OVHcloud contracts and terms" }
+  operations:
+    summary: >-
+      OVHcloud publishes security, compliance, service-availability, and shared
+      responsibility information for its Public Cloud portfolio.
+    facts:
+      operating_model: European public cloud
+    references:
+      - { url: "https://www.ovhcloud.com/en/security/", title: "OVHcloud security" }
+      - { url: "https://www.ovhcloud.com/en/public-cloud/regions-availability/", title: "OVHcloud Public Cloud product availability" }
+  privileged_access:
+    summary: >-
+      Provider personnel controls are described in OVHcloud security and
+      contractual materials; this profile does not infer sovereign controls for
+      the standard Public Cloud offering.
+    facts:
+      review_state: Provider-operated fact; not scored
+    references:
+      - { url: "https://www.ovhcloud.com/en/security/", title: "OVHcloud security" }
+  subcontracting:
+    summary: >-
+      OVHcloud's data-protection materials govern subprocessors and international
+      processing; exact notice and objection rights require contract review.
+    facts:
+      review_state: Contract review required
+    references:
+      - { url: "https://www.ovhcloud.com/en/personal-data-protection/", title: "OVHcloud personal data protection" }
+  audit_and_exit:
+    summary: >-
+      OVHcloud publishes assurance information and contractual documents; report
+      access, audit rights, data return, and exit assistance vary by contract.
+    facts:
+      contractual_rights_review_required: true
+    references:
+      - { url: "https://www.ovhcloud.com/en/enterprise/certification-conformity/", title: "OVHcloud certifications and compliance" }
+      - { url: "https://www.ovhcloud.com/en/terms-and-conditions/contracts/", title: "OVHcloud contracts and terms" }
+  continuity:
+    summary: >-
+      OVHcloud publishes service status and regional availability; customers
+      remain responsible for workload recovery architecture and testing.
+    facts:
+      customer_responsibility: Workload recovery design and testing
+    references:
+      - { url: "https://www.status-ovhcloud.com/", title: "OVHcloud service status" }
+      - { url: "https://www.ovhcloud.com/en/public-cloud/regions-availability/", title: "OVHcloud Public Cloud product availability" }
+  vulnerability_disclosure:
+    summary: >-
+      OVHcloud publishes security information and vulnerability-reporting
+      channels through its security programme.
+    facts:
+      public_reporting_channel: true
+    references:
+      - { url: "https://corporate.ovhcloud.com/en/security/", title: "OVHcloud security programme" }
+  transfers:
+    summary: >-
+      This assessment is limited to eu-west-par. Data location and transfer
+      commitments are governed by OVHcloud's contracts and data-protection
+      materials.
+    facts:
+      assessed_region: eu-west-par
+    references:
+      - { url: "https://www.ovhcloud.com/en/personal-data-protection/", title: "OVHcloud personal data protection" }
+      - { url: "https://www.ovhcloud.com/en/public-cloud/regions-availability/", title: "OVHcloud Public Cloud product availability" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Certificate scope must be checked against the assessed Public Cloud services.
+    offering: public-cloud
+    regions: [eu-west-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.ovhcloud.com/en/enterprise/certification-conformity/", title: "OVHcloud certifications and compliance" }
+  - id: iso-27017
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Programme scope must be checked against the assessed Public Cloud services.
+    offering: public-cloud
+    regions: [eu-west-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.ovhcloud.com/en/enterprise/certification-conformity/", title: "OVHcloud certifications and compliance" }
+  - id: iso-27018
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Programme scope must be checked against the assessed Public Cloud services.
+    offering: public-cloud
+    regions: [eu-west-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.ovhcloud.com/en/enterprise/certification-conformity/", title: "OVHcloud certifications and compliance" }
+  - id: soc2-type2
+    kind: attestation
+    status: unknown
+    validity: unknown
+    scope: Report-defined OVHcloud services and period.
+    offering: public-cloud
+    regions: [eu-west-par]
+    all_services: false
+    report_access: nda
+    evidence:
+      - { url: "https://www.ovhcloud.com/en/enterprise/certification-conformity/", title: "OVHcloud certifications and compliance" }

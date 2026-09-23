@@ -1,0 +1,85 @@
+vignette:
+  legal:
+    summary: >-
+      This profile covers Hetzner Cloud and Object Storage in EU locations under
+      Hetzner's published contractual and data-protection terms; Dedicated and
+      Robot products are excluded.
+    facts:
+      offering_scope: Hetzner Cloud and Object Storage only
+      excluded: Dedicated servers and Robot
+    references:
+      - { url: "https://www.hetzner.com/legal/terms-and-conditions/", title: "Hetzner terms and conditions" }
+  operations:
+    summary: >-
+      Hetzner documents the shared-responsibility split for Cloud Servers and
+      Object Storage in its technical and organisational measures.
+    facts:
+      operating_model: Cost-focused public infrastructure cloud
+    references:
+      - { url: "https://docs.hetzner.com/general/security-and-identify/technical-and-organizational-measures/", title: "Hetzner technical and organisational measures" }
+  privileged_access:
+    summary: >-
+      Hetzner states that authorised personnel access provider-operated
+      infrastructure under documented approval, authentication, and review
+      procedures; this is a provider-operated fact rather than a tenant score.
+    facts:
+      review_state: Provider-operated fact; not scored
+    references:
+      - { url: "https://docs.hetzner.com/general/security-and-identify/technical-and-organizational-measures/", title: "Hetzner technical and organisational measures" }
+  subcontracting:
+    summary: >-
+      Subprocessor and processing obligations are governed by Hetzner's
+      published data-protection and contractual materials; exact scope requires
+      contractual review.
+    facts:
+      review_state: Contract review required
+    references:
+      - { url: "https://www.hetzner.com/legal/privacy-policy/", title: "Hetzner privacy policy" }
+  audit_and_exit:
+    summary: >-
+      Public documentation describes account and change logging, while audit,
+      data-return, and termination rights depend on the applicable contract.
+    facts:
+      public_operational_controls: true
+      contractual_rights_review_required: true
+    references:
+      - { url: "https://docs.hetzner.com/general/security-and-identify/technical-and-organizational-measures/", title: "Hetzner technical and organisational measures" }
+      - { url: "https://www.hetzner.com/legal/terms-and-conditions/", title: "Hetzner terms and conditions" }
+  continuity:
+    summary: >-
+      Hetzner publishes service status and location information; tenants remain
+      responsible for designing and testing workload recovery across locations.
+    facts:
+      customer_responsibility: Workload recovery design and testing
+    references:
+      - { url: "https://status.hetzner.com/", title: "Hetzner service status" }
+      - { url: "https://docs.hetzner.com/cloud/general/locations/", title: "Hetzner Cloud locations" }
+  vulnerability_disclosure:
+    summary: >-
+      Hetzner publishes security information and contact paths for reporting
+      security issues; response commitments require separate verification.
+    facts:
+      public_security_information: true
+    references:
+      - { url: "https://www.hetzner.com/legal/security-policy/", title: "Hetzner security policy" }
+  transfers:
+    summary: >-
+      This assessment is limited to fsn1, nbg1, and hel1. Processing and transfer
+      obligations remain governed by Hetzner's privacy and contractual terms.
+    facts:
+      assessed_locations: [fsn1, nbg1, hel1]
+    references:
+      - { url: "https://www.hetzner.com/legal/privacy-policy/", title: "Hetzner privacy policy" }
+      - { url: "https://docs.hetzner.com/cloud/general/locations/", title: "Hetzner Cloud locations" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Certificate scope must be checked against the assessed Cloud and Object Storage services.
+    offering: cloud
+    regions: [fsn1, nbg1, hel1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://docs.hetzner.com/general/company-and-policy/information-security-at-hetzner/", title: "Information security at Hetzner" }
