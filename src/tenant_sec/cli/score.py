@@ -44,8 +44,11 @@ def _coverage_to_dict(coverage) -> dict | None:
     "--profile",
     "profile_path",
     required=True,
-    type=click.Path(exists=True, path_type=Path),
-    help="Path to a scoring profile YAML file.",
+    type=click.Path(path_type=Path),
+    help=(
+        "Scoring profile path or bundled profile name "
+        "(for example, eu-regulated-fintech)."
+    ),
 )
 @click.option(
     "--providers",
@@ -80,7 +83,23 @@ def score(
     controls_dir = data_dir / "controls"
 
     # Load scoring profile
-    scoring_profile = load_scoring_profile(profile_path, schema_dir)
+    profile_candidates = [profile_path, data_dir / profile_path]
+    if profile_path.suffix:
+        profile_candidates.append(data_dir / "profiles" / profile_path.name)
+    else:
+        profile_candidates.append(
+            data_dir / "profiles" / f"{profile_path.name}.yaml"
+        )
+    resolved_profile = next(
+        (candidate for candidate in profile_candidates if candidate.is_file()),
+        None,
+    )
+    if resolved_profile is None:
+        raise click.ClickException(
+            f"Scoring profile not found: {profile_path}. "
+            "Use a file path or a bundled profile name."
+        )
+    scoring_profile = load_scoring_profile(resolved_profile, schema_dir)
 
     candidates = load_all_assessments(providers_dir, schema_dir)
     if not candidates:

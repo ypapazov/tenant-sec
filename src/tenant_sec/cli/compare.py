@@ -102,9 +102,14 @@ def compare(
         if provider.is_v2 and provider.offering is not None
     }
     if len(v2_cohorts) > 1:
-        raise click.ClickException(
-            "Methodology-2 assessments from different cohorts cannot share "
-            "one comparison."
+        click.echo(
+            click.style(
+                "Warning: this raw control comparison spans cohorts "
+                f"({', '.join(sorted(v2_cohorts))}). It is not a ranking or "
+                "league table.",
+                fg="yellow",
+            ),
+            err=True,
         )
 
     # Determine controls to show
