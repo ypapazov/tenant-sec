@@ -3,7 +3,7 @@
 An open-source framework for evaluating cloud provider security capabilities at the **tenant level** — the controls and features a cloud customer can actually use, configure, and rely on.
 
 > [!WARNING]
-> **1.0-RC1 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
+> **1.0-RC1.1 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
 
 > **[Explore controls visually](https://tenant-sec.io/controls.html)** · **[Try the in-browser evaluator](https://tenant-sec.io/evaluate.html)** · **[Read the docs](https://tenant-sec.io/)**
 

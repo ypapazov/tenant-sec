@@ -249,4 +249,4 @@ class TestRootCommands:
     def test_version(self, runner):
         result = runner.invoke(cli, ["--version"])
         assert result.exit_code == 0
-        assert "1.0.0rc1" in result.output
+        assert "1.0.0rc1.post1" in result.output

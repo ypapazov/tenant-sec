@@ -62,7 +62,7 @@ DATA_DIR_HELP = (
 try:
     PACKAGE_VERSION = version("tenant-sec")
 except PackageNotFoundError:
-    PACKAGE_VERSION = "1.0.0rc1"
+    PACKAGE_VERSION = "1.0.0rc1.post1"
 
 
 @click.group()
