@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Optional
 
@@ -11,9 +11,13 @@ import jsonschema
 import yaml
 
 from .models import (
+    AssessmentClaim,
     AssessmentStatus,
     CertificationRecord,
     Control,
+    CriteriaResult,
+    EvidenceApplicability,
+    EvidenceItem,
     LeafControlScore,
     MixedControlScore,
     MustHaveEntry,
@@ -190,6 +194,7 @@ def _semantic_errors(data: dict, file_type: str, schema_dir: Path) -> list[str]:
                 errors.append(
                     f"Assessed control '{control_id}' requires confidence"
                 )
+            errors.extend(_validate_claim_bundle(control_id, result))
             for service_id, service in (result.get("services") or {}).items():
                 if service.get("score") is not None:
                     if service.get("status") != "assessed":
@@ -220,7 +225,43 @@ def _semantic_errors(data: dict, file_type: str, schema_dir: Path) -> list[str]:
                 errors.append(
                     f"Assessed control '{control_id}' requires confidence"
                 )
+            errors.extend(_validate_claim_bundle(control_id, result))
 
+    return errors
+
+
+def _validate_claim_bundle(control_id: str, result: dict) -> list[str]:
+    errors: list[str] = []
+    evidence = result.get("evidence_items") or []
+    claims = result.get("claims") or []
+    criteria = result.get("criteria_results") or []
+    if not evidence:
+        errors.append(
+            f"Assessed control '{control_id}' requires evidence_items"
+        )
+    if not claims:
+        errors.append(f"Assessed control '{control_id}' requires claims")
+    if {item.get("level") for item in criteria} != {0, 1, 2, 3}:
+        errors.append(
+            f"Assessed control '{control_id}' requires one criteria result "
+            "for each level L0-L3"
+        )
+    evidence_ids = {item.get("id") for item in evidence}
+    claim_ids = {claim.get("id") for claim in claims}
+    for claim in claims:
+        missing = set(claim.get("evidence_item_ids") or []) - evidence_ids
+        if missing:
+            errors.append(
+                f"Control '{control_id}' claim '{claim.get('id')}' references "
+                f"unknown evidence: {', '.join(sorted(missing))}"
+            )
+    for item in criteria:
+        missing = set(item.get("claim_ids") or []) - claim_ids
+        if missing:
+            errors.append(
+                f"Control '{control_id}' L{item.get('level')} references "
+                f"unknown claims: {', '.join(sorted(missing))}"
+            )
     return errors
 
 
@@ -325,6 +366,59 @@ def _parse_references(values: Any) -> list[Reference]:
     ]
 
 
+def _parse_evidence_items(values: Any) -> list[EvidenceItem]:
+    items: list[EvidenceItem] = []
+    for raw in values or []:
+        scope = raw["applicability"]
+        retrieved = str(raw["retrieved_at"]).replace("Z", "+00:00")
+        items.append(
+            EvidenceItem(
+                id=str(raw["id"]),
+                url=str(raw["url"]),
+                title=str(raw["title"]),
+                source_class=str(raw["source_class"]),
+                retrieved_at=datetime.fromisoformat(retrieved),
+                updated_at=_parse_date(raw.get("updated_at")),
+                content_hash=str(raw["content_hash"]),
+                quote=str(raw["quote"]),
+                applicability=EvidenceApplicability(
+                    offering=str(scope["offering"]),
+                    regions=[str(v) for v in scope.get("regions") or []],
+                    services=[str(v) for v in scope.get("services") or []],
+                    edition=str(scope["edition"]),
+                ),
+            )
+        )
+    return items
+
+
+def _parse_claims(values: Any) -> list[AssessmentClaim]:
+    return [
+        AssessmentClaim(
+            id=str(raw["id"]),
+            assertion=str(raw["assertion"]),
+            result=str(raw["result"]),
+            evidence_item_ids=[
+                str(value) for value in raw.get("evidence_item_ids") or []
+            ],
+            services=[str(value) for value in raw.get("services") or []],
+        )
+        for raw in values or []
+    ]
+
+
+def _parse_criteria_results(values: Any) -> list[CriteriaResult]:
+    return [
+        CriteriaResult(
+            level=int(raw["level"]),
+            met=bool(raw["met"]),
+            reasoning=str(raw["reasoning"]),
+            claim_ids=[str(value) for value in raw.get("claim_ids") or []],
+        )
+        for raw in values or []
+    ]
+
+
 def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
     if data.get("score") == "mixed":
         services: dict[str, ServiceScore] = {}
@@ -343,6 +437,11 @@ def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
             status=_parse_status(data.get("status")),
             confidence=data.get("confidence"),
             references=_parse_references(data.get("references")),
+            evidence_items=_parse_evidence_items(data.get("evidence_items")),
+            claims=_parse_claims(data.get("claims")),
+            criteria_results=_parse_criteria_results(
+                data.get("criteria_results")
+            ),
         )
     else:
         return LeafControlScore(
@@ -353,6 +452,11 @@ def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
             status=_parse_status(data.get("status")),
             confidence=data.get("confidence"),
             references=_parse_references(data.get("references")),
+            evidence_items=_parse_evidence_items(data.get("evidence_items")),
+            claims=_parse_claims(data.get("claims")),
+            criteria_results=_parse_criteria_results(
+                data.get("criteria_results")
+            ),
         )
 
 

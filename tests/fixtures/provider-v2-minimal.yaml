@@ -27,6 +27,30 @@ controls:
     references:
       - url: https://example.com/docs/abac
         title: Example ABAC documentation
+    evidence_items:
+      - id: ev-abac-doc
+        url: https://example.com/docs/abac
+        title: Example ABAC documentation
+        source_class: technical
+        retrieved_at: "2026-09-16T12:00:00Z"
+        content_hash: "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        quote: Attribute conditions can be configured on supported policies.
+        applicability:
+          offering: public
+          regions: [eu-1]
+          services: [s3]
+          edition: standard
+    claims:
+      - id: cl-abac-managed
+        assertion: Managed attribute conditions are available.
+        result: supported
+        evidence_item_ids: [ev-abac-doc]
+        services: [s3]
+    criteria_results:
+      - { level: 0, met: false, reasoning: Capability exists, claim_ids: [cl-abac-managed] }
+      - { level: 1, met: false, reasoning: Capability is managed, claim_ids: [cl-abac-managed] }
+      - { level: 2, met: true, reasoning: Managed with limited scope, claim_ids: [cl-abac-managed] }
+      - { level: 3, met: false, reasoning: Full customization is absent, claim_ids: [cl-abac-managed] }
   enc.cmk:
     status: assessed
     score: mixed
@@ -35,6 +59,30 @@ controls:
     references:
       - url: https://example.com/docs/cmk
         title: Example CMK documentation
+    evidence_items:
+      - id: ev-cmk-doc
+        url: https://example.com/docs/cmk
+        title: Example CMK documentation
+        source_class: technical
+        retrieved_at: "2026-09-16T12:00:00Z"
+        content_hash: "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        quote: The documentation does not establish CMK support for this service.
+        applicability:
+          offering: public
+          regions: [eu-1]
+          services: [s3]
+          edition: standard
+    claims:
+      - id: cl-cmk-unresolved
+        assertion: CMK support for the in-scope service is unresolved.
+        result: supported
+        evidence_item_ids: [ev-cmk-doc]
+        services: [s3]
+    criteria_results:
+      - { level: 0, met: false, reasoning: Unavailability is not proven, claim_ids: [cl-cmk-unresolved] }
+      - { level: 1, met: false, reasoning: Client-side support is not established, claim_ids: [cl-cmk-unresolved] }
+      - { level: 2, met: false, reasoning: Managed CMK support is not established, claim_ids: [cl-cmk-unresolved] }
+      - { level: 3, met: false, reasoning: Customizable CMK support is not established, claim_ids: [cl-cmk-unresolved] }
     services:
       s3:
         status: unknown

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 from enum import IntEnum, StrEnum
 from typing import Optional
 
@@ -40,6 +40,52 @@ class Reference:
 
     url: str
     title: str
+
+
+@dataclass(frozen=True)
+class EvidenceApplicability:
+    """Assessment scope to which an evidence item applies."""
+
+    offering: str
+    regions: list[str]
+    services: list[str]
+    edition: str
+
+
+@dataclass(frozen=True)
+class EvidenceItem:
+    """Immutable source excerpt used by one or more atomic claims."""
+
+    id: str
+    url: str
+    title: str
+    source_class: str
+    retrieved_at: datetime
+    content_hash: str
+    quote: str
+    applicability: EvidenceApplicability
+    updated_at: Optional[date] = None
+
+
+@dataclass(frozen=True)
+class AssessmentClaim:
+    """Atomic supported, unsupported, or contradicted assertion."""
+
+    id: str
+    assertion: str
+    result: str
+    evidence_item_ids: list[str]
+    services: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class CriteriaResult:
+    """Evaluation of one L0-L3 criterion against atomic claims."""
+
+    level: int
+    met: bool
+    reasoning: str
+    claim_ids: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -80,6 +126,9 @@ class LeafControlScore:
     status: Optional[AssessmentStatus] = None
     confidence: Optional[str] = None
     references: list[Reference] = field(default_factory=list)
+    evidence_items: list[EvidenceItem] = field(default_factory=list)
+    claims: list[AssessmentClaim] = field(default_factory=list)
+    criteria_results: list[CriteriaResult] = field(default_factory=list)
 
 
 @dataclass
@@ -92,6 +141,9 @@ class MixedControlScore:
     status: Optional[AssessmentStatus] = None
     confidence: Optional[str] = None
     references: list[Reference] = field(default_factory=list)
+    evidence_items: list[EvidenceItem] = field(default_factory=list)
+    claims: list[AssessmentClaim] = field(default_factory=list)
+    criteria_results: list[CriteriaResult] = field(default_factory=list)
 
 
 # Union type for a control score entry in a provider profile

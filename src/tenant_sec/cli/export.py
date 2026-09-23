@@ -17,6 +17,56 @@ def _references_to_dict(references) -> list[dict[str, str]]:
     return [{"url": ref.url, "title": ref.title} for ref in references]
 
 
+def _claim_bundle_to_dict(entry) -> dict:
+    out: dict = {}
+    if entry.evidence_items:
+        out["evidence_items"] = [
+            {
+                "id": item.id,
+                "url": item.url,
+                "title": item.title,
+                "source_class": item.source_class,
+                "retrieved_at": item.retrieved_at.isoformat(),
+                **(
+                    {"updated_at": item.updated_at.isoformat()}
+                    if item.updated_at
+                    else {}
+                ),
+                "content_hash": item.content_hash,
+                "quote": item.quote,
+                "applicability": {
+                    "offering": item.applicability.offering,
+                    "regions": item.applicability.regions,
+                    "services": item.applicability.services,
+                    "edition": item.applicability.edition,
+                },
+            }
+            for item in entry.evidence_items
+        ]
+    if entry.claims:
+        out["claims"] = [
+            {
+                "id": claim.id,
+                "assertion": claim.assertion,
+                "result": claim.result,
+                "evidence_item_ids": claim.evidence_item_ids,
+                **({"services": claim.services} if claim.services else {}),
+            }
+            for claim in entry.claims
+        ]
+    if entry.criteria_results:
+        out["criteria_results"] = [
+            {
+                "level": result.level,
+                "met": result.met,
+                "reasoning": result.reasoning,
+                "claim_ids": result.claim_ids,
+            }
+            for result in entry.criteria_results
+        ]
+    return out
+
+
 def _provider_to_dict(provider) -> dict:
     """Convert a ProviderProfile to a JSON-serializable dict."""
     controls = {}
@@ -37,6 +87,7 @@ def _provider_to_dict(provider) -> dict:
                 c["compensating_controls"] = entry.compensating_controls
             if entry.verified_at:
                 c["verified_at"] = entry.verified_at.isoformat()
+            c.update(_claim_bundle_to_dict(entry))
             controls[control_id] = c
         elif isinstance(entry, MixedControlScore):
             c = {
@@ -78,6 +129,7 @@ def _provider_to_dict(provider) -> dict:
                 c["confidence"] = entry.confidence
             if entry.references:
                 c["references"] = _references_to_dict(entry.references)
+            c.update(_claim_bundle_to_dict(entry))
             controls[control_id] = c
 
     result = {

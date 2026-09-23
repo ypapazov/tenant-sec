@@ -28,6 +28,82 @@
       "required": ["url", "title"],
       "additionalProperties": false
     },
+    "evidence_item": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^ev-[a-z0-9-]+$" },
+        "url": { "type": "string", "format": "uri" },
+        "title": { "type": "string", "minLength": 1 },
+        "source_class": {
+          "type": "string",
+          "enum": ["regulator", "binding", "api", "technical", "support", "secondary"]
+        },
+        "retrieved_at": { "type": "string", "format": "date-time" },
+        "updated_at": {
+          "oneOf": [
+            { "type": "string", "format": "date" },
+            { "type": "null" }
+          ]
+        },
+        "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "quote": { "type": "string", "minLength": 1 },
+        "applicability": {
+          "type": "object",
+          "properties": {
+            "offering": { "type": "string", "minLength": 1 },
+            "regions": { "type": "array", "items": { "type": "string" } },
+            "services": { "type": "array", "items": { "type": "string" } },
+            "edition": { "type": "string", "minLength": 1 }
+          },
+          "required": ["offering", "regions", "services", "edition"],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id", "url", "title", "source_class", "retrieved_at",
+        "content_hash", "quote", "applicability"
+      ],
+      "additionalProperties": false
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "pattern": "^cl-[a-z0-9-]+$" },
+        "assertion": { "type": "string", "minLength": 1 },
+        "result": {
+          "type": "string",
+          "enum": ["supported", "unsupported", "contradicted"]
+        },
+        "evidence_item_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^ev-[a-z0-9-]+$" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "services": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["id", "assertion", "result", "evidence_item_ids"],
+      "additionalProperties": false
+    },
+    "criteria_result": {
+      "type": "object",
+      "properties": {
+        "level": { "type": "integer", "enum": [0, 1, 2, 3] },
+        "met": { "type": "boolean" },
+        "reasoning": { "type": "string", "minLength": 1 },
+        "claim_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^cl-[a-z0-9-]+$" },
+          "uniqueItems": true
+        }
+      },
+      "required": ["level", "met", "reasoning", "claim_ids"],
+      "additionalProperties": false
+    },
     "service_in_scope": {
       "type": "object",
       "properties": {
@@ -237,6 +313,21 @@
                 "type": "array",
                 "items": { "$ref": "#/$defs/reference" }
               },
+              "evidence_items": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/evidence_item" },
+                "minItems": 1
+              },
+              "claims": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/claim" },
+                "minItems": 1
+              },
+              "criteria_results": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/criteria_result" },
+                "minItems": 4
+              },
               "verified_at": { "type": "string", "format": "date" },
               "status": { "const": "assessed" },
               "confidence": { "$ref": "#/$defs/confidence" }
@@ -275,6 +366,21 @@
               "references": {
                 "type": "array",
                 "items": { "$ref": "#/$defs/reference" }
+              },
+              "evidence_items": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/evidence_item" },
+                "minItems": 1
+              },
+              "claims": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/claim" },
+                "minItems": 1
+              },
+              "criteria_results": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/criteria_result" },
+                "minItems": 4
               },
               "services": {
                 "type": "object",
