@@ -1,0 +1,60 @@
+provider: hetzner
+assessment_id: hetzner/cloud/eu-central/standard
+display_name: Hetzner Cloud
+assessed_by: community:pipeline
+assessed_at: '2026-09-23'
+methodology_version: '2.0'
+revision: 1
+review_status: unreviewed
+review_note: RC2 assessment is in progress and has not completed human review.
+offering:
+  id: cloud
+  name: Hetzner Cloud
+  partition: commercial
+  regions:
+    - fsn1
+    - nbg1
+    - hel1
+  region_equivalence: >-
+    The assessed Cloud and Object Storage product surface is available across
+    Hetzner's EU-central locations; location-specific limitations remain part
+    of claim applicability and human review.
+  edition: standard
+  cohort: cost-focused
+services_in_scope:
+  - id: cloud-servers
+    name: Cloud Servers
+    category: compute.vm
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: object-storage
+    name: Object Storage
+    category: storage.object
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: volumes
+    name: Volumes
+    category: storage.block
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: networks
+    name: Networks
+    category: network.vpc
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: load-balancers
+    name: Load Balancers
+    category: network.loadbalancer
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: dns
+    name: DNS
+    category: network.dns
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+  - id: project-access
+    name: Project Access
+    category: identity.iam
+    regions: [fsn1, nbg1, hel1]
+    edition: standard
+controls: {}

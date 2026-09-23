@@ -21,6 +21,8 @@ categories:
       aws: ["ec2"]
       azure: ["virtual-machines"]
       gcp: ["compute-engine"]
+      hetzner: ["cloud-servers"]
+      ovhcloud: ["instances"]
       scaleway: ["instances"]
 
   compute.containers:
@@ -29,6 +31,8 @@ categories:
       aws: ["eks", "ecs"]
       azure: ["aks"]
       gcp: ["gke"]
+      hetzner: []
+      ovhcloud: ["managed-kubernetes-service"]
       scaleway: ["kapsule"]
 
   compute.serverless:
@@ -54,6 +58,8 @@ categories:
       aws: ["s3"]
       azure: ["blob-storage"]
       gcp: ["cloud-storage"]
+      hetzner: ["object-storage"]
+      ovhcloud: ["object-storage"]
       scaleway: ["object-storage"]
 
   storage.block:
@@ -62,6 +68,8 @@ categories:
       aws: ["ebs"]
       azure: ["managed-disks"]
       gcp: ["persistent-disk"]
+      hetzner: ["volumes"]
+      ovhcloud: ["block-storage"]
       scaleway: ["block-storage"]
 
   storage.file:
@@ -87,6 +95,8 @@ categories:
       aws: ["rds", "aurora"]
       azure: ["sql-database", "postgresql", "mysql"]
       gcp: ["cloud-sql", "alloydb"]
+      hetzner: []
+      ovhcloud: ["postgresql"]
       scaleway: ["rdb"]
 
   database.nosql:
@@ -120,6 +130,8 @@ categories:
       aws: ["vpc"]
       azure: ["virtual-network"]
       gcp: ["vpc"]
+      hetzner: ["networks"]
+      ovhcloud: ["private-network"]
       scaleway: ["vpc"]
 
   network.loadbalancer:
@@ -128,6 +140,8 @@ categories:
       aws: ["alb", "nlb", "elb"]
       azure: ["load-balancer", "application-gateway"]
       gcp: ["cloud-load-balancing"]
+      hetzner: ["load-balancers"]
+      ovhcloud: ["load-balancer"]
       scaleway: ["load-balancer"]
 
   network.cdn:
@@ -144,6 +158,8 @@ categories:
       aws: ["route53"]
       azure: ["dns", "private-dns"]
       gcp: ["cloud-dns"]
+      hetzner: ["dns"]
+      ovhcloud: []
       scaleway: ["dns"]
 
   network.vpn:
@@ -178,6 +194,8 @@ categories:
       aws: ["kms"]
       azure: ["key-vault"]
       gcp: ["cloud-kms"]
+      hetzner: []
+      ovhcloud: ["key-management-service"]
       scaleway: ["secret-manager"]
 
   security.secrets:
@@ -186,6 +204,8 @@ categories:
       aws: ["secrets-manager"]
       azure: ["key-vault"]
       gcp: ["secret-manager"]
+      hetzner: []
+      ovhcloud: ["secret-manager"]
       scaleway: ["secret-manager"]
 
   security.waf:
@@ -212,4 +232,6 @@ categories:
       aws: ["iam"]
       azure: ["entra-id", "active-directory"]
       gcp: ["iam"]
+      hetzner: ["project-access"]
+      ovhcloud: ["iam"]
       scaleway: ["iam"]

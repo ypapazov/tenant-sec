@@ -1,0 +1,68 @@
+provider: ovhcloud
+assessment_id: ovhcloud/public-cloud/eu-west-par/standard
+display_name: OVHcloud
+assessed_by: community:pipeline
+assessed_at: '2026-09-23'
+methodology_version: '2.0'
+revision: 1
+review_status: unreviewed
+review_note: RC2 assessment is in progress and has not completed human review.
+offering:
+  id: public-cloud
+  name: OVHcloud Public Cloud
+  partition: commercial
+  regions: [eu-west-par]
+  edition: standard
+  cohort: eu-public
+services_in_scope:
+  - id: instances
+    name: Public Cloud Instances
+    category: compute.vm
+    regions: [eu-west-par]
+    edition: standard
+  - id: managed-kubernetes-service
+    name: Managed Kubernetes Service
+    category: compute.containers
+    regions: [eu-west-par]
+    edition: standard
+  - id: object-storage
+    name: Object Storage
+    category: storage.object
+    regions: [eu-west-par]
+    edition: standard
+  - id: block-storage
+    name: Block Storage
+    category: storage.block
+    regions: [eu-west-par]
+    edition: standard
+  - id: postgresql
+    name: Public Cloud Databases for PostgreSQL
+    category: database.relational
+    regions: [eu-west-par]
+    edition: standard
+  - id: private-network
+    name: Private Network and vRack
+    category: network.vpc
+    regions: [eu-west-par]
+    edition: standard
+  - id: load-balancer
+    name: Public Cloud Load Balancer
+    category: network.loadbalancer
+    regions: [eu-west-par]
+    edition: standard
+  - id: key-management-service
+    name: Key Management Service
+    category: security.kms
+    regions: [eu-west-par]
+    edition: standard
+  - id: secret-manager
+    name: Secret Manager
+    category: security.secrets
+    regions: [eu-west-par]
+    edition: standard
+  - id: iam
+    name: Identity and Access Management
+    category: identity.iam
+    regions: [eu-west-par]
+    edition: standard
+controls: {}
