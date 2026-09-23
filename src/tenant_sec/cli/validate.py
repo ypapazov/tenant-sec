@@ -11,7 +11,7 @@ from ..core.loader import validate_file
 
 
 @click.command()
-@click.argument("path", type=click.Path(exists=True, path_type=Path))
+@click.argument("path", type=click.Path(path_type=Path))
 @click.option(
     "--type",
     "file_type",
@@ -42,9 +42,15 @@ def validate(ctx: click.Context, path: Path, file_type: Optional[str]) -> None:
 
     if not schema_dir.exists():
         raise click.ClickException(f"Schema directory not found: {schema_dir}")
+    resolved_path = path if path.is_file() else data_dir / path
+    if not resolved_path.is_file():
+        raise click.ClickException(
+            f"File not found: {path}. Provide a filesystem path or a path "
+            "relative to the tenant-sec data directory."
+        )
 
     errors = validate_file(
-        path=path,
+        path=resolved_path,
         schema_dir=schema_dir,
         file_type=file_type,
         controls_dir=controls_dir if controls_dir.exists() else None,
@@ -52,9 +58,11 @@ def validate(ctx: click.Context, path: Path, file_type: Optional[str]) -> None:
     )
 
     if errors:
-        click.echo(click.style(f"✗ {path}", fg="red", bold=True))
+        click.echo(click.style(f"✗ {resolved_path}", fg="red", bold=True))
         for error in errors:
             click.echo(f"  {click.style('ERROR', fg='red')}: {error}")
         raise SystemExit(1)
     else:
-        click.echo(click.style(f"✓ {path} is valid", fg="green"))
+        click.echo(
+            click.style(f"✓ {resolved_path} is valid", fg="green")
+        )

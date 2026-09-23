@@ -57,6 +57,18 @@ class TestValidateCommand:
         )
         assert result.exit_code == 0, result.output
 
+    def test_validate_bundled_relative_path_outside_repo(
+        self, runner, tmp_path, monkeypatch
+    ):
+        monkeypatch.chdir(tmp_path)
+        result = _invoke(
+            runner,
+            "validate",
+            "providers/scaleway.yaml",
+        )
+        assert result.exit_code == 0, result.output
+        assert "valid" in result.output.lower()
+
     def test_validate_help(self, runner):
         result = _invoke(runner, "validate", "--help")
         assert result.exit_code == 0
@@ -99,6 +111,28 @@ class TestScoreCommand:
         assert "assessment_id" in data[0]
         assert "catalog_completeness" in data[0]
         assert "service_coverages" in data[0]
+
+    @pytest.mark.parametrize(
+        "profile_selector",
+        [
+            "profiles/eu-regulated-fintech.yaml",
+            "eu-regulated-fintech",
+        ],
+    )
+    def test_score_bundled_profile_outside_repo(
+        self, runner, profile_selector, tmp_path, monkeypatch
+    ):
+        monkeypatch.chdir(tmp_path)
+        result = _invoke(
+            runner,
+            "score",
+            "--profile",
+            profile_selector,
+            "--providers",
+            "aws,gcp,azure",
+        )
+        assert result.exit_code == 0, result.output
+        assert "Scoring Profile" in result.output
 
     def test_score_csv_output(self, runner):
         result = _invoke(
@@ -151,6 +185,19 @@ class TestCompareCommand:
             runner, "compare", "--providers", "aws,gcp,azure"
         )
         assert result.exit_code == 0, result.output
+
+    def test_compare_across_cohorts_warns_but_runs(self, runner):
+        result = _invoke(
+            runner,
+            "compare",
+            "--providers",
+            "aws,gcp,scaleway",
+            "--domain",
+            "encryption",
+        )
+        assert result.exit_code == 0, result.output
+        assert "spans cohorts" in result.output
+        assert "ENC" in result.output
 
     def test_compare_help(self, runner):
         result = _invoke(runner, "compare", "--help")
