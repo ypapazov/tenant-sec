@@ -5,6 +5,7 @@ assessed_by: community:test
 assessed_at: "2026-09-16"
 methodology_version: "2.0"
 revision: 1
+review_status: human-reviewed
 offering:
   id: public
   name: Public Cloud

@@ -262,6 +262,15 @@
       "minimum": 1,
       "description": "Monotonically increasing profile revision number"
     },
+    "review_status": {
+      "type": "string",
+      "enum": ["unreviewed", "human-reviewed"],
+      "description": "Whether methodology 2.x recommendations have completed human review"
+    },
+    "review_note": {
+      "type": "string",
+      "description": "Human-readable qualification of the review state"
+    },
     "offering": { "$ref": "#/$defs/offering" },
     "vignette": {
       "type": "object",
@@ -471,7 +480,7 @@
         "required": ["methodology_version"]
       },
       "then": {
-        "required": ["assessment_id", "offering"],
+        "required": ["assessment_id", "offering", "review_status"],
         "properties": {
           "offering": {
             "required": ["id", "name", "partition", "regions", "edition", "cohort"],

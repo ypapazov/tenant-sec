@@ -154,6 +154,10 @@ def _provider_to_dict(provider) -> dict:
     }
     if provider.assessment_id:
         result["assessment_id"] = provider.assessment_id
+    if provider.review_status:
+        result["review_status"] = provider.review_status
+    if provider.review_note:
+        result["review_note"] = provider.review_note
     if provider.offering:
         result["offering"] = {
             key: value

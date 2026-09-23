@@ -141,14 +141,14 @@ class TestDetailCommand:
 class TestCompareCommand:
     def test_compare_two_providers(self, runner):
         result = _invoke(
-            runner, "compare", "--providers", "aws,scaleway", "--domain", "iam"
+            runner, "compare", "--providers", "aws,gcp", "--domain", "iam"
         )
         assert result.exit_code == 0, result.output
         assert "IAM" in result.output
 
     def test_compare_three_providers(self, runner):
         result = _invoke(
-            runner, "compare", "--providers", "aws,gcp,scaleway"
+            runner, "compare", "--providers", "aws,gcp,azure"
         )
         assert result.exit_code == 0, result.output
 

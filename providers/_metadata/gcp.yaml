@@ -1,0 +1,96 @@
+vignette:
+  legal:
+    summary: Google Cloud's commercial public-cloud processing terms are documented in its Cloud Data Processing Addendum.
+    facts:
+      offering_scope: Commercial public cloud only; sovereign variants are excluded.
+    references:
+      - { url: "https://cloud.google.com/terms/data-processing-addendum", title: "Google Cloud Data Processing Addendum" }
+  operations:
+    summary: Google documents security, privacy, compliance, resilience, and operational practices for Google Cloud.
+    facts:
+      operating_model: Shared-responsibility public cloud
+    references:
+      - { url: "https://cloud.google.com/security", title: "Google Cloud security" }
+  privileged_access:
+    summary: Privileged Access Manager provides time-bound, approval-based privileged access; Access Approval is a separate customer-approval control with product-specific availability.
+    facts:
+      pam_available: true
+      access_approval_scope_varies: true
+    references:
+      - { url: "https://cloud.google.com/docs/security/privileged-access-management", title: "Privileged Access Manager overview" }
+      - { url: "https://cloud.google.com/assured-workloads/access-approval/docs/overview", title: "Access Approval overview" }
+  subcontracting:
+    summary: Google publishes a Cloud subprocessor list for customer-data processing.
+    facts:
+      public_list: true
+    references:
+      - { url: "https://cloud.google.com/terms/subprocessors", title: "Google Cloud subprocessors" }
+  audit_and_exit:
+    summary: Google publishes contractual audit, data-return, and deletion terms in the Cloud Data Processing Addendum; report access varies by artefact.
+    facts:
+      contractual_source: Cloud Data Processing Addendum
+    references:
+      - { url: "https://cloud.google.com/terms/data-processing-addendum", title: "Google Cloud Data Processing Addendum" }
+  continuity:
+    summary: Google documents infrastructure security and resilience, while workload recovery design and testing remain customer responsibilities.
+    facts:
+      customer_responsibility: Workload recovery architecture
+    references:
+      - { url: "https://cloud.google.com/security", title: "Google Cloud security" }
+  vulnerability_disclosure:
+    summary: Google maintains public vulnerability-reporting and security-response programmes covering Google products and services.
+    facts:
+      public_reporting_channel: true
+    references:
+      - { url: "https://bughunters.google.com/", title: "Google Bug Hunters" }
+  transfers:
+    summary: International-transfer safeguards and regional processing commitments are set out in the Cloud Data Processing Addendum.
+    facts:
+      offering_scope: Google Cloud commercial public cloud
+    references:
+      - { url: "https://cloud.google.com/terms/data-processing-addendum", title: "Google Cloud Data Processing Addendum" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Google Cloud programme scope; not assumed to include every assessed service.
+    offering: public
+    regions: [europe-west1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://cloud.google.com/security/compliance/offerings", title: "Google Cloud compliance offerings" }
+  - id: iso-27017
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Google Cloud programme scope.
+    offering: public
+    regions: [europe-west1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://cloud.google.com/security/compliance/offerings", title: "Google Cloud compliance offerings" }
+  - id: iso-27018
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Google Cloud programme scope.
+    offering: public
+    regions: [europe-west1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://cloud.google.com/security/compliance/offerings", title: "Google Cloud compliance offerings" }
+  - id: soc2-type2
+    kind: attestation
+    status: unknown
+    validity: unknown
+    scope: Report-defined Google Cloud services and period.
+    offering: public
+    regions: [europe-west1]
+    all_services: false
+    report_access: nda
+    evidence:
+      - { url: "https://cloud.google.com/security/compliance/offerings", title: "Google Cloud compliance offerings" }

@@ -208,6 +208,8 @@ class ProviderProfile:
     controls: dict[str, ControlScore]  # control_id → score
     assessment_id: Optional[str] = None
     offering: Optional[ProviderOffering] = None
+    review_status: Optional[str] = None
+    review_note: Optional[str] = None
     vignette: dict[str, dict] = field(default_factory=dict)
     certifications: list[CertificationRecord] = field(default_factory=list)
     service_scope_exceptions: dict[str, str] = field(default_factory=dict)

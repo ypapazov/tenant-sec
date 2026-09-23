@@ -1,0 +1,94 @@
+vignette:
+  legal:
+    summary: AWS commercial services are governed by the AWS Customer Agreement and service terms; data-processing commitments are documented separately.
+    facts:
+      offering_scope: Commercial public cloud only; GovCloud claims are excluded.
+    references:
+      - { url: "https://aws.amazon.com/agreement/", title: "AWS Customer Agreement" }
+  operations:
+    summary: AWS publishes security, service-health, incident-reporting, and compliance resources through its Trust Center.
+    facts:
+      operating_model: Shared-responsibility public cloud
+    references:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center" }
+  privileged_access:
+    summary: AWS describes operator-access and data-protection controls in its Trust Center; this RC does not infer controls from GovCloud or sovereign offerings.
+    facts:
+      review_state: Provider-operated facts; not scored
+    references:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — data protection and privacy" }
+  subcontracting:
+    summary: AWS publishes a named subprocessor list and change information for its data-processing chain.
+    facts:
+      public_list: true
+    references:
+      - { url: "https://aws.amazon.com/compliance/sub-processors/what_has_changed/", title: "AWS subprocessor changes" }
+  audit_and_exit:
+    summary: AWS provides compliance reports and audit material through its compliance programmes and AWS Artifact; access conditions vary by report.
+    facts:
+      report_access: Mixed public and authenticated access
+    references:
+      - { url: "https://aws.amazon.com/compliance/faq/", title: "AWS Compliance FAQ" }
+  continuity:
+    summary: AWS publishes operational-resilience and service-status information; customer continuity architecture remains a shared responsibility.
+    facts:
+      customer_responsibility: Workload recovery design and testing
+    references:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — operational visibility" }
+  vulnerability_disclosure:
+    summary: AWS provides public channels for vulnerability reports, security concerns, abuse reports, and security testing guidance.
+    facts:
+      public_reporting_channel: true
+    references:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — report an incident" }
+  transfers:
+    summary: International-transfer and data-processing commitments are governed by the applicable AWS agreement and privacy terms.
+    facts:
+      offering_scope: AWS commercial public cloud
+    references:
+      - { url: "https://aws.amazon.com/agreement/", title: "AWS Customer Agreement" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: AWS services listed by the programme; not assumed to cover every assessed service.
+    offering: public
+    regions: [eu-west-1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — compliance programmes" }
+  - id: iso-27017
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: AWS programme scope only.
+    offering: public
+    regions: [eu-west-1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — compliance programmes" }
+  - id: iso-27018
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: AWS programme scope only.
+    offering: public
+    regions: [eu-west-1]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://aws.amazon.com/trust-center/", title: "AWS Trust Center — compliance programmes" }
+  - id: soc2-type2
+    kind: attestation
+    status: unknown
+    validity: unknown
+    scope: Report-defined AWS services and period.
+    offering: public
+    regions: [eu-west-1]
+    all_services: false
+    report_access: nda
+    evidence:
+      - { url: "https://aws.amazon.com/compliance/faq/", title: "AWS Compliance FAQ" }

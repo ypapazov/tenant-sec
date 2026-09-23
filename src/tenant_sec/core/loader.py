@@ -145,7 +145,16 @@ def _semantic_errors(data: dict, file_type: str, schema_dir: Path) -> list[str]:
                 )
             services = record.get("services") or []
             all_services = bool(record.get("all_services", False))
-            if bool(services) == all_services:
+            if services and all_services:
+                errors.append(
+                    f"Certification '{cert_id}' cannot declare both a services "
+                    "list and all_services: true"
+                )
+            elif (
+                record.get("status") == "held"
+                and not services
+                and not all_services
+            ):
                 errors.append(
                     f"Certification '{cert_id}' must declare either a non-empty "
                     "services list or all_services: true, but not both"
@@ -521,6 +530,8 @@ def _parse_provider(data: dict) -> ProviderProfile:
         controls=controls,
         assessment_id=data.get("assessment_id"),
         offering=offering,
+        review_status=data.get("review_status"),
+        review_note=data.get("review_note"),
         vignette=data.get("vignette") or {},
         certifications=certifications,
         service_scope_exceptions=data.get("service_scope_exceptions") or {},

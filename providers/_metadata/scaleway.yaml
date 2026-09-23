@@ -1,0 +1,85 @@
+vignette:
+  legal:
+    summary: Scaleway's public-cloud relationship is governed by its contractual documents, privacy policy, and data-processing terms under European jurisdiction.
+    facts:
+      offering_scope: Scaleway public cloud in fr-par; future qualified offerings are excluded.
+    references:
+      - { url: "https://www.scaleway.com/en/privacy-policy/", title: "Scaleway privacy policy" }
+  operations:
+    summary: Scaleway states that its European infrastructure operates continuously with native DDoS protection and a dedicated CSIRT.
+    facts:
+      csirt: true
+      provider_statement: true
+    references:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+  privileged_access:
+    summary: Scaleway's technical and organisational measures describe provider-operated access controls; this RC does not infer sovereign-offering controls for the public standard offering.
+    facts:
+      review_state: Provider-operated facts; not scored
+    references:
+      - { url: "https://www-uploads.scaleway.com/Technical_and_Organizational_Measures_9519142843.pdf", title: "Scaleway technical and organisational measures" }
+  subcontracting:
+    summary: Scaleway publishes a named subprocessor list for its processing chain.
+    facts:
+      public_list: true
+    references:
+      - { url: "https://www.scaleway.com/en/subprocessorlist/", title: "Scaleway subprocessor list" }
+  audit_and_exit:
+    summary: Scaleway publishes security and compliance information and provides contractual documents through its Trust Center and contracts pages; report access varies.
+    facts:
+      report_access: Mixed public and request-based access
+    references:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+  continuity:
+    summary: Scaleway describes high availability and incident response for its European infrastructure; customers remain responsible for workload recovery architecture and testing.
+    facts:
+      customer_responsibility: Workload recovery design and testing
+    references:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+  vulnerability_disclosure:
+    summary: Scaleway's security policy and CSIRT materials describe operational security and incident-response channels.
+    facts:
+      csirt: true
+    references:
+      - { url: "https://www-uploads.scaleway.com/PSSI_en_69ca10d789.pdf", title: "Scaleway information systems security policy" }
+  transfers:
+    summary: Scaleway states that its infrastructure and processing remain within European jurisdiction; the applicable privacy and contractual documents define transfer obligations.
+    facts:
+      provider_statement: European jurisdiction
+    references:
+      - { url: "https://www.scaleway.com/en/privacy-policy/", title: "Scaleway privacy policy" }
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Scaleway certificate scope; not assumed to include every assessed service.
+    offering: public
+    regions: [fr-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+  - id: hds
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: HDS-certified hosting scope only.
+    offering: public
+    regions: [fr-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }
+  - id: secnumcloud-3.2
+    kind: qualification
+    status: in-progress
+    validity: unknown
+    scope: Qualification process is ongoing; no SecNumCloud status is claimed for this public standard assessment.
+    offering: public
+    regions: [fr-par]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://www.scaleway.com/en/security-and-compliance/", title: "Scaleway security and compliance" }

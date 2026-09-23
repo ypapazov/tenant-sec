@@ -1,0 +1,96 @@
+vignette:
+  legal:
+    summary: Azure commercial services are governed by the applicable Microsoft customer or licensing agreement, Product Terms, and Data Protection Addendum.
+    facts:
+      offering_scope: Commercial public cloud only; Azure Government and 21Vianet are excluded.
+    references:
+      - { url: "https://azure.microsoft.com/en-us/support/legal/", title: "Microsoft Azure legal information" }
+  operations:
+    summary: Microsoft describes Azure security, supplier assurance, and compliance operations through its Trust Center and assurance documentation.
+    facts:
+      operating_model: Shared-responsibility public cloud
+    references:
+      - { url: "https://learn.microsoft.com/en-us/compliance/assurance/assurance-supplier-management", title: "Microsoft supplier security and privacy assurance" }
+  privileged_access:
+    summary: Customer Lockbox can require customer approval for Microsoft support access to customer content, subject to service and plan availability.
+    facts:
+      customer_lockbox_available: true
+      availability_varies: true
+    references:
+      - { url: "https://learn.microsoft.com/en-us/azure/security/fundamentals/customer-lockbox-overview", title: "Customer Lockbox for Microsoft Azure" }
+  subcontracting:
+    summary: Microsoft publishes subprocessors and supplier-assurance information for Online Services; contractual notice terms depend on the applicable agreement.
+    facts:
+      supplier_assurance_programme: true
+    references:
+      - { url: "https://learn.microsoft.com/en-us/compliance/assurance/assurance-supplier-management", title: "Microsoft supplier security and privacy assurance" }
+  audit_and_exit:
+    summary: Audit reports and compliance documentation are available through Microsoft's Service Trust Portal; contractual exit terms are defined by the applicable agreement and DPA.
+    facts:
+      report_access: Service Trust Portal
+    references:
+      - { url: "https://azure.microsoft.com/en-us/support/legal/", title: "Microsoft Azure legal information" }
+  continuity:
+    summary: Azure publishes service-level and resilience commitments; customers remain responsible for selecting and testing workload recovery architectures.
+    facts:
+      customer_responsibility: Workload recovery design and testing
+    references:
+      - { url: "https://azure.microsoft.com/en-us/support/legal/", title: "Microsoft Azure legal information — service levels" }
+  vulnerability_disclosure:
+    summary: Microsoft operates a public Security Response Center for reporting vulnerabilities affecting Microsoft products and cloud services.
+    facts:
+      public_reporting_channel: true
+    references:
+      - { url: "https://msrc.microsoft.com/report/vulnerability", title: "Microsoft Security Response Center" }
+  transfers:
+    summary: Data-transfer, privacy, and EU Data Boundary commitments are described in the DPA and Product Terms for Microsoft Online Services.
+    facts:
+      offering_scope: Azure commercial public cloud
+    references:
+      - { url: "https://www.microsoft.com/licensing/terms/product/ForOnlineServices", title: "Microsoft Product Terms for Online Services" }
+      - { url: "https://learn.microsoft.com/en-us/compliance/regulatory/gdpr-dpia-azure", title: "Azure and GDPR data protection impact assessments" }
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Azure programme scope; not assumed to include every assessed service.
+    offering: public
+    regions: [westeurope]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://learn.microsoft.com/en-us/azure/compliance/offerings/", title: "Azure compliance offerings" }
+  - id: iso-27017
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Azure programme scope.
+    offering: public
+    regions: [westeurope]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://learn.microsoft.com/en-us/azure/compliance/offerings/", title: "Azure compliance offerings" }
+  - id: iso-27018
+    kind: certification
+    status: unknown
+    validity: unknown
+    scope: Azure programme scope.
+    offering: public
+    regions: [westeurope]
+    all_services: false
+    report_access: public
+    evidence:
+      - { url: "https://learn.microsoft.com/en-us/azure/compliance/offerings/", title: "Azure compliance offerings" }
+  - id: soc2-type2
+    kind: attestation
+    status: unknown
+    validity: unknown
+    scope: Report-defined Azure services and period.
+    offering: public
+    regions: [westeurope]
+    all_services: false
+    report_access: nda
+    evidence:
+      - { url: "https://learn.microsoft.com/en-us/azure/compliance/offerings/", title: "Azure compliance offerings" }
