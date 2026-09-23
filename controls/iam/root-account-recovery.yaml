@@ -1,0 +1,37 @@
+---
+id: iam.root-account-recovery
+domain: iam
+name: "Root and Owner Account Recovery"
+description: >
+  Tenant-operable controls protecting recovery of the highest-privilege account
+  or organization owner. Covers recovery-factor hardening, approval, delay,
+  notification, emergency access, and resistance to support-channel takeover.
+
+criteria:
+  L0: >
+    Recovery of the root or owner account has no tenant-configurable safeguards
+    beyond provider support or a single mailbox, and the tenant cannot monitor
+    or constrain the recovery path.
+  L1: >
+    The tenant must build compensating procedures around provider support, such
+    as external identity proofing, monitored mailboxes, or manual multi-person
+    approval; the platform exposes no managed recovery policy.
+  L2: >
+    Managed recovery supports multiple protected factors, recovery contacts,
+    and immediate notifications, but approval, delay, or policy enforcement is
+    limited or cannot be required for every recovery path.
+  L3: >
+    The tenant can enforce multi-party approval or equivalent phishing-resistant
+    recovery, time delays and out-of-band notifications, protected emergency
+    access, auditable recovery events, and policy coverage for every root or
+    owner recovery path.
+
+framework_mappings:
+  ccm: ["IAM-02", "IAM-08"]
+  nist_800_53_r5: ["IA-2", "IA-5", "CP-2"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

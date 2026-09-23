@@ -1,0 +1,36 @@
+---
+id: enc.private-ca-lifecycle
+domain: encryption
+name: "Private CA and Certificate Lifecycle"
+description: >
+  Tenant-operated private public-key infrastructure for issuing, rotating,
+  revoking, and auditing workload certificates. Covers managed CA hierarchy,
+  policy constraints, short-lived certificates, revocation, and automation.
+
+criteria:
+  L0: >
+    The offering exposes no tenant-accessible way to operate a private CA or
+    issue private workload certificates, including on tenant-managed compute.
+  L1: >
+    Private PKI is achievable only by deploying and operating CA software,
+    protecting keys, implementing issuance, rotation, revocation, and audit
+    pipelines entirely in tenant-managed workloads.
+  L2: >
+    A managed private CA or certificate service provides issuance, rotation,
+    revocation, and audit integration, but hierarchy, policy constraints,
+    automation, regional coverage, or supported workload integrations are
+    limited.
+  L3: >
+    A managed private CA supports tenant-controlled hierarchies and policy,
+    hardware-protected keys, automated short-lived issuance and rotation,
+    revocation, comprehensive audit logs, and broad workload integration.
+
+framework_mappings:
+  ccm: ["CEK-03", "CEK-08"]
+  nist_800_53_r5: ["SC-12", "SC-17", "IA-5"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

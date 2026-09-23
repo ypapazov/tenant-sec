@@ -1,0 +1,37 @@
+---
+id: net.threat-prevention
+domain: network
+name: "Network Threat Prevention"
+description: >
+  Tenant-configurable managed inspection and prevention for network traffic.
+  Covers IDS/IPS, traffic mirroring, managed signatures, custom policy,
+  encrypted-traffic limitations, centralized enforcement, and findings export.
+
+criteria:
+  L0: >
+    The tenant cannot inspect or prevent network threats through any exposed
+    platform interface and cannot attach a tenant-managed inspection appliance
+    to relevant traffic paths.
+  L1: >
+    The tenant can deploy and operate inspection appliances or custom packet
+    processing, but must manage signatures, scaling, routing, availability,
+    findings, and response automation.
+  L2: >
+    Managed IDS, IPS, traffic mirroring, or threat-prevention policy is
+    available, but coverage, encrypted-traffic inspection, signatures,
+    customization, centralized rollout, or service integration is limited.
+  L3: >
+    Managed prevention provides centralized and customizable policy, broad
+    ingress, egress, and east-west coverage, managed and custom detections,
+    explicit encrypted-traffic controls, high availability, and real-time
+    findings export and response integration.
+
+framework_mappings:
+  ccm: ["IVS-09", "TVM-10"]
+  nist_800_53_r5: ["SC-7", "SI-4"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: false

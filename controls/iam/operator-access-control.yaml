@@ -1,0 +1,36 @@
+---
+id: iam.operator-access-control
+domain: iam
+name: "Customer-Controlled Operator Access"
+description: >
+  Tenant-visible and tenant-controlled access by provider personnel to tenant
+  resources or data. Covers access-transparency logs, approval or lockbox
+  workflows, time-bounded access, purpose disclosure, and emergency overrides.
+
+criteria:
+  L0: >
+    The tenant has no interface to observe, constrain, approve, or deny provider
+    operator access. Generic audit statements or contractual assurances do not
+    constitute a tenant-operable control.
+  L1: >
+    The tenant can build a detection or approval loop from generic audit events,
+    support tickets, or external encryption, but the provider does not expose a
+    managed operator-access workflow.
+  L2: >
+    A managed access-transparency log or customer approval workflow exists, but
+    applies only to selected services, support plans, or access paths; emergency
+    access may bypass approval with after-the-fact notification.
+  L3: >
+    The tenant can require approval for provider access across the offering,
+    inspect identity, purpose, scope, and duration, deny or revoke access, and
+    audit emergency overrides through tamper-resistant records.
+
+framework_mappings:
+  ccm: ["IAM-09", "LOG-09"]
+  nist_800_53_r5: ["AC-2", "AC-6", "AU-2"]
+  cis_aws_v5: []
+  cis_azure_v5: []
+  cis_gcp_v4: []
+  mitre_attack: []
+
+service_scoped: true

@@ -16,6 +16,8 @@ domains:
       - iam.mfa-enforcement
       - iam.identity-lifecycle
       - iam.session-management
+      - iam.operator-access-control
+      - iam.root-account-recovery
 
   governance:
     name: "Organization Governance & Policy"
@@ -38,6 +40,7 @@ domains:
       - enc.hsm-backing
       - enc.encryption-in-transit
       - enc.confidential-computing
+      - enc.private-ca-lifecycle
 
   network:
     name: "Network Security"
@@ -51,6 +54,7 @@ domains:
       - net.waf
       - net.egress-control
       - net.flow-logging
+      - net.threat-prevention
 
   logging:
     name: "Logging, Monitoring & Audit"

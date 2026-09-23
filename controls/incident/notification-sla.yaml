@@ -20,16 +20,18 @@ criteria:
     SLA, no direct notification to affected tenants, and no private advance
     notice for critical vulnerabilities.
   L2: >
-    Contractual incident notification exists (e.g., 72 hours for GDPR Article 33
-    compliance) but only covers data breaches, not security incidents without
-    confirmed data exposure. Provider uses general notification (announcement to
-    all customers), not targeted notification to affected tenants.
+    Contractual incident notification exists and requires a processor to notify
+    the controller without undue delay, consistent with GDPR Article 33(2), but
+    does not define a shorter measurable provider-to-customer deadline or cover
+    security incidents without confirmed personal-data exposure. The GDPR
+    72-hour clock is the controller-to-supervisory-authority obligation under
+    Article 33(1), not the processor-to-customer deadline.
   L3: >
-    Strong notification commitment: targeted notification to directly affected
-    tenants within 24-72 hours of incident confirmation, contractual SLA,
-    advance notification for vulnerabilities requiring tenant action (with
-    embargo if needed), dedicated incident response channel, and published
-    transparency reports with post-incident analyses.
+    Strong notification commitment: targeted notice to directly affected
+    tenants under a measurable contractual deadline (for example, within
+    24 hours of confirmation), broader coverage than personal-data breaches,
+    advance notice for vulnerabilities requiring tenant action where feasible,
+    a dedicated incident channel, and post-incident reporting.
 
 framework_mappings:
   ccm: ["SEF-04", "SEF-05"]

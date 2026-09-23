@@ -2,7 +2,7 @@
 
 An open-source framework for evaluating cloud provider security capabilities at the **tenant level** — the controls and features a cloud customer can actually use, configure, and rely on.
 
-[![Controls Explorer — 67 controls across 9 domains](docs/controls-preview.png)](https://your-org.github.io/tenant-sec/controls.html)
+[![Controls Explorer — 71 controls across 9 domains](docs/controls-preview.png)](https://your-org.github.io/tenant-sec/controls.html)
 
 > **[Explore controls visually](https://your-org.github.io/tenant-sec/controls.html)** · **[Try the in-browser evaluator](https://your-org.github.io/tenant-sec/evaluate.html)** · **[Read the docs](https://your-org.github.io/tenant-sec/)**
 
@@ -72,7 +72,7 @@ Assessments follow [`METHODOLOGY.md`](METHODOLOGY.md). L0–L3 applies only to t
 tenant-sec/
 ├── METHODOLOGY.md     # How scores, coverage, evidence, and certifications work
 ├── schema/            # JSON Schemas (draft 2020-12) + service and certification catalogues
-├── controls/          # 67 control definitions (one YAML per control)
+├── controls/          # 71 control definitions (one YAML per control)
 ├── providers/         # Provider assessment profiles (AWS, GCP, Scaleway)
 ├── mappings/          # Framework cross-references (CCM, NIST 800-53)
 ├── profiles/          # Example scoring profiles
