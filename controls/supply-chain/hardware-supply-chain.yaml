@@ -2,6 +2,7 @@
 id: supply-chain.hardware-supply-chain
 domain: supply-chain
 name: "Hardware Supply Chain"
+surface: vignette
 description: >
   Custom silicon, hardware root of trust, firmware integrity, and supply chain
   provenance. Covers whether the provider uses purpose-built security silicon

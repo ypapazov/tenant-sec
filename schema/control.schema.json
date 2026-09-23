@@ -46,6 +46,12 @@
       },
       "additionalProperties": false
     },
+    "surface": {
+      "type": "string",
+      "enum": ["tenant", "vignette"],
+      "default": "tenant",
+      "description": "tenant = scored on the L0–L3 ladder; vignette = provider-operated fact, not a maturity score"
+    },
     "service_scoped": {
       "type": "boolean",
       "default": false,

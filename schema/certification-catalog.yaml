@@ -1,0 +1,77 @@
+---
+# Named assurance programmes. Scoring profiles reference these ids.
+# A held certification is inventory. It is never converted into an L0–L3 score.
+version: "0.2.0"
+
+kinds:
+  certification: "Third-party certificate against a standard (e.g. ISO/IEC 27001)"
+  attestation: "Independent attestation of controls over a period (e.g. BSI C5, SOC 2)"
+  qualification: "National security qualification of a named offering (e.g. SecNumCloud)"
+  authorization: "Government authorization to operate for a defined system and scope (e.g. FedRAMP)"
+  assessment-label: "Label issued after a scoped assessment (e.g. TISAX)"
+  code-of-conduct: "Adherence to a code (e.g. CISPE)"
+  scheme-draft: "Scheme not issuing certificates; do not record as held"
+
+programmes:
+  iso-27001:
+    name: "ISO/IEC 27001"
+    kind: certification
+    geography: global
+  iso-27017:
+    name: "ISO/IEC 27017"
+    kind: certification
+    geography: global
+  iso-27018:
+    name: "ISO/IEC 27018"
+    kind: certification
+    geography: global
+  iso-27701:
+    name: "ISO/IEC 27701"
+    kind: certification
+    geography: global
+  soc2-type2:
+    name: "SOC 2 Type II"
+    kind: attestation
+    geography: global
+  bsi-c5-type1:
+    name: "BSI C5 Type 1"
+    kind: attestation
+    geography: DE
+    notes: "Point-in-time design attestation. Not a certification."
+  bsi-c5-type2:
+    name: "BSI C5 Type 2"
+    kind: attestation
+    geography: DE
+    notes: "Operating-effectiveness attestation over a period. Not a certification."
+  secnumcloud-3.2:
+    name: "SecNumCloud 3.2"
+    kind: qualification
+    geography: FR
+    notes: "ANSSI qualification of a named offering, not of the company."
+  hds:
+    name: "Hébergeur de Données de Santé (HDS)"
+    kind: certification
+    geography: FR
+  pci-dss:
+    name: "PCI DSS"
+    kind: attestation
+    geography: global
+  tisax-assessment-level-3:
+    name: "TISAX Assessment Level 3"
+    kind: assessment-label
+    geography: DE
+  ens:
+    name: "Esquema Nacional de Seguridad (ENS)"
+    kind: certification
+    geography: ES
+  fedramp:
+    name: "FedRAMP"
+    kind: authorization
+    geography: US
+    notes: "US federal; not a substitute for C5 or SecNumCloud."
+  eucs:
+    name: "EUCS (cloud services)"
+    kind: scheme-draft
+    geography: EU
+    notes: "Not adopted; no certificates. Do not record as held."
+    holdable: false

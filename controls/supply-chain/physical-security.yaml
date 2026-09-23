@@ -2,6 +2,7 @@
 id: supply-chain.physical-security
 domain: supply-chain
 name: "Physical Security"
+surface: vignette
 description: >
   Datacenter physical security certifications, access controls, and environmental
   protections. This is an attestation-based assessment (tenants cannot test

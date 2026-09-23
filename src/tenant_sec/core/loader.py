@@ -11,16 +11,21 @@ import jsonschema
 import yaml
 
 from .models import (
+    AssessmentStatus,
+    CertificationRecord,
     Control,
     LeafControlScore,
     MixedControlScore,
     MustHaveEntry,
+    ProviderOffering,
     ProviderProfile,
+    Reference,
     ScoringProfile,
     ServiceInScope,
     ServiceScore,
 )
 from .registry import ControlRegistry, ServiceCatalog
+from .certifications import CertificationCatalog
 
 # Schema file names
 SCHEMA_NAMES = {
@@ -28,6 +33,7 @@ SCHEMA_NAMES = {
     "provider": "provider.schema.json",
     "scoring-profile": "scoring-profile.schema.json",
     "maturity": "maturity.schema.json",
+    "certification-catalog": "certification-catalog.schema.json",
 }
 
 
@@ -49,7 +55,10 @@ def _load_schema(schema_dir: Path, schema_type: str) -> dict:
 
 
 def _validate_yaml(data: dict, schema: dict, path: Optional[Path] = None) -> None:
-    validator = jsonschema.Draft202012Validator(schema)
+    validator = jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+    )
     errors = list(validator.iter_errors(data))
     if errors:
         # Report the first / most specific error
@@ -61,6 +70,160 @@ def _validate_yaml(data: dict, schema: dict, path: Optional[Path] = None) -> Non
         )
 
 
+def _semantic_errors(data: dict, file_type: str, schema_dir: Path) -> list[str]:
+    """Cross-field rules that JSON Schema cannot express cleanly."""
+    errors: list[str] = []
+    cert_path = schema_dir / "certification-catalog.yaml"
+    cert_catalog = (
+        CertificationCatalog.from_file(cert_path) if cert_path.exists() else None
+    )
+
+    if file_type == "scoring-profile":
+        for cert_id in data.get("must_have_certifications") or []:
+            programme = cert_catalog.get(cert_id) if cert_catalog else None
+            if programme is None:
+                errors.append(
+                    f"Unknown required certification id '{cert_id}'"
+                )
+            elif not cert_catalog.is_holdable(cert_id):
+                errors.append(
+                    f"Required programme '{cert_id}' cannot be held"
+                )
+        return errors
+
+    if file_type != "provider":
+        return errors
+
+    is_v2 = str(data.get("methodology_version", "")).startswith("2.")
+    service_ids = [svc.get("id") for svc in data.get("services_in_scope") or []]
+    if len(service_ids) != len(set(service_ids)):
+        errors.append("services_in_scope IDs must be unique service instances")
+
+    for record in data.get("certifications") or []:
+        cert_id = record.get("id", "")
+        programme = cert_catalog.get(cert_id) if cert_catalog else None
+        if programme is None:
+            errors.append(f"Unknown certification id '{cert_id}'")
+            continue
+        if record.get("kind") and record["kind"] != programme.kind:
+            errors.append(
+                f"Certification '{cert_id}' kind must be '{programme.kind}'"
+            )
+        if record.get("status") == "held" and not cert_catalog.is_holdable(cert_id):
+            errors.append(f"Programme '{cert_id}' cannot be recorded as held")
+        if is_v2:
+            required = (
+                "status",
+                "validity",
+                "scope",
+                "offering",
+                "regions",
+                "report_access",
+                "evidence",
+            )
+            missing = [
+                field
+                for field in required
+                if record.get(field) in (None, "", [])
+            ]
+            if missing:
+                errors.append(
+                    f"Certification '{cert_id}' is missing v2 fields: "
+                    + ", ".join(missing)
+                )
+            if record.get("validity") == "fixed" and not record.get("valid_until"):
+                errors.append(
+                    f"Certification '{cert_id}' has fixed validity without valid_until"
+                )
+            if record.get("status") == "held" and record.get("validity") == "unknown":
+                errors.append(
+                    f"Held certification '{cert_id}' cannot have unknown validity"
+                )
+            services = record.get("services") or []
+            all_services = bool(record.get("all_services", False))
+            if bool(services) == all_services:
+                errors.append(
+                    f"Certification '{cert_id}' must declare either a non-empty "
+                    "services list or all_services: true, but not both"
+                )
+
+    if not is_v2:
+        return errors
+
+    offering = data.get("offering") or {}
+    identity_parts = str(data.get("assessment_id", "")).split("/")
+    if (
+        not identity_parts
+        or identity_parts[0] != data.get("provider")
+        or offering.get("id") not in identity_parts[1:]
+    ):
+        errors.append(
+            "assessment_id must start with the provider and include offering.id"
+        )
+    if (
+        len(offering.get("regions") or []) > 1
+        and not offering.get("region_equivalence")
+    ):
+        errors.append(
+            "A multi-region v2 assessment requires region_equivalence; "
+            "otherwise use separate assessment files"
+        )
+
+    for control_id, result in (data.get("controls") or {}).items():
+        status = result.get("status")
+        if result.get("score") == "mixed":
+            extra_services = set(result.get("services") or {}) - set(service_ids)
+            if extra_services:
+                errors.append(
+                    f"Control '{control_id}' contains services outside "
+                    f"services_in_scope: {', '.join(sorted(extra_services))}"
+                )
+            if status != "assessed":
+                errors.append(
+                    f"Control '{control_id}' must explicitly use status 'assessed'"
+                )
+            if not result.get("references"):
+                errors.append(
+                    f"Assessed control '{control_id}' requires references"
+                )
+            if not result.get("confidence"):
+                errors.append(
+                    f"Assessed control '{control_id}' requires confidence"
+                )
+            for service_id, service in (result.get("services") or {}).items():
+                if service.get("score") is not None:
+                    if service.get("status") != "assessed":
+                        errors.append(
+                            f"Control '{control_id}' service '{service_id}' "
+                            "must explicitly use status 'assessed'"
+                        )
+                    if not service.get("references"):
+                        errors.append(
+                            f"Control '{control_id}' service '{service_id}' "
+                            "requires references"
+                        )
+                elif service.get("status") is None:
+                    errors.append(
+                        f"Control '{control_id}' service '{service_id}' "
+                        "must use an explicit non-score status"
+                    )
+        elif result.get("score") is not None:
+            if status != "assessed":
+                errors.append(
+                    f"Control '{control_id}' must explicitly use status 'assessed'"
+                )
+            if not result.get("references"):
+                errors.append(
+                    f"Assessed control '{control_id}' requires references"
+                )
+            if not result.get("confidence"):
+                errors.append(
+                    f"Assessed control '{control_id}' requires confidence"
+                )
+
+    return errors
+
+
 def detect_file_type(data: dict) -> Optional[str]:
     """Heuristic: detect which schema type a YAML file matches."""
     if "criteria" in data:
@@ -69,6 +232,8 @@ def detect_file_type(data: dict) -> Optional[str]:
         return "provider"
     if "weights" in data and "mixed_aggregation" in data:
         return "scoring-profile"
+    if "programmes" in data and "version" in data:
+        return "certification-catalog"
     return None
 
 
@@ -90,6 +255,9 @@ def load_provider(path: Path, schema_dir: Optional[Path] = None) -> ProviderProf
     if schema_dir:
         schema = _load_schema(schema_dir, "provider")
         _validate_yaml(data, schema, path)
+        semantic_errors = _semantic_errors(data, "provider", schema_dir)
+        if semantic_errors:
+            raise ValidationError(semantic_errors[0], path)
     return _parse_provider(data)
 
 
@@ -100,6 +268,9 @@ def load_scoring_profile(
     if schema_dir:
         schema = _load_schema(schema_dir, "scoring-profile")
         _validate_yaml(data, schema, path)
+        semantic_errors = _semantic_errors(data, "scoring-profile", schema_dir)
+        if semantic_errors:
+            raise ValidationError(semantic_errors[0], path)
     return _parse_scoring_profile(data)
 
 
@@ -109,6 +280,10 @@ def load_control_registry(controls_dir: Path) -> ControlRegistry:
 
 def load_service_catalog(catalog_path: Path) -> ServiceCatalog:
     return ServiceCatalog.from_file(catalog_path)
+
+
+def load_certification_catalog(catalog_path: Path) -> CertificationCatalog:
+    return CertificationCatalog.from_file(catalog_path)
 
 
 # ── Parsing helpers ────────────────────────────────────────────────────────────
@@ -125,6 +300,7 @@ def _parse_control(data: dict) -> Control:
         service_scoped=data.get("service_scoped", False),
         parent=data.get("parent"),
         sub_control_aggregation=data.get("sub_control_aggregation"),
+        surface=data.get("surface", "tenant"),
     )
 
 
@@ -136,25 +312,47 @@ def _parse_date(value: Any) -> Optional[date]:
     return date.fromisoformat(str(value))
 
 
+def _parse_status(value: Any) -> Optional[AssessmentStatus]:
+    if value is None:
+        return None
+    return AssessmentStatus(str(value))
+
+
+def _parse_references(values: Any) -> list[Reference]:
+    return [
+        Reference(url=str(ref["url"]), title=str(ref["title"]))
+        for ref in (values or [])
+    ]
+
+
 def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
     if data.get("score") == "mixed":
         services: dict[str, ServiceScore] = {}
         for svc_id, svc_data in data.get("services", {}).items():
             services[svc_id] = ServiceScore(
-                score=svc_data["score"],
+                score=svc_data.get("score"),
                 evidence=svc_data["evidence"],
+                status=_parse_status(svc_data.get("status")),
+                confidence=svc_data.get("confidence"),
+                references=_parse_references(svc_data.get("references")),
             )
         return MixedControlScore(
             services=services,
             summary=data.get("summary"),
             verified_at=_parse_date(data.get("verified_at")),
+            status=_parse_status(data.get("status")),
+            confidence=data.get("confidence"),
+            references=_parse_references(data.get("references")),
         )
     else:
         return LeafControlScore(
-            score=int(data["score"]),
+            score=int(data["score"]) if data.get("score") is not None else None,
             evidence=data["evidence"],
             compensating_controls=data.get("compensating_controls"),
             verified_at=_parse_date(data.get("verified_at")),
+            status=_parse_status(data.get("status")),
+            confidence=data.get("confidence"),
+            references=_parse_references(data.get("references")),
         )
 
 
@@ -165,6 +363,8 @@ def _parse_provider(data: dict) -> ProviderProfile:
             name=svc["name"],
             category=svc["category"],
             aliases=svc.get("aliases", []),
+            regions=svc.get("regions", []),
+            edition=svc.get("edition"),
         )
         for svc in data.get("services_in_scope", [])
     ]
@@ -173,6 +373,38 @@ def _parse_provider(data: dict) -> ProviderProfile:
         control_id: _parse_control_score(score_data)
         for control_id, score_data in data.get("controls", {}).items()
     }
+
+    offering_data = data.get("offering") or {}
+    offering = None
+    if offering_data:
+        offering = ProviderOffering(
+            id=offering_data.get("id"),
+            name=offering_data.get("name"),
+            partition=offering_data.get("partition"),
+            regions=offering_data.get("regions") or [],
+            region_equivalence=offering_data.get("region_equivalence"),
+            edition=offering_data.get("edition"),
+            cohort=offering_data.get("cohort"),
+        )
+
+    certifications = [
+        CertificationRecord(
+            id=rec["id"],
+            kind=rec.get("kind"),
+            status=rec.get("status", "held"),
+            valid_from=_parse_date(rec.get("valid_from")),
+            valid_until=_parse_date(rec.get("valid_until")),
+            validity=rec.get("validity"),
+            scope=rec.get("scope"),
+            offering=rec.get("offering"),
+            regions=rec.get("regions") or [],
+            services=rec.get("services") or [],
+            all_services=bool(rec.get("all_services", False)),
+            report_access=rec.get("report_access"),
+            evidence=_parse_references(rec.get("evidence")),
+        )
+        for rec in data.get("certifications") or []
+    ]
 
     return ProviderProfile(
         provider=data["provider"],
@@ -183,6 +415,11 @@ def _parse_provider(data: dict) -> ProviderProfile:
         revision=data["revision"],
         services_in_scope=services,
         controls=controls,
+        assessment_id=data.get("assessment_id"),
+        offering=offering,
+        vignette=data.get("vignette") or {},
+        certifications=certifications,
+        service_scope_exceptions=data.get("service_scope_exceptions") or {},
     )
 
 
@@ -194,7 +431,15 @@ def _parse_scoring_profile(data: dict) -> ScoringProfile:
     return ScoringProfile(
         name=data["name"],
         description=data.get("description"),
+        methodology_version=data.get("methodology_version"),
         must_have=must_have,
+        must_have_certifications=list(data.get("must_have_certifications") or []),
+        min_catalog_coverage=data.get("min_catalog_coverage"),
+        min_catalog_completeness=data.get("min_catalog_completeness"),
+        cohort=data.get("cohort"),
+        service_coverage_thresholds=tuple(
+            data.get("service_coverage_thresholds") or (2, 3)
+        ),
         weights=data["weights"],
         mixed_aggregation=data["mixed_aggregation"],
     )
@@ -231,15 +476,49 @@ def validate_file(
         errors.append(f"Schema validation error: {exc}")
         return errors
 
+    errors.extend(_semantic_errors(data, detected_type, schema_dir))
+    if errors:
+        return errors
+
+    if detected_type == "scoring-profile" and controls_dir:
+        registry = load_control_registry(controls_dir)
+        for requirement in data.get("must_have") or []:
+            control_id = requirement.get("control", "")
+            control = registry.get(control_id)
+            if control is None:
+                errors.append(f"Unknown must-have control ID '{control_id}'")
+            elif control.surface != "tenant":
+                errors.append(
+                    f"Must-have control '{control_id}' is not tenant-scored"
+                )
+        tenant_domains = {
+            control.domain
+            for control in registry.all_controls()
+            if control.surface == "tenant"
+        }
+        for domain, weight in (data.get("weights") or {}).items():
+            if float(weight) > 0 and domain not in tenant_domains:
+                errors.append(
+                    f"Domain '{domain}' has positive weight but no tenant controls"
+                )
+
     # Cross-reference checks for provider profiles
     if detected_type == "provider" and controls_dir and catalog_path:
         registry = load_control_registry(controls_dir)
         catalog = load_service_catalog(catalog_path)
 
         for control_id in data.get("controls", {}).keys():
-            if registry.get(control_id) is None:
+            control = registry.get(control_id)
+            if control is None:
                 errors.append(
                     f"Unknown control ID '{control_id}' — not found in controls/_index.yaml"
+                )
+
+        for control_id in (data.get("service_scope_exceptions") or {}):
+            control = registry.get(control_id)
+            if control is None or not control.service_scoped:
+                errors.append(
+                    f"Invalid service_scope_exceptions control '{control_id}'"
                 )
 
         # Check service IDs in mixed composites resolve through catalog
@@ -252,6 +531,18 @@ def validate_file(
                         errors.append(
                             f"Control '{control_id}': service alias '{svc_id}' "
                             f"not found in service catalog for provider '{provider_slug}'"
+                        )
+
+        catalog_path_dir = catalog_path.parent if catalog_path else None
+        if catalog_path_dir:
+            cert_catalog_file = catalog_path_dir / "certification-catalog.yaml"
+            if cert_catalog_file.exists() and data.get("certifications"):
+                cert_catalog = CertificationCatalog.from_file(cert_catalog_file)
+                for rec in data["certifications"]:
+                    cid = rec.get("id")
+                    if cid and cert_catalog.get(cid) is None:
+                        errors.append(
+                            f"Unknown certification id '{cid}' — not in certification-catalog.yaml"
                         )
 
     return errors

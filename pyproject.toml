@@ -50,6 +50,7 @@ include = [
     "/mappings",
     "/profiles",
     "/schema",
+    "/METHODOLOGY.md",
 ]
 
 [tool.pytest.ini_options]

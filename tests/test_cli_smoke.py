@@ -95,6 +95,10 @@ class TestScoreCommand:
         assert len(data) == 1
         assert "overall_score" in data[0]
         assert 0 <= data[0]["overall_score"] <= 100
+        assert data[0]["score_kind"] == "heuristic_index"
+        assert "assessment_id" in data[0]
+        assert "catalog_completeness" in data[0]
+        assert "service_coverages" in data[0]
 
     def test_score_csv_output(self, runner):
         result = _invoke(
@@ -109,6 +113,9 @@ class TestScoreCommand:
         )
         assert result.exit_code == 0, result.output
         assert "overall_score" in result.output
+        assert "assessment_id" in result.output
+        assert "offering_id" in result.output
+        assert "cohort" in result.output
 
     def test_score_help(self, runner):
         result = _invoke(runner, "score", "--help")
@@ -168,6 +175,10 @@ class TestExportCommand:
         )
         assert result.exit_code == 0, result.output
         assert "control_id" in result.output
+        assert "assessment_id" in result.output
+        assert "offering_id" in result.output
+        assert "certifications_json" in result.output
+        assert "vignette_json" in result.output
 
     def test_export_html(self, runner):
         result = _invoke(

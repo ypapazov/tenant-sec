@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from typing import Optional
 
 
@@ -25,6 +25,23 @@ class MaturityLevel(IntEnum):
         return labels.get(value, f"L{value}")
 
 
+class AssessmentStatus(StrEnum):
+    ASSESSED = "assessed"
+    UNKNOWN = "unknown"
+    CONFLICTING = "conflicting"
+    NOT_ASSESSED = "not_assessed"
+    NOT_APPLICABLE = "not_applicable"
+    OUT_OF_SCOPE = "out_of_scope"
+
+
+@dataclass(frozen=True)
+class Reference:
+    """A source cited by an assessment or assurance record."""
+
+    url: str
+    title: str
+
+
 @dataclass
 class Control:
     """A single control definition from controls/{domain}/*.yaml."""
@@ -38,24 +55,31 @@ class Control:
     service_scoped: bool = False
     parent: Optional[str] = None
     sub_control_aggregation: Optional[str] = None  # min, max, mean, worst
+    surface: str = "tenant"  # tenant | vignette
 
 
 @dataclass
 class ServiceScore:
     """An individual service score within a mixed composite."""
 
-    score: Optional[int]  # None means not applicable
+    score: Optional[int]
     evidence: str
+    status: Optional[AssessmentStatus] = None
+    confidence: Optional[str] = None
+    references: list[Reference] = field(default_factory=list)
 
 
 @dataclass
 class LeafControlScore:
-    """A direct maturity level score for a control."""
+    """A direct maturity result or explicit non-score state for a control."""
 
-    score: int  # 0-3
+    score: Optional[int]
     evidence: str
     compensating_controls: Optional[str] = None
     verified_at: Optional[date] = None
+    status: Optional[AssessmentStatus] = None
+    confidence: Optional[str] = None
+    references: list[Reference] = field(default_factory=list)
 
 
 @dataclass
@@ -65,6 +89,9 @@ class MixedControlScore:
     services: dict[str, ServiceScore]  # service_id → ServiceScore
     summary: Optional[str] = None
     verified_at: Optional[date] = None
+    status: Optional[AssessmentStatus] = None
+    confidence: Optional[str] = None
+    references: list[Reference] = field(default_factory=list)
 
 
 # Union type for a control score entry in a provider profile
@@ -73,12 +100,46 @@ ControlScore = LeafControlScore | MixedControlScore
 
 @dataclass
 class ServiceInScope:
-    """A service listed in a provider's services_in_scope."""
+    """A service instance listed in a provider's assessment scope."""
 
     id: str  # Provider-local alias
     name: str
     category: str  # Canonical category from service catalog
     aliases: list[str] = field(default_factory=list)
+    regions: list[str] = field(default_factory=list)
+    edition: Optional[str] = None
+
+
+@dataclass
+class CertificationRecord:
+    """A held (or expired) programme on an offering. Inventory, not a score."""
+
+    id: str
+    kind: Optional[str] = None
+    status: Optional[str] = None
+    valid_from: Optional[date] = None
+    valid_until: Optional[date] = None
+    validity: Optional[str] = None
+    scope: Optional[str] = None
+    offering: Optional[str] = None
+    regions: list[str] = field(default_factory=list)
+    services: list[str] = field(default_factory=list)
+    all_services: bool = False
+    report_access: Optional[str] = None
+    evidence: list[Reference] = field(default_factory=list)
+
+
+@dataclass
+class ProviderOffering:
+    """Named commercial offering this file assesses."""
+
+    id: Optional[str] = None
+    name: Optional[str] = None
+    partition: Optional[str] = None
+    regions: list[str] = field(default_factory=list)
+    region_equivalence: Optional[str] = None
+    edition: Optional[str] = None
+    cohort: Optional[str] = None
 
 
 @dataclass
@@ -93,6 +154,20 @@ class ProviderProfile:
     revision: int
     services_in_scope: list[ServiceInScope]
     controls: dict[str, ControlScore]  # control_id → score
+    assessment_id: Optional[str] = None
+    offering: Optional[ProviderOffering] = None
+    vignette: dict[str, dict] = field(default_factory=dict)
+    certifications: list[CertificationRecord] = field(default_factory=list)
+    service_scope_exceptions: dict[str, str] = field(default_factory=dict)
+
+    @property
+    def identity(self) -> str:
+        """Stable row identity; v1 falls back to the provider slug."""
+        return self.assessment_id or self.provider
+
+    @property
+    def is_v2(self) -> bool:
+        return self.methodology_version.startswith("2.")
 
 
 @dataclass
@@ -111,4 +186,16 @@ class ScoringProfile:
     weights: dict[str, float]  # domain → weight (must sum to 1.0)
     mixed_aggregation: str
     description: Optional[str] = None
+    methodology_version: Optional[str] = None
     must_have: list[MustHaveEntry] = field(default_factory=list)
+    must_have_certifications: list[str] = field(default_factory=list)
+    min_catalog_coverage: Optional[float] = None
+    min_catalog_completeness: Optional[float] = None
+    cohort: Optional[str] = None
+    service_coverage_thresholds: tuple[int, ...] = (2, 3)
+
+    @property
+    def required_catalog_completeness(self) -> Optional[float]:
+        if self.min_catalog_completeness is not None:
+            return self.min_catalog_completeness
+        return self.min_catalog_coverage

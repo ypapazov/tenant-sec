@@ -15,13 +15,13 @@ must_have:
 
 weights:
   iam: 0.15
-  governance: 0.12
+  governance: 0.13
   encryption: 0.15
-  network: 0.12
+  network: 0.13
   logging: 0.12
-  data: 0.12
-  compute: 0.10
-  incident: 0.07
-  supply-chain: 0.05
+  data: 0.13
+  compute: 0.11
+  incident: 0.08
+  supply-chain: 0.00
 
 mixed_aggregation: "mean"

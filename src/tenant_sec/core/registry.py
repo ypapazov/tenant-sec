@@ -83,6 +83,7 @@ def _parse_control(data: dict) -> Control:
         service_scoped=data.get("service_scoped", False),
         parent=data.get("parent"),
         sub_control_aggregation=data.get("sub_control_aggregation"),
+        surface=data.get("surface", "tenant"),
     )
 
 

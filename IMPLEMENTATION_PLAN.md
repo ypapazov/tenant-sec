@@ -1,11 +1,69 @@
 # tenant-sec — Implementation Plan
 
-**Version:** 1.0
-**Date:** February 2026
-**Status:** Ready for implementation
-**Prerequisites:** Read `prd.md` and `control-taxonomy-draft.md` first.
+**Version:** 2.0 (methodology workstream added 2026-09-16)
+**Original:** 1.0, February 2026
+**Status:** v1 CLI/data shipped; methodology 2.0 is in progress
+**Prerequisites:** Read `prd.md`, `control-taxonomy-draft.md`, and `METHODOLOGY.md`.
+
+The sections from “1. Architecture Decisions” onward are the v1 plan as executed. They remain useful history. Where they conflict with `METHODOLOGY.md` v2, **methodology 2.0 wins**.
 
 ---
+
+## 0. Methodology 2.0 workstream
+
+This is the current implementation track. Do not publish new provider rankings until the publication bar in `METHODOLOGY.md` §15 is met.
+
+### Decisions (locked 2026-09-16)
+
+- Assessment unit is provider + offering + region/partition + service + edition + date, not a company name.
+- L0–L3 applies only to tenant-operable controls in state `assessed`. Unknown is not L0.
+- Provider-operated facts live in a skim-able vignette, not on the maturity ladder.
+- Certifications are a typed inventory. Profiles require or rank catalogue IDs. Logos are not maturity.
+- Coverage is a fraction of applicable services (default threshold L2), optionally banded for display.
+- Must-haves and required certifications are eligibility gates; they sort before the heuristic score.
+- Source-class discipline in `METHODOLOGY.md` §7 is mandatory for published `assessed` results.
+- Google ADK remains the agent runtime. ADK 1 (pipeline commit 2026-05-04) was the contemporary default; ADK 2 GA followed on 2026-05-19. Pin `google-adk>=1.32,<2` until an explicit ADK 2 graph migration. Do not replace ADK with a raw LLM SDK.
+
+### Phase M1 — Document and schema (this increment)
+
+- [x] Write `METHODOLOGY.md` v2
+- [x] Certification catalogue YAML + scoring-profile `must_have_certifications`
+- [x] Provider `offering`, `vignette`, `certifications` (optional, backward compatible)
+- [x] Enforce assessment states, offering-scoped certification gates, and tenant-only scoring
+- [x] Integrate catalog completeness and per-service L2/L3 coverage into engine and CLI
+- [x] Preserve all v2 fields through load/export round trips
+- [ ] Claim-level evidence records required on new assessments (schema `$defs` first; enforce after one pilot offering)
+- [x] Control `surface: tenant | vignette` retag; deprecate scored certification/hardware/physical controls
+
+### Phase M2 — Criteria corrections (before re-assessment)
+
+- Fix `incident.notification-sla` legal text (GDPR 33(2) vs 72h)
+- Split `data.sovereignty-controls`; move legal/jurisdiction to vignette
+- Replace `supply-chain.compliance-certifications` usage in scoring profiles with `must_have_certifications`
+- Re-rubric `data.deletion-guarantees`; do not keep scores that contradict criteria
+- Add tenant-control stubs listed in `METHODOLOGY.md` §12 (operator-access log, network threat prevention, private CA, root/recovery) — definitions only, no fake scores
+
+### Phase M3 — Baseline repair
+
+- Score the seven catalogue controls missing from AWS, GCP, Scaleway
+- Require mixed scoring for `service_scoped` controls (or an explicit exception)
+- Add Azure as a hyperscaler comparator
+- Reassess Scaleway against 2025–2026 Key Manager / Audit Trail docs
+- Fill vignette + certification inventory for each offering (no L0–L3 on those fields)
+
+### Phase M4 — Agent runtime
+
+- [x] Pin ADK 1.x (`google-adk>=1.32,<2` in tenant-sec-agentic)
+- Five-control ADK 2 (or ADK 1 graph-equivalent) pilot: `enc.cmk`, `iam.mfa-enforcement`, `log.control-plane-audit`, `data.residency-guarantees`, `incident.notification-sla`
+- Typed artefacts, human-review state, citation propagation into `providers/*.yaml`
+- Independent challenger; no same-model rubber stamp
+
+### Phase M5 — EU offerings (inventory first, scores after M3)
+
+Stubs (no scores): OVHcloud Public Cloud, Hetzner Cloud, STACKIT, IONOS, then T Cloud Public / UpCloud / Cleura / Exoscale. Separate files for sovereign/dedicated offerings. Do not league-table across cohorts.
+
+---
+
 
 ## 1. Architecture Decisions
 
@@ -826,7 +884,7 @@ Phase 5 depends on Phase 3 (it visualizes scoring engine output).
 The following are explicitly deferred. Do not build them.
 
 - **API server** — deferred to v1.1 per PRD
-- **METHODOLOGY.md** — deferred per discussion
+- **METHODOLOGY.md** — **done (v2, September 2026)**; v1 had deferred it
 - **CIS and MITRE framework mappings** — post-v1; CCM and NIST 800-53 only for v1
 - **Interactive visualizations** — v1 is static HTML/PNG only
 - **Authentication, rate limiting, provider self-service** — v1 is a CLI tool and data repository

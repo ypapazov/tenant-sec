@@ -16,7 +16,10 @@ Three things get lost:
 - **Per-service gaps** — CMK encryption on S3 but not on the managed database; WAF on EC2 but not for the AI platform
 - **Signal** — when every provider checks the same boxes, security teams end up doing ad-hoc deep dives to find what the framework was supposed to surface
 
-tenant-sec replaces binary pass/fail with a **4-level maturity scale** and a **mixed composite** for per-service variability — preserving the signal that binary frameworks collapse.
+tenant-sec replaces binary pass/fail with a **4-level maturity scale** for
+assessed tenant-operable controls and a **mixed composite** for per-service
+variability. Unknown, conflicting, and incomplete research remain explicit
+non-score states.
 
 ## Maturity levels
 
@@ -31,8 +34,8 @@ tenant-sec replaces binary pass/fail with a **4-level maturity scale** and a **m
 ## What's in the box
 
 - **67 controls** across 9 domains (IAM, Governance, Encryption, Network, Logging, Data, Compute, Incident, Supply Chain)
-- **3 provider assessments** (AWS, GCP, Scaleway) with evidence text and per-service breakdowns
-- **Scoring engine** — weighted domain scores, configurable mixed aggregation, must-have filters
+- **3 legacy methodology-1 assessments** (AWS, GCP, Scaleway), retained for compatibility while v2 reassessment is in progress
+- **Scoring engine** — cohort-aware eligibility gates, catalogue completeness, service coverage, and a labelled heuristic index
 - **Framework mappings** — CSA CCM v4.1 and NIST SP 800-53 Rev 5
 - **Interactive tools** — browser-based [Controls Explorer](https://your-org.github.io/tenant-sec/controls.html) and [Evaluator](https://your-org.github.io/tenant-sec/evaluate.html) (no install required)
 
@@ -59,11 +62,16 @@ tenant-sec compare --providers aws,gcp,scaleway --domain iam
 tenant-sec export --provider aws --format html -o aws-report.html
 ```
 
+## Methodology
+
+Assessments follow [`METHODOLOGY.md`](METHODOLOGY.md). L0–L3 applies only to tenant-operable controls with sufficient evidence. Unknown is not L0. Certifications are a list, not a maturity score. Provider-operated facts belong in a vignette.
+
 ## Repository structure
 
 ```
 tenant-sec/
-├── schema/            # JSON Schemas (draft 2020-12) + service catalog
+├── METHODOLOGY.md     # How scores, coverage, evidence, and certifications work
+├── schema/            # JSON Schemas (draft 2020-12) + service and certification catalogues
 ├── controls/          # 67 control definitions (one YAML per control)
 ├── providers/         # Provider assessment profiles (AWS, GCP, Scaleway)
 ├── mappings/          # Framework cross-references (CCM, NIST 800-53)

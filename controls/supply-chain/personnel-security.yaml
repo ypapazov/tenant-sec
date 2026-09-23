@@ -2,6 +2,7 @@
 id: supply-chain.personnel-security
 domain: supply-chain
 name: "Personnel Security"
+surface: vignette
 description: >
   Background checks, access controls for provider employees who may access
   tenant infrastructure or data, insider threat programs, and whether the

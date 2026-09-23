@@ -2,6 +2,7 @@
 id: supply-chain.compliance-certifications
 domain: supply-chain
 name: "Compliance Certifications"
+surface: vignette
 description: >
   Catalog of held third-party certifications and the scope of those certifications
   (which services and regions are covered). Key certifications: ISO 27001,

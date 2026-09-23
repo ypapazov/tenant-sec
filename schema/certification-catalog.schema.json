@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tenant-sec.dev/schema/certification-catalog.schema.json",
+  "title": "Certification Catalogue Schema",
+  "description": "Validates schema/certification-catalog.yaml",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "kinds": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "programmes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "certification",
+              "attestation",
+              "qualification",
+              "authorization",
+              "assessment-label",
+              "code-of-conduct",
+              "scheme-draft"
+            ]
+          },
+          "geography": { "type": "string" },
+          "notes": { "type": "string" },
+          "holdable": { "type": "boolean", "default": true }
+        },
+        "required": ["name", "kind"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": ["version", "programmes"],
+  "additionalProperties": false
+}

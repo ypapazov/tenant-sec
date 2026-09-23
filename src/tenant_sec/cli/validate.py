@@ -15,7 +15,9 @@ from ..core.loader import validate_file
 @click.option(
     "--type",
     "file_type",
-    type=click.Choice(["control", "provider", "scoring-profile"]),
+    type=click.Choice(
+        ["control", "provider", "scoring-profile", "certification-catalog"]
+    ),
     default=None,
     help="File type to validate against. Auto-detected if omitted.",
 )

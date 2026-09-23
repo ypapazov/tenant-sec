@@ -8,9 +8,10 @@ from typing import Optional
 import click
 from tabulate import tabulate
 
-from ..core.loader import load_provider, load_control_registry
+from ..core.loader import load_control_registry
 from ..core.models import LeafControlScore, MixedControlScore
 from ..core.staleness import staleness_info
+from ._providers import load_all_assessments, select_one_assessment
 
 
 LEVEL_COLORS = {0: "red", 1: "yellow", 2: "cyan", 3: "green"}
@@ -27,7 +28,7 @@ def _colored_level(score: int) -> str:
     "--provider",
     "provider_slug",
     required=True,
-    help="Provider slug (e.g. aws, gcp, scaleway).",
+    help="Provider slug, profile filename stem, or assessment ID.",
 )
 @click.option(
     "--domain",
@@ -55,11 +56,10 @@ def detail(
     providers_dir = data_dir / "providers"
     controls_dir = data_dir / "controls"
 
-    provider_path = providers_dir / f"{provider_slug}.yaml"
-    if not provider_path.exists():
-        raise click.ClickException(f"Provider profile not found: {provider_path}")
-
-    provider = load_provider(provider_path, schema_dir)
+    provider = select_one_assessment(
+        load_all_assessments(providers_dir, schema_dir),
+        provider_slug,
+    )
     registry = load_control_registry(controls_dir)
 
     staleness = staleness_info(provider.assessed_at, provider.assessed_by)
@@ -69,6 +69,7 @@ def detail(
 
     click.echo(
         f"\n{click.style(provider.display_name, bold=True)}{stale_warn} — "
+        f"{provider.identity} — "
         f"assessed {provider.assessed_at} by {provider.assessed_by} "
         f"(rev {provider.revision})\n"
     )
@@ -76,7 +77,11 @@ def detail(
     domains_to_show = [domain] if domain else registry.domains()
 
     for dom in domains_to_show:
-        controls = registry.by_domain(dom)
+        controls = [
+            control
+            for control in registry.by_domain(dom)
+            if control.surface == "tenant"
+        ]
         if not controls:
             continue
 
@@ -90,7 +95,13 @@ def detail(
                 continue
 
             if isinstance(score_entry, LeafControlScore):
-                level_str = _colored_level(score_entry.score)
+                if score_entry.score is None:
+                    level_str = click.style(
+                        str(score_entry.status or "not_assessed").upper(),
+                        fg="yellow",
+                    )
+                else:
+                    level_str = _colored_level(score_entry.score)
                 click.echo(f"  {control.id:<45} {level_str}  {control.name}")
                 if verbose:
                     evidence = score_entry.evidence.strip().replace("\n", " ")
@@ -110,7 +121,10 @@ def detail(
                 svc_rows = []
                 for svc_id, svc_score in score_entry.services.items():
                     if svc_score.score is None:
-                        score_disp = click.style("N/A", dim=True)
+                        score_disp = click.style(
+                            str(svc_score.status or "not_applicable").upper(),
+                            dim=True,
+                        )
                     else:
                         score_disp = _colored_level(svc_score.score)
                     evidence = svc_score.evidence.strip()[:60] + "…" if not verbose else svc_score.evidence.strip()

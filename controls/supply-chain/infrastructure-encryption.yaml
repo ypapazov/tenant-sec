@@ -2,6 +2,7 @@
 id: supply-chain.infrastructure-encryption
 domain: supply-chain
 name: "Infrastructure-Level Encryption"
+surface: vignette
 description: >
   Provider-managed encryption of all data at rest at the infrastructure level,
   independent of tenant configuration (hardware or software encryption of

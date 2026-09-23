@@ -2,6 +2,7 @@
 id: incident.notification-sla
 domain: incident
 name: "Incident Notification SLA"
+surface: vignette
 description: >
   Contractual commitments on provider-side security incident notification
   timeline. Covers both infrastructure-level security incidents affecting

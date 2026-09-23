@@ -2,6 +2,7 @@
 id: supply-chain.dependency-disclosure
 domain: supply-chain
 name: "Dependency Disclosure"
+surface: vignette
 description: >
   Provider's disclosure of third-party dependencies, sub-processors, and
   infrastructure partners that have access to tenant data or influence service

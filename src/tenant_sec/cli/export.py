@@ -9,8 +9,12 @@ from pathlib import Path
 
 import click
 
-from ..core.loader import load_provider
 from ..core.models import LeafControlScore, MixedControlScore
+from ._providers import load_all_assessments, select_one_assessment
+
+
+def _references_to_dict(references) -> list[dict[str, str]]:
+    return [{"url": ref.url, "title": ref.title} for ref in references]
 
 
 def _provider_to_dict(provider) -> dict:
@@ -19,9 +23,16 @@ def _provider_to_dict(provider) -> dict:
     for control_id, entry in provider.controls.items():
         if isinstance(entry, LeafControlScore):
             c: dict = {
-                "score": entry.score,
                 "evidence": entry.evidence,
             }
+            if entry.score is not None or entry.status is None:
+                c["score"] = entry.score
+            if entry.status is not None:
+                c["status"] = str(entry.status)
+            if entry.confidence:
+                c["confidence"] = entry.confidence
+            if entry.references:
+                c["references"] = _references_to_dict(entry.references)
             if entry.compensating_controls:
                 c["compensating_controls"] = entry.compensating_controls
             if entry.verified_at:
@@ -32,8 +43,27 @@ def _provider_to_dict(provider) -> dict:
                 "score": "mixed",
                 "services": {
                     svc_id: {
-                        "score": svc.score,
                         "evidence": svc.evidence,
+                        **(
+                            {"score": svc.score}
+                            if svc.score is not None or svc.status is None
+                            else {}
+                        ),
+                        **(
+                            {"status": str(svc.status)}
+                            if svc.status is not None
+                            else {}
+                        ),
+                        **(
+                            {"confidence": svc.confidence}
+                            if svc.confidence
+                            else {}
+                        ),
+                        **(
+                            {"references": _references_to_dict(svc.references)}
+                            if svc.references
+                            else {}
+                        ),
                     }
                     for svc_id, svc in entry.services.items()
                 },
@@ -42,9 +72,15 @@ def _provider_to_dict(provider) -> dict:
                 c["summary"] = entry.summary
             if entry.verified_at:
                 c["verified_at"] = entry.verified_at.isoformat()
+            if entry.status is not None:
+                c["status"] = str(entry.status)
+            if entry.confidence:
+                c["confidence"] = entry.confidence
+            if entry.references:
+                c["references"] = _references_to_dict(entry.references)
             controls[control_id] = c
 
-    return {
+    result = {
         "provider": provider.provider,
         "display_name": provider.display_name,
         "assessed_by": provider.assessed_by,
@@ -56,21 +92,106 @@ def _provider_to_dict(provider) -> dict:
                 "id": svc.id,
                 "name": svc.name,
                 "category": svc.category,
+                **({"aliases": svc.aliases} if svc.aliases else {}),
+                **({"regions": svc.regions} if svc.regions else {}),
+                **({"edition": svc.edition} if svc.edition else {}),
             }
             for svc in provider.services_in_scope
         ],
         "controls": controls,
     }
+    if provider.assessment_id:
+        result["assessment_id"] = provider.assessment_id
+    if provider.offering:
+        result["offering"] = {
+            key: value
+            for key, value in {
+                "id": provider.offering.id,
+                "name": provider.offering.name,
+                "partition": provider.offering.partition,
+                "regions": provider.offering.regions,
+                "region_equivalence": provider.offering.region_equivalence,
+                "edition": provider.offering.edition,
+                "cohort": provider.offering.cohort,
+            }.items()
+            if value not in (None, [])
+        }
+    if provider.vignette:
+        result["vignette"] = provider.vignette
+    if provider.certifications:
+        certifications = []
+        for record in provider.certifications:
+            certifications.append(
+                {
+                    key: value
+                    for key, value in {
+                        "id": record.id,
+                        "kind": record.kind,
+                        "status": record.status,
+                        "valid_from": (
+                            record.valid_from.isoformat()
+                            if record.valid_from
+                            else None
+                        ),
+                        "valid_until": (
+                            record.valid_until.isoformat()
+                            if record.valid_until
+                            else None
+                        ),
+                        "validity": record.validity,
+                        "scope": record.scope,
+                        "offering": record.offering,
+                        "regions": record.regions,
+                        "services": record.services,
+                        "all_services": record.all_services or None,
+                        "report_access": record.report_access,
+                        "evidence": _references_to_dict(record.evidence),
+                    }.items()
+                    if value not in (None, [])
+                }
+            )
+        result["certifications"] = certifications
+    if provider.service_scope_exceptions:
+        result["service_scope_exceptions"] = provider.service_scope_exceptions
+    return result
 
 
 def _provider_to_csv(provider) -> str:
     buf = io.StringIO()
+    profile_data = _provider_to_dict(provider)
+    profile_columns = {
+        "assessment_id": provider.identity,
+        "provider": provider.provider,
+        "offering_id": (
+            provider.offering.id if provider.offering and provider.offering.id else ""
+        ),
+        "cohort": (
+            provider.offering.cohort
+            if provider.offering and provider.offering.cohort
+            else ""
+        ),
+        "certifications_json": json.dumps(
+            profile_data.get("certifications", []), separators=(",", ":")
+        ),
+        "vignette_json": json.dumps(
+            profile_data.get("vignette", {}), separators=(",", ":")
+        ),
+    }
     fieldnames = [
+        "assessment_id",
+        "provider",
+        "offering_id",
+        "cohort",
+        "certifications_json",
+        "vignette_json",
         "control_id",
         "type",
         "service",
         "score",
+        "status",
+        "confidence",
         "evidence",
+        "references",
         "compensating_controls",
         "verified_at",
     ]
@@ -81,11 +202,15 @@ def _provider_to_csv(provider) -> str:
         if isinstance(entry, LeafControlScore):
             writer.writerow(
                 {
+                    **profile_columns,
                     "control_id": control_id,
                     "type": "leaf",
                     "service": "",
                     "score": entry.score,
+                    "status": str(entry.status) if entry.status else "assessed",
+                    "confidence": entry.confidence or "",
                     "evidence": entry.evidence.strip().replace("\n", " "),
+                    "references": " ".join(ref.url for ref in entry.references),
                     "compensating_controls": (
                         entry.compensating_controls.strip().replace("\n", " ")
                         if entry.compensating_controls
@@ -98,11 +223,17 @@ def _provider_to_csv(provider) -> str:
             for svc_id, svc in entry.services.items():
                 writer.writerow(
                     {
+                        **profile_columns,
                         "control_id": control_id,
                         "type": "mixed",
                         "service": svc_id,
                         "score": svc.score if svc.score is not None else "N/A",
+                        "status": str(svc.status) if svc.status else (
+                            "assessed" if svc.score is not None else "not_applicable"
+                        ),
+                        "confidence": svc.confidence or entry.confidence or "",
                         "evidence": svc.evidence.strip().replace("\n", " "),
+                        "references": " ".join(ref.url for ref in svc.references),
                         "compensating_controls": "",
                         "verified_at": (
                             entry.verified_at.isoformat() if entry.verified_at else ""
@@ -115,9 +246,10 @@ def _provider_to_csv(provider) -> str:
 def _provider_to_html(provider) -> str:
     level_colors = {0: "#dc2626", 1: "#d97706", 2: "#0891b2", 3: "#16a34a"}
 
-    def badge(score) -> str:
+    def badge(score, status=None) -> str:
         if score is None:
-            return '<span style="color:#6b7280">N/A</span>'
+            label = str(status or "not_applicable").upper()
+            return f'<span style="color:#6b7280">{label}</span>'
         color = level_colors.get(score, "#6b7280")
         return f'<span style="color:{color};font-weight:bold">L{score}</span>'
 
@@ -128,7 +260,7 @@ def _provider_to_html(provider) -> str:
             rows_html.append(
                 f"<tr>"
                 f"<td><code>{control_id}</code></td>"
-                f"<td>{badge(entry.score)}</td>"
+                f"<td>{badge(entry.score, entry.status)}</td>"
                 f"<td></td>"
                 f"<td>{evidence_html}</td>"
                 f"</tr>"
@@ -144,7 +276,7 @@ def _provider_to_html(provider) -> str:
                 rows_html.append(
                     f"<tr>"
                     f"{control_cell}"
-                    f"<td>{badge(svc.score)}</td>"
+                    f"<td>{badge(svc.score, svc.status)}</td>"
                     f"<td><small>{svc_id}</small></td>"
                     f"<td><small>{svc.evidence.strip().replace(chr(10), ' ')}</small></td>"
                     f"</tr>"
@@ -170,6 +302,7 @@ def _provider_to_html(provider) -> str:
 <body>
 <h1>{provider.display_name}</h1>
 <div class="meta">
+  Assessment: <strong>{provider.identity}</strong> &bull;
   Assessed by: <strong>{provider.assessed_by}</strong> &bull;
   Assessed at: <strong>{provider.assessed_at}</strong> &bull;
   Revision: <strong>{provider.revision}</strong> &bull;
@@ -197,7 +330,7 @@ def _provider_to_html(provider) -> str:
     "--provider",
     "provider_slug",
     required=True,
-    help="Provider slug (e.g. aws, gcp, scaleway).",
+    help="Provider slug, profile filename stem, or assessment ID.",
 )
 @click.option(
     "--format",
@@ -234,11 +367,10 @@ def export(
     schema_dir = data_dir / "schema"
     providers_dir = data_dir / "providers"
 
-    provider_path = providers_dir / f"{provider_slug}.yaml"
-    if not provider_path.exists():
-        raise click.ClickException(f"Provider profile not found: {provider_path}")
-
-    provider = load_provider(provider_path, schema_dir)
+    provider = select_one_assessment(
+        load_all_assessments(providers_dir, schema_dir),
+        provider_slug,
+    )
 
     if output_format == "json":
         content = json.dumps(_provider_to_dict(provider), indent=2)

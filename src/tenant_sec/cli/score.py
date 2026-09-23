@@ -3,21 +3,40 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 from typing import Optional
 
 import click
 from tabulate import tabulate
 
-from ..core.loader import load_provider, load_scoring_profile, load_control_registry
+from ..core.loader import (
+    load_certification_catalog,
+    load_control_registry,
+    load_scoring_profile,
+)
 from ..scoring.engine import ScoringEngine
+from ._providers import load_all_assessments, select_assessments
 
 
 def _level_symbol(score: Optional[float]) -> str:
     if score is None:
         return "—"
     return f"L{int(round(score))}"
+
+
+def _coverage_to_dict(coverage) -> dict | None:
+    if coverage is None:
+        return None
+    return {
+        "meeting_threshold": coverage.assessed,
+        "assessed_total": coverage.assessed_total,
+        "applicable": coverage.applicable,
+        "fraction": coverage.fraction,
+        "completeness": coverage.completeness,
+        "band": coverage.band,
+        "threshold": coverage.threshold,
+        "state_counts": coverage.state_counts,
+    }
 
 
 @click.command()
@@ -31,7 +50,7 @@ def _level_symbol(score: Optional[float]) -> str:
 @click.option(
     "--providers",
     default=None,
-    help="Comma-separated provider slugs to include. Defaults to all in providers/.",
+    help="Comma-separated slugs, profile stems, or assessment IDs. Defaults to all.",
 )
 @click.option(
     "--format",
@@ -63,25 +82,27 @@ def score(
     # Load scoring profile
     scoring_profile = load_scoring_profile(profile_path, schema_dir)
 
-    # Determine which providers to load
-    if providers:
-        provider_slugs = [p.strip() for p in providers.split(",")]
-        provider_paths = [providers_dir / f"{slug}.yaml" for slug in provider_slugs]
-    else:
-        provider_paths = sorted(providers_dir.glob("*.yaml"))
-
-    if not provider_paths:
+    candidates = load_all_assessments(providers_dir, schema_dir)
+    if not candidates:
         raise click.ClickException("No provider profiles found.")
-
-    loaded_providers = []
-    for p in provider_paths:
-        if not p.exists():
-            raise click.ClickException(f"Provider profile not found: {p}")
-        loaded_providers.append(load_provider(p, schema_dir))
+    loaded_providers = (
+        select_assessments(
+            candidates,
+            [provider.strip() for provider in providers.split(",")],
+        )
+        if providers
+        else [profile for _, profile in candidates]
+    )
 
     # Load registry
     registry = load_control_registry(controls_dir)
-    engine = ScoringEngine(registry)
+    certification_catalog = load_certification_catalog(
+        schema_dir / "certification-catalog.yaml"
+    )
+    engine = ScoringEngine(
+        registry,
+        certification_catalog=certification_catalog,
+    )
 
     results = engine.score(loaded_providers, scoring_profile)
 
@@ -93,7 +114,12 @@ def score(
                 {
                     "rank": r.rank,
                     "provider": r.provider,
+                    "assessment_id": r.assessment_id,
+                    "offering_id": r.offering_id,
+                    "cohort": r.cohort,
                     "display_name": r.display_name,
+                    "score_kind": "heuristic_index",
+                    "aggregation": scoring_profile.mixed_aggregation,
                     "overall_score": r.overall_score,
                     "domain_scores": r.domain_scores,
                     "must_have_passed": r.must_have_passed,
@@ -106,6 +132,33 @@ def score(
                         }
                         for mh in r.must_have_results
                     ],
+                    "eligible": r.eligible,
+                    "eligibility_reasons": r.eligibility_reasons,
+                    "publishable": r.publishable,
+                    "publication_reasons": r.publication_reasons,
+                    "certs_passed": r.certs_passed,
+                    "cert_results": [
+                        {
+                            "certification_id": c.certification_id,
+                            "held": c.held,
+                            "current": c.current,
+                            "passed": c.passed,
+                            "valid_until": c.valid_until,
+                            "scope_matches": c.scope_matches,
+                            "reason": c.reason,
+                        }
+                        for c in r.cert_results
+                    ],
+                    "catalog_completeness": _coverage_to_dict(
+                        r.catalog_coverage
+                    ),
+                    "service_coverages": {
+                        control_id: {
+                            f"L{threshold}": _coverage_to_dict(coverage)
+                            for threshold, coverage in thresholds.items()
+                        }
+                        for control_id, thresholds in r.service_coverages.items()
+                    },
                     "stale": r.stale,
                 }
             )
@@ -117,17 +170,55 @@ def score(
 
         buf = io.StringIO()
         domains = sorted(scoring_profile.weights.keys())
-        fieldnames = ["rank", "provider", "overall_score", "must_have_passed", "stale"] + [
+        fieldnames = [
+            "rank",
+            "provider",
+            "assessment_id",
+            "offering_id",
+            "cohort",
+            "overall_score",
+            "eligible",
+            "eligibility_reasons",
+            "publishable",
+            "must_have_passed",
+            "certs_passed",
+            "catalog_completeness",
+            "service_coverages",
+            "stale",
+        ] + [
             f"domain_{d}" for d in domains
         ]
         writer = csv.DictWriter(buf, fieldnames=fieldnames)
         writer.writeheader()
         for r in results:
             row = {
-                "rank": r.rank,
+                "rank": r.rank if r.rank else "",
                 "provider": r.provider,
+                "assessment_id": r.assessment_id,
+                "offering_id": r.offering_id or "",
+                "cohort": r.cohort or "",
                 "overall_score": r.overall_score,
+                "eligible": r.eligible,
+                "eligibility_reasons": "; ".join(r.eligibility_reasons),
+                "publishable": r.publishable,
                 "must_have_passed": r.must_have_passed,
+                "certs_passed": r.certs_passed,
+                "catalog_completeness": (
+                    ""
+                    if r.catalog_coverage is None
+                    or r.catalog_coverage.completeness is None
+                    else f"{r.catalog_coverage.completeness:.2f}"
+                ),
+                "service_coverages": json.dumps(
+                    {
+                        control_id: {
+                            f"L{threshold}": _coverage_to_dict(coverage)
+                            for threshold, coverage in thresholds.items()
+                        }
+                        for control_id, thresholds in r.service_coverages.items()
+                    },
+                    separators=(",", ":"),
+                ),
                 "stale": r.stale,
             }
             for d in domains:
@@ -150,9 +241,9 @@ def score(
             "supply-chain": "SC",
         }
 
-        headers = ["Rank", "Provider", "Overall"] + [
+        headers = ["Rank", "Provider", "Assessment", "Index"] + [
             domain_abbrev.get(d, d[:4].title()) for d in domains
-        ] + ["Must-Haves", "Stale"]
+        ] + ["Complete", "Must-Haves", "Certs", "Eligible", "Publish", "Stale"]
 
         rows = []
         for r in results:
@@ -164,19 +255,57 @@ def score(
                     fg="red",
                 )
             )
+            eligible_str = (
+                click.style("yes", fg="green")
+                if r.eligible
+                else click.style("no", fg="red")
+            )
+            cert_status = (
+                click.style("PASS", fg="green")
+                if r.certs_passed
+                else click.style("FAIL", fg="red")
+            )
+            publish_status = (
+                click.style("yes", fg="green")
+                if r.publishable
+                else click.style("no", fg="yellow")
+            )
+            completeness = (
+                "—"
+                if r.catalog_coverage is None
+                or r.catalog_coverage.completeness is None
+                else f"{r.catalog_coverage.completeness:.0%}"
+            )
             stale_str = click.style("YES", fg="yellow") if r.stale else "no"
             row = [
-                r.rank,
+                r.rank if r.rank else "—",
                 r.display_name,
-                f"{r.overall_score:.1f}",
+                r.assessment_id,
+                str(round(r.overall_score)),
             ]
             for d in domains:
                 ds = r.domain_scores.get(d)
-                row.append(f"{ds:.1f}" if ds is not None else "—")
-            row += [mh_status, stale_str]
+                row.append(str(round(ds)) if ds is not None else "—")
+            row += [
+                completeness,
+                mh_status,
+                cert_status,
+                eligible_str,
+                publish_status,
+                stale_str,
+            ]
             rows.append(row)
 
         click.echo(f"\nScoring Profile: {scoring_profile.name}")
-        click.echo(f"Aggregation: {scoring_profile.mixed_aggregation}\n")
+        click.echo(
+            "Index: ordinal maturity heuristic (integer display); "
+            f"aggregation: {scoring_profile.mixed_aggregation}\n"
+        )
         click.echo(tabulate(rows, headers=headers, tablefmt="simple"))
+        for result in results:
+            reasons = result.eligibility_reasons or result.publication_reasons
+            if reasons:
+                click.echo(
+                    f"  {result.assessment_id}: " + "; ".join(reasons)
+                )
         click.echo()

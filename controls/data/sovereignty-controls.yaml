@@ -2,6 +2,7 @@
 id: data.sovereignty-controls
 domain: data
 name: "Data Sovereignty Controls"
+surface: vignette
 description: >
   Beyond residency: controls over who can access tenant data under which legal
   jurisdiction, including whether the provider can be compelled to disclose

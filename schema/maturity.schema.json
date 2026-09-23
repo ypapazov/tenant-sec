@@ -4,40 +4,134 @@
   "title": "Maturity Schema",
   "description": "Building blocks for maturity levels and control scores",
   "$defs": {
+    "assessment_status": {
+      "type": "string",
+      "enum": [
+        "assessed",
+        "unknown",
+        "conflicting",
+        "not_assessed",
+        "not_applicable",
+        "out_of_scope"
+      ],
+      "description": "Evidence state. Omit on v1 scores; treated as assessed. Unknown is not L0."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "reference": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "title": { "type": "string", "minLength": 1 }
+      },
+      "required": ["url", "title"],
+      "additionalProperties": false
+    },
     "maturity_level": {
       "type": "integer",
       "enum": [0, 1, 2, 3],
       "description": "L0=impossible from tenant space, L1=requires own processing loop, L2=available managed limited, L3=available managed customizable"
     },
     "service_score": {
-      "type": "object",
-      "properties": {
-        "score": {
-          "oneOf": [
-            { "$ref": "#/$defs/maturity_level" },
-            { "type": "null" }
-          ],
-          "description": "Maturity level for this service, or null if not applicable"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "score": { "$ref": "#/$defs/maturity_level" },
+            "evidence": { "type": "string", "minLength": 1 },
+            "status": { "const": "assessed" },
+            "confidence": { "$ref": "#/$defs/confidence" },
+            "references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/reference" }
+            }
+          },
+          "required": ["score", "evidence"],
+          "additionalProperties": false
         },
-        "evidence": {
-          "type": "string",
-          "minLength": 1,
-          "description": "Evidence justifying the score; required even for null (explain why not applicable)"
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "unknown",
+                "conflicting",
+                "not_assessed",
+                "not_applicable",
+                "out_of_scope"
+              ]
+            },
+            "evidence": { "type": "string", "minLength": 1 },
+            "confidence": { "$ref": "#/$defs/confidence" },
+            "references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/reference" }
+            }
+          },
+          "required": ["status", "evidence"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "score": { "type": "null" },
+            "evidence": { "type": "string", "minLength": 1 },
+            "confidence": { "$ref": "#/$defs/confidence" },
+            "references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/reference" }
+            }
+          },
+          "required": ["score", "evidence"],
+          "additionalProperties": false
         }
-      },
-      "required": ["score", "evidence"],
-      "additionalProperties": false
+      ]
     },
     "leaf_control_score": {
-      "type": "object",
-      "properties": {
-        "score": { "$ref": "#/$defs/maturity_level" },
-        "evidence": { "type": "string", "minLength": 1 },
-        "compensating_controls": { "type": "string" },
-        "verified_at": { "type": "string", "format": "date" }
-      },
-      "required": ["score", "evidence"],
-      "additionalProperties": false
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "score": { "$ref": "#/$defs/maturity_level" },
+            "evidence": { "type": "string", "minLength": 1 },
+            "compensating_controls": { "type": "string" },
+            "verified_at": { "type": "string", "format": "date" },
+            "status": { "const": "assessed" },
+            "confidence": { "$ref": "#/$defs/confidence" },
+            "references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/reference" }
+            }
+          },
+          "required": ["score", "evidence"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "unknown",
+                "conflicting",
+                "not_assessed",
+                "not_applicable",
+                "out_of_scope"
+              ]
+            },
+            "evidence": { "type": "string", "minLength": 1 },
+            "verified_at": { "type": "string", "format": "date" },
+            "confidence": { "$ref": "#/$defs/confidence" },
+            "references": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/reference" }
+            }
+          },
+          "required": ["status", "evidence"],
+          "additionalProperties": false
+        }
+      ]
     },
     "mixed_control_score": {
       "type": "object",
@@ -49,7 +143,13 @@
           "additionalProperties": { "$ref": "#/$defs/service_score" },
           "minProperties": 1
         },
-        "verified_at": { "type": "string", "format": "date" }
+        "verified_at": { "type": "string", "format": "date" },
+        "status": { "const": "assessed" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "references": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reference" }
+        }
       },
       "required": ["score", "services"],
       "additionalProperties": false

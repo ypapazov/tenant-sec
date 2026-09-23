@@ -4,6 +4,30 @@
   "title": "Provider Profile Schema",
   "description": "Validates files in providers/",
   "$defs": {
+    "assessment_status": {
+      "type": "string",
+      "enum": [
+        "assessed",
+        "unknown",
+        "conflicting",
+        "not_assessed",
+        "not_applicable",
+        "out_of_scope"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "reference": {
+      "type": "object",
+      "properties": {
+        "url": { "type": "string", "format": "uri" },
+        "title": { "type": "string", "minLength": 1 }
+      },
+      "required": ["url", "title"],
+      "additionalProperties": false
+    },
     "service_in_scope": {
       "type": "object",
       "properties": {
@@ -21,9 +45,113 @@
         "aliases": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "edition": { "type": "string", "minLength": 1 }
       },
       "required": ["id", "name", "category"],
+      "additionalProperties": false
+    },
+    "offering": {
+      "type": "object",
+      "description": "Named commercial offering this file assesses. Distinct from the company slug.",
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "partition": { "type": "string" },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "region_equivalence": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Evidence-backed reason one assessment may cover this region set"
+        },
+        "edition": { "type": "string" },
+        "cohort": {
+          "type": "string",
+          "enum": ["hyperscaler", "eu-public", "cost-focused", "sovereign", "dedicated", "watchlist"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "vignette_block": {
+      "type": "object",
+      "description": "Structured provider-operated facts. Not an L0–L3 score.",
+      "properties": {
+        "summary": { "type": "string" },
+        "facts": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "references": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reference" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "certification_record": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9.-]*$",
+          "description": "Catalogue id from schema/certification-catalog.yaml"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "certification",
+            "attestation",
+            "qualification",
+            "authorization",
+            "assessment-label",
+            "code-of-conduct",
+            "scheme-draft"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["held", "expired", "in-progress", "not-held", "unknown"]
+        },
+        "valid_from": { "type": "string", "format": "date" },
+        "valid_until": { "type": "string", "format": "date" },
+        "validity": {
+          "type": "string",
+          "enum": ["fixed", "continuous", "unknown"]
+        },
+        "scope": { "type": "string" },
+        "offering": { "type": "string" },
+        "regions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "services": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "all_services": {
+          "type": "boolean",
+          "default": false,
+          "description": "Explicitly states that the programme covers every service in this assessment"
+        },
+        "report_access": {
+          "type": "string",
+          "enum": ["public", "nda", "none"]
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reference" }
+        }
+      },
+      "required": ["id"],
       "additionalProperties": false
     }
   },
@@ -48,10 +176,47 @@
       "type": "string",
       "minLength": 1
     },
+    "assessment_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)+$",
+      "description": "Stable assessment-scope identity, e.g. aws/commercial/eu/standard"
+    },
     "revision": {
       "type": "integer",
       "minimum": 1,
       "description": "Monotonically increasing profile revision number"
+    },
+    "offering": { "$ref": "#/$defs/offering" },
+    "vignette": {
+      "type": "object",
+      "description": "Skim-able provider-operated facts. Keys are block names from METHODOLOGY.md §11.",
+      "properties": {
+        "legal": { "$ref": "#/$defs/vignette_block" },
+        "operations": { "$ref": "#/$defs/vignette_block" },
+        "privileged_access": { "$ref": "#/$defs/vignette_block" },
+        "subcontracting": { "$ref": "#/$defs/vignette_block" },
+        "audit_and_exit": { "$ref": "#/$defs/vignette_block" },
+        "continuity": { "$ref": "#/$defs/vignette_block" },
+        "vulnerability_disclosure": { "$ref": "#/$defs/vignette_block" },
+        "transfers": { "$ref": "#/$defs/vignette_block" }
+      },
+      "additionalProperties": { "$ref": "#/$defs/vignette_block" }
+    },
+    "certifications": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/certification_record" },
+      "description": "Typed inventory. Never converted into an L0–L3 score."
+    },
+    "service_scope_exceptions": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]+(\\.[a-z][a-z0-9-]+)?$"
+      },
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Written v2 exceptions allowing a service-scoped control to use one offering-wide leaf result"
     },
     "services_in_scope": {
       "type": "array",
@@ -70,19 +235,36 @@
               "compensating_controls": { "type": "string" },
               "references": {
                 "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "url": { "type": "string", "format": "uri" },
-                    "title": { "type": "string" }
-                  },
-                  "required": ["url", "title"],
-                  "additionalProperties": false
-                }
+                "items": { "$ref": "#/$defs/reference" }
               },
-              "verified_at": { "type": "string", "format": "date" }
+              "verified_at": { "type": "string", "format": "date" },
+              "status": { "const": "assessed" },
+              "confidence": { "$ref": "#/$defs/confidence" }
             },
             "required": ["score", "evidence"],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "enum": [
+                  "unknown",
+                  "conflicting",
+                  "not_assessed",
+                  "not_applicable",
+                  "out_of_scope"
+                ]
+              },
+              "evidence": { "type": "string", "minLength": 1 },
+              "references": {
+                "type": "array",
+                "items": { "$ref": "#/$defs/reference" }
+              },
+              "verified_at": { "type": "string", "format": "date" },
+              "confidence": { "$ref": "#/$defs/confidence" }
+            },
+            "required": ["status", "evidence"],
             "additionalProperties": false
           },
           {
@@ -92,47 +274,70 @@
               "summary": { "type": "string" },
               "references": {
                 "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "url": { "type": "string", "format": "uri" },
-                    "title": { "type": "string" }
-                  },
-                  "required": ["url", "title"],
-                  "additionalProperties": false
-                }
+                "items": { "$ref": "#/$defs/reference" }
               },
               "services": {
                 "type": "object",
                 "additionalProperties": {
-                  "type": "object",
-                  "properties": {
-                    "score": {
-                      "oneOf": [
-                        { "type": "integer", "enum": [0, 1, 2, 3] },
-                        { "type": "null" }
-                      ]
-                    },
-                    "evidence": { "type": "string", "minLength": 1 },
-                    "references": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "url": { "type": "string", "format": "uri" },
-                          "title": { "type": "string" }
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "score": { "type": "integer", "enum": [0, 1, 2, 3] },
+                        "status": { "const": "assessed" },
+                        "evidence": { "type": "string", "minLength": 1 },
+                        "references": {
+                          "type": "array",
+                          "items": { "$ref": "#/$defs/reference" }
                         },
-                        "required": ["url", "title"],
-                        "additionalProperties": false
-                      }
+                        "confidence": { "$ref": "#/$defs/confidence" }
+                      },
+                      "required": ["score", "evidence"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "enum": [
+                            "unknown",
+                            "conflicting",
+                            "not_assessed",
+                            "not_applicable",
+                            "out_of_scope"
+                          ]
+                        },
+                        "evidence": { "type": "string", "minLength": 1 },
+                        "references": {
+                          "type": "array",
+                          "items": { "$ref": "#/$defs/reference" }
+                        },
+                        "confidence": { "$ref": "#/$defs/confidence" }
+                      },
+                      "required": ["status", "evidence"],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "score": { "type": "null" },
+                        "evidence": { "type": "string", "minLength": 1 },
+                        "references": {
+                          "type": "array",
+                          "items": { "$ref": "#/$defs/reference" }
+                        },
+                        "confidence": { "$ref": "#/$defs/confidence" }
+                      },
+                      "required": ["score", "evidence"],
+                      "additionalProperties": false
                     }
-                  },
-                  "required": ["score", "evidence"],
-                  "additionalProperties": false
+                  ]
                 },
                 "minProperties": 1
               },
-              "verified_at": { "type": "string", "format": "date" }
+              "verified_at": { "type": "string", "format": "date" },
+              "status": { "const": "assessed" },
+              "confidence": { "$ref": "#/$defs/confidence" }
             },
             "required": ["score", "services"],
             "additionalProperties": false
@@ -150,6 +355,27 @@
     "revision",
     "services_in_scope",
     "controls"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "methodology_version": { "pattern": "^2\\." }
+        },
+        "required": ["methodology_version"]
+      },
+      "then": {
+        "required": ["assessment_id", "offering"],
+        "properties": {
+          "offering": {
+            "required": ["id", "name", "partition", "regions", "edition", "cohort"],
+            "properties": {
+              "regions": { "minItems": 1 }
+            }
+          }
+        }
+      }
+    }
   ],
   "additionalProperties": false
 }

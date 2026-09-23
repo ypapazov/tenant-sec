@@ -1,0 +1,56 @@
+provider: aws
+assessment_id: aws/public/eu/standard
+display_name: Example Public Cloud
+assessed_by: community:test
+assessed_at: "2026-09-16"
+methodology_version: "2.0"
+revision: 1
+offering:
+  id: public
+  name: Public Cloud
+  partition: commercial
+  regions: [eu-1]
+  edition: standard
+  cohort: eu-public
+services_in_scope:
+  - id: s3
+    name: Object Storage
+    category: storage.object
+    regions: [eu-1]
+    edition: standard
+controls:
+  iam.abac:
+    status: assessed
+    score: 2
+    confidence: high
+    evidence: Managed attribute conditions are available with limited policy scope.
+    references:
+      - url: https://example.com/docs/abac
+        title: Example ABAC documentation
+  enc.cmk:
+    status: assessed
+    score: mixed
+    confidence: low
+    summary: Assessed for the in-scope service instance.
+    references:
+      - url: https://example.com/docs/cmk
+        title: Example CMK documentation
+    services:
+      s3:
+        status: unknown
+        evidence: No authoritative implementation evidence was found.
+certifications:
+  - id: iso-27001
+    kind: certification
+    status: held
+    validity: fixed
+    valid_from: "2026-01-01"
+    valid_until: "2027-01-01"
+    scope: Public Cloud in eu-1
+    offering: public
+    regions: [eu-1]
+    all_services: true
+    report_access: public
+    evidence:
+      - url: https://example.com/assurance/iso-27001
+        title: Issuer register entry

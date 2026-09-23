@@ -17,6 +17,7 @@ PROVIDERS_DIR = REPO_ROOT / "providers"
 PROFILES_DIR = REPO_ROOT / "profiles"
 MAPPINGS_DIR = REPO_ROOT / "mappings"
 CATALOG_PATH = SCHEMA_DIR / "service-catalog.yaml"
+CERTIFICATION_CATALOG_PATH = SCHEMA_DIR / "certification-catalog.yaml"
 
 
 @pytest.fixture(scope="session")
@@ -59,6 +60,13 @@ def control_registry(controls_dir):
 def service_catalog(catalog_path):
     from tenant_sec.core.registry import ServiceCatalog
     return ServiceCatalog.from_file(catalog_path)
+
+
+@pytest.fixture(scope="session")
+def certification_catalog():
+    from tenant_sec.core.certifications import CertificationCatalog
+
+    return CertificationCatalog.from_file(CERTIFICATION_CATALOG_PATH)
 
 
 @pytest.fixture(scope="session")

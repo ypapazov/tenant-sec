@@ -2,6 +2,7 @@
 id: supply-chain.transparency-reports
 domain: supply-chain
 name: "Transparency Reports"
+surface: vignette
 description: >
   Publication of government data requests, law enforcement interactions, and
   national security orders. Covers canary statements, frequency of reporting,

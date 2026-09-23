@@ -26,9 +26,9 @@ weights:
   encryption: 0.20
   network: 0.10
   logging: 0.15
-  data: 0.10
+  data: 0.11
   compute: 0.05
-  incident: 0.03
-  supply-chain: 0.02
+  incident: 0.04
+  supply-chain: 0.00
 
 mixed_aggregation: "p20"
