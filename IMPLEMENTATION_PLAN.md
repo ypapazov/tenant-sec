@@ -32,16 +32,16 @@ This is the current implementation track. Do not publish new provider rankings u
 - [x] Enforce assessment states, offering-scoped certification gates, and tenant-only scoring
 - [x] Integrate catalog completeness and per-service L2/L3 coverage into engine and CLI
 - [x] Preserve all v2 fields through load/export round trips
-- [ ] Claim-level evidence records required on new assessments (schema `$defs` first; enforce after one pilot offering)
+- [x] Claim-level evidence records required on new assessments (schema `$defs` first; enforce after one pilot offering)
 - [x] Control `surface: tenant | vignette` retag; deprecate scored certification/hardware/physical controls
 
 ### Phase M2 — Criteria corrections (before re-assessment)
 
-- Fix `incident.notification-sla` legal text (GDPR 33(2) vs 72h)
-- Split `data.sovereignty-controls`; move legal/jurisdiction to vignette
-- Replace `supply-chain.compliance-certifications` usage in scoring profiles with `must_have_certifications`
-- Re-rubric `data.deletion-guarantees`; do not keep scores that contradict criteria
-- Add tenant-control stubs listed in `METHODOLOGY.md` §12 (operator-access log, network threat prevention, private CA, root/recovery) — definitions only, no fake scores
+- [x] Fix `incident.notification-sla` legal text (GDPR 33(2) vs 72h)
+- [x] Split `data.sovereignty-controls`; move legal/jurisdiction to vignette
+- [x] Replace `supply-chain.compliance-certifications` usage in scoring profiles with `must_have_certifications`
+- [x] Re-rubric `data.deletion-guarantees`; do not keep scores that contradict criteria
+- [x] Add tenant-control stubs listed in `METHODOLOGY.md` §12 (operator-access log, network threat prevention, private CA, root/recovery) — definitions only, no fake scores
 
 ### Phase M3 — Baseline repair
 
