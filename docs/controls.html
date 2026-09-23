@@ -45,6 +45,12 @@
   .gh-icon { margin-left: auto; display: flex; align-items: center; }
   .gh-icon svg { width: 20px; height: 20px; fill: var(--muted); transition: fill .15s; }
   .gh-icon:hover svg { fill: var(--text); }
+  .rc-warning {
+    padding: .7rem 1.5rem; text-align: center;
+    color: #fff3cd; background: #3a2a08;
+    border-bottom: 1px solid var(--warn); font-size: .85rem;
+  }
+  .rc-warning strong { color: #ffd866; }
 
   .toolbar {
     position: sticky; top: 52px; z-index: 150;
@@ -364,11 +370,17 @@
 
 <nav>
   <a href="index.html" class="logo">tenant<span>-sec</span></a>
-  <a href="index.html" style="color:var(--muted);font-size:.8rem">Contribute</a>
+  <a href="https://github.com/ypapazov/tenant-sec" style="color:var(--muted);font-size:.8rem">Contribute</a>
   <span class="nav-title">Controls Explorer</span>
   <a href="evaluate.html">Evaluator</a>
-  <a href="index.html" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  <a href="https://github.com/ypapazov/tenant-sec" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
 </nav>
+
+<div class="rc-warning" role="alert">
+  <strong>1.0-RC1 — AI-assisted provisional assessments.</strong>
+  These recommendations have not completed human review. Do not use them as
+  the sole basis for security, compliance, or procurement decisions.
+</div>
 
 <div class="toolbar" id="toolbar">
   <span class="toolbar-label">Providers</span>
@@ -379,7 +391,7 @@
     <div class="legend-item"><div class="legend-swatch" style="background:var(--l1)"></div>L1</div>
     <div class="legend-item"><div class="legend-swatch" style="background:var(--l0)"></div>L0</div>
     <div class="legend-item"><div class="legend-swatch" style="background:var(--mix)"></div>Mixed</div>
-    <div class="legend-item"><div class="legend-swatch" style="background:var(--na)"></div>N/A</div>
+    <div class="legend-item"><div class="legend-swatch" style="background:var(--na)"></div>Unknown / unscored</div>
   </div>
 </div>
 <div class="stats-bar" id="statsBar"></div>
@@ -528,11 +540,11 @@ function renderServiceSquares(providerId, ctrlId) {
   const ctrl = providers[providerId]?.controls?.[ctrlId];
   if (!ctrl || ctrl.score !== 'mixed' || !ctrl.services) return '';
   const entries = Object.entries(ctrl.services)
-    .map(([svcId, svc]) => ({ svcId, score: svc.score ?? -1 }))
-    .sort((a, b) => b.score - a.score);
-  const squares = entries.map(({ svcId, score }) => {
+    .map(([svcId, svc]) => ({ svcId, score: svc.score, status: svc.status }))
+    .sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
+  const squares = entries.map(({ svcId, score, status }) => {
     const cls = scoreClass(score);
-    return `<div class="svc-sq dot-${cls}" data-tip="${svcId}: ${scoreLabel(score)}"></div>`;
+    return `<div class="svc-sq dot-${cls}" data-tip="${svcId}: ${scoreLabel(score, status)}"></div>`;
   }).join('');
   const md = getMixDist(providerId, ctrlId);
   let pctLabel = '';
@@ -620,7 +632,11 @@ function buildProviderPills() {
   for (const [id, prov] of Object.entries(providers)) {
     const pill = document.createElement('button');
     pill.className = 'provider-pill';
-    pill.textContent = prov.display_name || id;
+    pill.textContent = (prov.display_name || id) +
+      (prov.review_status === 'unreviewed' ? ' ⚠' : '');
+    pill.title = prov.review_status === 'unreviewed'
+      ? 'AI-assisted provisional assessment; human review pending'
+      : '';
     pill.dataset.id = id;
     pill.onclick = () => toggleFocus(id);
     wrap.appendChild(pill);
@@ -647,14 +663,20 @@ function getProviderScore(providerId, ctrlId) {
   return prov.controls[ctrlId].score;
 }
 
+function getProviderStatus(providerId, ctrlId) {
+  return providers[providerId]?.controls?.[ctrlId]?.status;
+}
+
 function scoreClass(score) {
   if (score === 'mixed') return 'mix';
   if (score === null || score === undefined) return 'na';
   return SCORE_COLORS[score] ?? 'na';
 }
 
-function scoreLabel(score) {
+function scoreLabel(score, status) {
   if (score === 'mixed') return 'MIX';
+  if (status === 'unknown') return 'UNKNOWN';
+  if (status === 'not_applicable') return 'N/A';
   if (score === null || score === undefined) return '\u2014';
   return 'L' + score;
 }
@@ -691,7 +713,7 @@ function renderMatrix() {
         if (s === 'mixed') return renderMixDot(pid, prov, ctrlId);
         const cls = scoreClass(s);
         const abbr = (prov.display_name || pid).substring(0, 3).toUpperCase();
-        const tip = `${prov.display_name || pid}: ${scoreLabel(s)}`;
+        const tip = `${prov.display_name || pid}: ${scoreLabel(s, getProviderStatus(pid, ctrlId))}`;
         return `<div class="score-dot dot-${cls}" data-tip="${tip}">${abbr[0]}</div>`;
       }).join('');
 
@@ -791,14 +813,17 @@ function updateStats() {
     return;
   }
   const prov = providers[focusedProvider];
-  const counts = { 0: 0, 1: 0, 2: 0, 3: 0, mixed: 0, na: 0 };
+  const counts = { 0: 0, 1: 0, 2: 0, 3: 0, mixed: 0, unknown: 0, not_applicable: 0, unscored: 0 };
   let total = 0;
   for (const domInfo of Object.values(controlIndex.domains)) {
     for (const ctrlId of domInfo.controls) {
       total++;
       const s = getProviderScore(focusedProvider, ctrlId);
-      if (s === 'mixed') counts.mixed++;
-      else if (s === null || s === undefined) counts.na++;
+      const status = getProviderStatus(focusedProvider, ctrlId);
+      if (status === 'unknown') counts.unknown++;
+      else if (status === 'not_applicable') counts.not_applicable++;
+      else if (s === 'mixed') counts.mixed++;
+      else if (s === null || s === undefined) counts.unscored++;
       else counts[s]++;
     }
   }
@@ -809,7 +834,9 @@ function updateStats() {
     <span class="stat"><span class="stat-val" style="color:var(--l1)">${counts[1]}</span> L1</span>
     <span class="stat"><span class="stat-val" style="color:var(--l0)">${counts[0]}</span> L0</span>
     <span class="stat"><span class="stat-val" style="color:var(--mix)">${counts.mixed}</span> Mixed</span>
-    <span class="stat"><span class="stat-val" style="color:var(--muted)">${counts.na}</span> N/A</span>
+    <span class="stat"><span class="stat-val" style="color:var(--muted)">${counts.unknown}</span> Unknown</span>
+    <span class="stat"><span class="stat-val" style="color:var(--muted)">${counts.not_applicable}</span> N/A</span>
+    <span class="stat"><span class="stat-val" style="color:var(--muted)">${counts.unscored}</span> Platform/unscored</span>
     <span class="stat" style="color:var(--muted)">&middot; ${total} total</span>
   `;
 }
@@ -876,7 +903,7 @@ function renderFocusedProvider(pid, ctrlId) {
 
   const s = ctrl.score;
   const cls = scoreClass(s);
-  const label = scoreLabel(s);
+  const label = scoreLabel(s, ctrl.status);
   const verified = ctrl.verified_at
     ? `<span class="psc-verified">Verified: ${ctrl.verified_at}</span>` : '';
 
@@ -892,7 +919,7 @@ function renderFocusedProvider(pid, ctrlId) {
         let html = `<div class="svc-expand-row${isExp ? ' expanded' : ''}" onclick="toggleServiceExpand('${svcId}')">
           <span class="svc-arrow">${isExp ? '\u25BC' : '\u25B6'}</span>
           <span class="svc-name">${escHtml(svcId)}</span>
-          <span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score)}</span>
+          <span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score, svc.status)}</span>
           ${!isExp ? `<span class="svc-preview">${escHtml(preview)}</span>` : ''}
         </div>`;
         if (isExp) {
@@ -935,7 +962,7 @@ function renderOtherProviders(ctrlId, excludeId) {
     const s = getProviderScore(pid, ctrlId);
     const cls = scoreClass(s);
     return `<span class="other-inline">${escHtml(prov.display_name || pid)}
-      <span class="score-badge-${cls}" style="padding:0 .35rem;border-radius:3px;font-size:.7rem;font-weight:700">${scoreLabel(s)}</span></span>`;
+      <span class="score-badge-${cls}" style="padding:0 .35rem;border-radius:3px;font-size:.7rem;font-weight:700">${scoreLabel(s, getProviderStatus(pid, ctrlId))}</span></span>`;
   }).join('');
 
   const cards = others.map(([pid, prov]) => renderProviderCard(pid, prov, ctrlId)).join('');
@@ -962,7 +989,7 @@ function renderProviderCard(pid, prov, ctrlId) {
 
   const s = ctrl.score;
   const cls = scoreClass(s);
-  const label = scoreLabel(s);
+  const label = scoreLabel(s, ctrl.status);
   const verified = ctrl.verified_at
     ? `<span class="psc-verified">Verified: ${ctrl.verified_at}</span>` : '';
 
@@ -976,7 +1003,7 @@ function renderProviderCard(pid, prov, ctrlId) {
           const sCls = scoreClass(svc.score);
           return `<tr>
             <td class="svc-name">${escHtml(svcId)}</td>
-            <td><span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score)}</span></td>
+            <td><span class="svc-score score-badge-${sCls}" style="padding:.1rem .35rem;border-radius:3px">${scoreLabel(svc.score, svc.status)}</span></td>
             <td class="svc-evidence">${escHtml((svc.evidence || '').trim())}</td>
           </tr>`;
         }).join('')}</tbody>

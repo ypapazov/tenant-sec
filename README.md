@@ -2,9 +2,10 @@
 
 An open-source framework for evaluating cloud provider security capabilities at the **tenant level** — the controls and features a cloud customer can actually use, configure, and rely on.
 
-[![Controls Explorer — 71 controls across 9 domains](docs/controls-preview.png)](https://your-org.github.io/tenant-sec/controls.html)
+> [!WARNING]
+> **1.0-RC1 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
 
-> **[Explore controls visually](https://your-org.github.io/tenant-sec/controls.html)** · **[Try the in-browser evaluator](https://your-org.github.io/tenant-sec/evaluate.html)** · **[Read the docs](https://your-org.github.io/tenant-sec/)**
+> **[Explore controls visually](https://tenant-sec.io/controls.html)** · **[Try the in-browser evaluator](https://tenant-sec.io/evaluate.html)** · **[Read the docs](https://tenant-sec.io/)**
 
 ## Why this exists
 
@@ -33,11 +34,11 @@ non-score states.
 
 ## What's in the box
 
-- **67 controls** across 9 domains (IAM, Governance, Encryption, Network, Logging, Data, Compute, Incident, Supply Chain)
-- **3 legacy methodology-1 assessments** (AWS, GCP, Scaleway), retained for compatibility while v2 reassessment is in progress
+- **71 controls** across 9 domains, including 62 tenant-operable controls
+- **4 provisional methodology-2 assessments** (AWS, Azure, GCP, Scaleway), explicitly marked unreviewed
 - **Scoring engine** — cohort-aware eligibility gates, catalogue completeness, service coverage, and a labelled heuristic index
 - **Framework mappings** — CSA CCM v4.1 and NIST SP 800-53 Rev 5
-- **Interactive tools** — browser-based [Controls Explorer](https://your-org.github.io/tenant-sec/controls.html) and [Evaluator](https://your-org.github.io/tenant-sec/evaluate.html) (no install required)
+- **Interactive tools** — browser-based [Controls Explorer](https://tenant-sec.io/controls.html) and [Evaluator](https://tenant-sec.io/evaluate.html) (no install required)
 
 ## Quick start
 
@@ -56,7 +57,7 @@ tenant-sec score --profile profiles/eu-regulated-fintech.yaml
 tenant-sec detail --provider aws --domain encryption
 
 # Side-by-side comparison
-tenant-sec compare --providers aws,gcp,scaleway --domain iam
+tenant-sec compare --providers aws,gcp,azure --domain iam
 
 # Export a provider profile
 tenant-sec export --provider aws --format html -o aws-report.html
@@ -66,6 +67,10 @@ tenant-sec export --provider aws --format html -o aws-report.html
 
 Assessments follow [`METHODOLOGY.md`](METHODOLOGY.md). L0–L3 applies only to tenant-operable controls with sufficient evidence. Unknown is not L0. Certifications are a list, not a maturity score. Provider-operated facts belong in a vignette.
 
+Methodology-2 rankings require an explicit comparison cohort. The bundled
+fintech and enterprise profiles compare the hyperscaler cohort; the sovereignty
+profile targets the EU-public cohort.
+
 ## Repository structure
 
 ```
@@ -73,7 +78,7 @@ tenant-sec/
 ├── METHODOLOGY.md     # How scores, coverage, evidence, and certifications work
 ├── schema/            # JSON Schemas (draft 2020-12) + service and certification catalogues
 ├── controls/          # 71 control definitions (one YAML per control)
-├── providers/         # Provider assessment profiles (AWS, GCP, Scaleway)
+├── providers/         # Provider assessment profiles (AWS, Azure, GCP, Scaleway)
 ├── mappings/          # Framework cross-references (CCM, NIST 800-53)
 ├── profiles/          # Example scoring profiles
 ├── docs/              # Static site — Controls Explorer, Evaluator, landing page

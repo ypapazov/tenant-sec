@@ -99,11 +99,31 @@ export function scoreProviders(providers, profile, index) {
   const aggFn = getAggFn(profile.mixed_aggregation ?? 'mean');
   const weights = profile.weights ?? {};
   const mustHaves = profile.must_have ?? [];
+  const hasV2Provider = providers.some(
+    provider => String(provider.methodology_version ?? '').startsWith('2.')
+  );
+  if (hasV2Provider && !profile.cohort) {
+    throw new Error('Methodology-2 ranking requires an explicit comparison cohort.');
+  }
 
   // Build domain→controlId map from index
   const domainControls = {};
   for (const [domain, info] of Object.entries(index.domains ?? {})) {
     domainControls[domain] = info.controls ?? [];
+  }
+  const emptyWeightedDomains = Object.entries(weights)
+    .filter(([domain, weight]) =>
+      weight > 0 &&
+      !(domainControls[domain] ?? []).some(
+        controlId => providers.some(provider => provider.controls?.[controlId])
+      )
+    )
+    .map(([domain]) => domain);
+  if (emptyWeightedDomains.length) {
+    throw new Error(
+      'Positive profile weights target domains without tenant controls: ' +
+      emptyWeightedDomains.sort().join(', ')
+    );
   }
 
   const results = providers.map(provider => {
@@ -144,9 +164,15 @@ export function scoreProviders(providers, profile, index) {
       }
     }
     const overallScore = totalWeight > 0 ? weightedSum / totalWeight : 0;
+    const providerCohort = provider.offering?.cohort ?? null;
+    const eligibilityReasons = [];
+    if (profile.cohort && providerCohort !== profile.cohort) {
+      eligibilityReasons.push('assessment is outside the profile cohort');
+    }
 
     return {
       provider:         provider.provider,
+      assessment_id:    provider.assessment_id ?? provider.provider,
       display_name:     provider.display_name,
       overall_score:    Math.round(overallScore * 10) / 10,
       domain_scores:    domainScores,
@@ -154,11 +180,21 @@ export function scoreProviders(providers, profile, index) {
       must_have_passed: mustHavePassed,
       effective_scores: effectiveScores,
       stale:            isStale(provider.assessed_at, provider.assessed_by),
+      cohort:           providerCohort,
+      eligible:         eligibilityReasons.length === 0,
+      eligibility_reasons: eligibilityReasons,
+      review_status:    provider.review_status ?? null,
     };
   });
 
-  // Step 5: rank descending, tie-break alphabetically
-  results.sort((a,b) => b.overall_score - a.overall_score || a.provider.localeCompare(b.provider));
-  results.forEach((r,i) => r.rank = i+1);
-  return results;
+  // Step 5: rank eligible assessments; retain ineligible selections below.
+  const eligible = results
+    .filter(result => result.eligible)
+    .sort((a,b) => b.overall_score - a.overall_score || a.assessment_id.localeCompare(b.assessment_id));
+  const ineligible = results
+    .filter(result => !result.eligible)
+    .sort((a,b) => b.overall_score - a.overall_score || a.assessment_id.localeCompare(b.assessment_id));
+  eligible.forEach((result, index) => result.rank = index + 1);
+  ineligible.forEach(result => result.rank = 0);
+  return [...eligible, ...ineligible];
 }

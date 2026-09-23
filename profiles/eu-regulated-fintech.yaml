@@ -1,5 +1,7 @@
 ---
 name: "eu-regulated-fintech"
+methodology_version: "2.0"
+cohort: "hyperscaler"
 description: >
   Weighting profile for a European fintech operating under DORA and GDPR,
   prioritizing data residency, encryption controls, and audit capabilities.

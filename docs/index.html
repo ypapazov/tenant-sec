@@ -46,6 +46,12 @@
   nav .contribute:hover { opacity: 1; }
   nav .gh-icon { display: flex; align-items: center; color: var(--muted); flex-shrink: 0; }
   nav .gh-icon:hover { color: var(--text); }
+  .rc-warning {
+    padding: .8rem 1.5rem; text-align: center;
+    color: #fff3cd; background: #3a2a08;
+    border-bottom: 1px solid var(--warn); font-size: .9rem;
+  }
+  .rc-warning strong { color: #ffd866; }
 
   /* ── Layout helpers ── */
   section { padding: 5rem 2rem; }
@@ -248,10 +254,16 @@
   <a href="#problem">Problem</a>
   <a href="#cli">CLI</a>
   <a href="#usecases">Use Cases</a>
-  <a href="#" class="contribute">Contribute</a>
+  <a href="https://github.com/ypapazov/tenant-sec" class="contribute">Contribute</a>
   <a href="evaluate.html" class="cta">▶ Try the Evaluator</a>
-  <a href="#" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  <a href="https://github.com/ypapazov/tenant-sec" class="gh-icon" title="GitHub"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
 </nav>
+
+<div class="rc-warning" role="alert">
+  <strong>1.0-RC1 — AI-assisted provisional assessments.</strong>
+  These recommendations have not completed human review. Do not use them as
+  the sole basis for security, compliance, or procurement decisions.
+</div>
 
 <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
 <section id="hero">
@@ -277,11 +289,13 @@
 
 <!-- ── Visual preview ───────────────────────────────────────────────────── -->
 <section id="preview">
-  <a href="controls.html" class="preview-frame">
-    <img src="controls-preview.png" alt="Controls Explorer — 67 controls across 9 domains with per-provider maturity scoring" loading="lazy">
+  <a href="controls.html" class="preview-frame" style="padding:2.5rem;text-decoration:none;background:var(--surface)">
+    <div style="font-size:1.5rem;font-weight:700;color:var(--text)">Controls Explorer</div>
+    <div style="margin-top:.75rem;color:var(--muted)">71 controls · 9 domains · 4 provisional provider assessments</div>
+    <div style="margin-top:1rem;color:var(--accent2)">Open the live data explorer →</div>
   </a>
   <p class="preview-caption">
-    67 controls. 9 domains. Per-provider maturity scores at a glance.
+    71 controls. 9 domains. Four provisional provider assessments at a glance.
     <a href="controls.html">Open the Controls Explorer →</a>
   </p>
 </section>
@@ -383,26 +397,27 @@
 <!-- ── Sample comparison ─────────────────────────────────────────────────── -->
 <section id="sample">
   <div class="inner" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;">
-    <div class="label">Sample output</div>
-    <h2 style="font-size:1.25rem">EU Regulated Fintech profile — AWS vs GCP vs Scaleway</h2>
+    <div class="label">Provisional RC output</div>
+    <h2 style="font-size:1.25rem">EU Regulated Fintech profile — hyperscaler cohort</h2>
+    <p style="font-size:.85rem">
+      Current 1.0-RC1 results. The heuristic index is not a certification or
+      security verdict, and the underlying recommendations are awaiting human review.
+    </p>
     <div class="cmp-wrap">
       <table class="cmp-table">
         <thead>
           <tr>
-            <th>Domain</th>
-            <th>Amazon Web Services</th>
+            <th>Measure</th>
             <th>Google Cloud</th>
-            <th>Scaleway</th>
+            <th>Amazon Web Services</th>
+            <th>Microsoft Azure</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td><strong>IAM</strong></td><td><span class="tag-l3">L3</span> · JIT, SCIM, ABAC, boundaries</td><td><span class="tag-l3">L3</span> · PAM, Workload Identity, PAB</td><td><span class="tag-l1">L1–L2</span> · OIDC federation, no JIT</td></tr>
-          <tr><td><strong>Governance</strong></td><td><span class="tag-l3">L3</span> · SCPs, RCPs, Control Tower</td><td><span class="tag-l3">L3</span> · Org Policy (CEL), SCC</td><td><span class="tag-l0">L0–L1</span> · IAM boundary only</td></tr>
-          <tr><td><strong>Encryption</strong></td><td><span class="tag-mx">MIXED</span> → L3 avg · XKS, CloudHSM</td><td><span class="tag-mx">MIXED</span> → L3 avg · EKM, Cloud HSM</td><td><span class="tag-mx">MIXED</span> → L1 avg · No CMK most services</td></tr>
-          <tr><td><strong>Network</strong></td><td><span class="tag-l3">L3</span> · Network Firewall, PrivateLink</td><td><span class="tag-l3">L3</span> · Hierarchical FW, PSC</td><td><span class="tag-l2">L2</span> · VPC, no managed NGFW/WAF</td></tr>
-          <tr><td><strong>Logging</strong></td><td><span class="tag-l3">L3</span> · CloudTrail, Security Lake</td><td><span class="tag-l3">L3</span> · Audit Logs, locked buckets</td><td><span class="tag-l1">L1</span> · Cockpit, no immutability</td></tr>
-          <tr><td><strong>Must-Haves</strong></td><td><span class="tag-l3">✓ ALL PASS</span></td><td><span class="tag-l3">✓ ALL PASS</span></td><td><span class="tag-l0">✗ 4 FAIL</span></td></tr>
-          <tr><td><strong>Overall</strong></td><td><span class="tag-l3">98.1 / 100</span></td><td><span class="tag-l3">98.9 / 100</span></td><td><span class="tag-l1">34.2 / 100</span></td></tr>
+          <tr><td><strong>Catalog completeness</strong></td><td>90%</td><td>84%</td><td>84%</td></tr>
+          <tr><td><strong>Technical must-haves</strong></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td></tr>
+          <tr><td><strong>Heuristic index</strong></td><td>81.6 / 100</td><td>80.7 / 100</td><td>75.5 / 100</td></tr>
+          <tr><td><strong>Human review</strong></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -417,14 +432,14 @@
 <section id="controls">
   <div class="inner">
     <div class="label">Coverage</div>
-    <h2>60 controls across 9 domains</h2>
-    <p>Every control has assessor-actionable L0–L3 criteria.
+    <h2>71 controls across 9 domains</h2>
+    <p>62 tenant-operable controls have assessor-actionable L0–L3 criteria.
     <code>service_scoped: true</code> signals that per-service mixed composites are expected.</p>
     <div class="domain-grid">
       <div class="domain-card">
         <div class="dname">IAM</div>
-        <div class="count">8 controls</div>
-        <div class="controls-list">External IdP federation · Directory integration · Privileged access · Service identity · ABAC · Permission boundaries · Credential management · Multi-tenancy isolation</div>
+        <div class="count">13 controls</div>
+        <div class="controls-list">External IdP federation · Privileged access · ABAC · MFA enforcement · Identity lifecycle · Operator access control · Root account recovery</div>
       </div>
       <div class="domain-card">
         <div class="dname">Governance &amp; Policy</div>
@@ -433,13 +448,13 @@
       </div>
       <div class="domain-card">
         <div class="dname">Encryption &amp; Key Mgmt</div>
-        <div class="count">8 controls</div>
-        <div class="controls-list">Encryption at rest default · CMK · BYOK · External KMS (HYOK) · Key lifecycle · HSM backing · Encryption in transit · Confidential computing</div>
+        <div class="count">9 controls</div>
+        <div class="controls-list">Encryption at rest default · CMK · BYOK · External KMS (HYOK) · Key lifecycle · HSM backing · Encryption in transit · Confidential computing · Private CA lifecycle</div>
       </div>
       <div class="domain-card">
         <div class="dname">Network Security</div>
-        <div class="count">8 controls</div>
-        <div class="controls-list">Isolation model · Cross-env connectivity · Firewall/SGs · Private service endpoints · DNS security · DDoS protection · WAF · Egress control</div>
+        <div class="count">10 controls</div>
+        <div class="controls-list">Isolation model · Cross-env connectivity · Firewall/SGs · Private service endpoints · DNS security · DDoS protection · WAF · Egress control · Flow logging · Threat prevention</div>
       </div>
       <div class="domain-card">
         <div class="dname">Logging &amp; Audit</div>
@@ -448,13 +463,13 @@
       </div>
       <div class="domain-card">
         <div class="dname">Data Security &amp; Residency</div>
-        <div class="count">6 controls</div>
-        <div class="controls-list">Residency guarantees · Sovereignty controls · Data classification · DLP · Backup governance · Deletion guarantees</div>
+        <div class="count">8 controls</div>
+        <div class="controls-list">Residency guarantees · Sovereignty controls · Data classification · DLP · Backup governance · Deletion guarantees · Object retention · Portability/export</div>
       </div>
       <div class="domain-card">
         <div class="dname">Compute &amp; Workloads</div>
-        <div class="count">6 controls</div>
-        <div class="controls-list">Image management · Runtime security · Container orchestration · Serverless security · Patch management · Secrets management</div>
+        <div class="count">7 controls</div>
+        <div class="controls-list">Image management · Runtime security · Container orchestration · Serverless security · Patch management · Secrets management · Secure remote access</div>
       </div>
       <div class="domain-card">
         <div class="dname">Incident Response</div>
@@ -491,7 +506,7 @@
 <span class="cmd">pip install tenant-sec</span>
 
 <span class="cmt"># Or clone and install in editable mode</span>
-<span class="cmd">git clone https://github.com/your-org/tenant-sec</span>
+<span class="cmd">git clone https://github.com/ypapazov/tenant-sec</span>
 <span class="cmd">pip install -e ".[dev]"</span></pre>
     </div>
 
@@ -707,22 +722,23 @@ mixed_aggregation: "p20"</pre>
 │   ├── scoring-profile.schema.json
 │   └── service-catalog.yaml   <span class="note"># 24 canonical categories</span>
 │
-├── <span class="dir">controls/</span>          <span class="note"># 60 control definitions</span>
+├── <span class="dir">controls/</span>          <span class="note"># 71 control definitions</span>
 │   ├── _index.yaml            <span class="note"># master index</span>
-│   ├── iam/                   <span class="note"># 8 controls</span>
+│   ├── iam/                   <span class="note"># 13 controls</span>
 │   ├── governance/            <span class="note"># 6 controls</span>
-│   ├── encryption/            <span class="note"># 8 controls</span>
-│   ├── network/               <span class="note"># 8 controls</span>
+│   ├── encryption/            <span class="note"># 9 controls</span>
+│   ├── network/               <span class="note"># 10 controls</span>
 │   ├── logging/               <span class="note"># 6 controls</span>
-│   ├── data/                  <span class="note"># 6 controls</span>
-│   ├── compute/               <span class="note"># 6 controls</span>
+│   ├── data/                  <span class="note"># 8 controls</span>
+│   ├── compute/               <span class="note"># 7 controls</span>
 │   ├── incident/              <span class="note"># 5 controls</span>
 │   └── supply-chain/          <span class="note"># 7 controls</span>
 │
 ├── <span class="dir">providers/</span>         <span class="note"># Assessments</span>
-│   ├── aws.yaml               <span class="note"># all 60 controls</span>
-│   ├── gcp.yaml               <span class="note"># all 60 controls</span>
-│   └── scaleway.yaml          <span class="note"># all 60 controls</span>
+│   ├── aws.yaml               <span class="note"># 62 tenant controls</span>
+│   ├── azure.yaml             <span class="note"># 62 tenant controls</span>
+│   ├── gcp.yaml               <span class="note"># 62 tenant controls</span>
+│   └── scaleway.yaml          <span class="note"># 62 tenant controls</span>
 │
 ├── <span class="dir">mappings/</span>
 │   ├── ccm-v4.1.yaml
@@ -748,7 +764,7 @@ mixed_aggregation: "p20"</pre>
           </li>
           <li>
             <strong>Control taxonomy</strong>
-            <span>60 controls across 9 domains. Each control has L0–L3 criteria written
+            <span>71 controls across 9 domains, including 62 tenant controls. Each tenant control has L0–L3 criteria written
             to be assessor-actionable, plus CCM and NIST 800-53 mappings.
             Adding a control is a data change — not a code change.</span>
           </li>

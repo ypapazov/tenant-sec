@@ -1,5 +1,7 @@
 ---
 name: "general-enterprise"
+methodology_version: "2.0"
+cohort: "hyperscaler"
 description: >
   Balanced weighting profile for a general enterprise with broad cloud
   security requirements. No domain is dramatically over-weighted; provides

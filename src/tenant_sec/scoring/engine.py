@@ -15,7 +15,7 @@ from ..core.staleness import is_stale
 from .aggregation import get_aggregation_fn
 from .coverage import CoverageFraction, catalog_coverage, service_coverage
 from .ranking import CertificationMustHaveResult, MustHaveResult, ScoredProvider
-from .resolution import effective_maturity
+from .resolution import effective_maturity, is_assessed_result
 
 
 class ScoringEngine:
@@ -236,9 +236,12 @@ class ScoringEngine:
             control.id
             for control in tenant_controls
             if control.service_scoped
-            and provider.controls.get(control.id) is not None
+            and (
+                entry := provider.controls.get(control.id)
+            ) is not None
+            and is_assessed_result(entry)
             and not isinstance(
-                provider.controls.get(control.id), MixedControlScore
+                entry, MixedControlScore
             )
             and control.id not in provider.service_scope_exceptions
         ]

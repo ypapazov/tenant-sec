@@ -1,10 +1,12 @@
 ---
 name: "data-sovereignty"
+methodology_version: "2.0"
+cohort: "eu-public"
 description: >
   Profile for organizations with strict data sovereignty requirements —
   government, critical infrastructure, or highly regulated sectors where
   data location and provider access controls are paramount.
-  This v1-compatible profile gates tenant-operable technical controls only;
+  This methodology-2 profile gates tenant-operable technical controls only;
   contractual sovereignty and qualifications must be reviewed separately.
 
 must_have:

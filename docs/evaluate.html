@@ -37,6 +37,12 @@
   nav a:hover { color: var(--text); }
   .back { margin-right: auto; }
   .nav-title { color: var(--muted); font-size: .875rem; }
+  .rc-warning {
+    padding: .7rem 1.5rem; text-align: center;
+    color: #fff3cd; background: #3a2a08;
+    border-bottom: 1px solid var(--warn); font-size: .85rem;
+  }
+  .rc-warning strong { color: #ffd866; }
 
   /* ── Layout ── */
   .layout {
@@ -307,8 +313,14 @@
   <a href="index.html" class="logo">tenant<span>-sec</span></a>
   <a href="controls.html">Controls Explorer</a>
   <span class="nav-title" style="margin-left:auto">In-browser Evaluator</span>
-  <a href="index.html" class="gh-icon" title="GitHub" style="display:flex;align-items:center"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+  <a href="https://github.com/ypapazov/tenant-sec" class="gh-icon" title="GitHub" style="display:flex;align-items:center"><svg viewBox="0 0 16 16" width="20" height="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
 </nav>
+
+<div class="rc-warning" role="alert">
+  <strong>1.0-RC1 — AI-assisted provisional assessments.</strong>
+  These recommendations have not completed human review. Do not use them as
+  the sole basis for security, compliance, or procurement decisions.
+</div>
 
 <div class="layout">
 
@@ -323,6 +335,14 @@
           <span class="spinner"></span> Loading…
         </div>
       </div>
+    </div>
+
+    <div>
+      <div class="section-label">Comparison cohort</div>
+      <select id="cohortSelect" onchange="onCohortChange()">
+        <option value="hyperscaler" selected>hyperscaler — AWS, Azure, GCP</option>
+        <option value="eu-public">eu-public — Scaleway</option>
+      </select>
     </div>
 
     <!-- Aggregation -->
@@ -391,7 +411,7 @@
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
 <script type="module">
-  import { scoreProviders } from './scoring-engine.js';
+  import { scoreProviders } from './scoring-engine.js?v=1.0.0rc1';
   window._scoreProviders = scoreProviders;
 </script>
 
@@ -405,8 +425,8 @@ const DOMAIN_LABELS = {
   'compute': 'Compute', 'incident': 'Incident Response', 'supply-chain': 'Supply Chain'
 };
 const DEFAULT_WEIGHTS = {
-  iam:0.15, governance:0.12, encryption:0.18, network:0.12,
-  logging:0.12, data:0.12, compute:0.09, incident:0.05, 'supply-chain':0.05
+  iam:0.15, governance:0.13, encryption:0.15, network:0.13,
+  logging:0.12, data:0.13, compute:0.11, incident:0.08, 'supply-chain':0
 };
 const BAR_COLORS = ['#388bfd','#3fb950','#d29922','#f78166','#bc8cff','#39d353','#79c0ff','#ff7b72','#a5d6ff'];
 
@@ -452,8 +472,10 @@ async function init() {
     if (r.status === 'fulfilled') {
       loadedProviders[id] = r.value;
       const label = document.createElement('label');
-      const name  = r.value.provider || id;
-      label.innerHTML = `<input type="checkbox" value="${id}" checked> ${name}`;
+      const name = r.value.display_name || r.value.provider || id;
+      const cohort = r.value.offering?.cohort || '';
+      label.dataset.cohort = cohort;
+      label.innerHTML = `<input type="checkbox" value="${id}" ${cohort === 'hyperscaler' ? 'checked' : ''}> ${name} <span style="color:var(--muted);font-size:.68rem">${cohort}</span>`;
       listEl.appendChild(label);
     }
   });
@@ -484,6 +506,14 @@ function buildWeightSliders() {
     container.appendChild(row);
   });
   updateWeightSum();
+}
+
+function onCohortChange() {
+  const cohort = document.getElementById('cohortSelect').value;
+  document.querySelectorAll('#providerList label').forEach(label => {
+    const input = label.querySelector('input');
+    input.checked = label.dataset.cohort === cohort;
+  });
 }
 
 function onWeightChange() {
@@ -570,6 +600,8 @@ function buildProfileFromSidebar() {
   });
   return {
     name: 'custom (browser)',
+    methodology_version: '2.0',
+    cohort: document.getElementById('cohortSelect').value,
     mixed_aggregation: document.getElementById('aggSelect').value,
     weights,
     must_have: mustHaves.map(m => ({control: m.control, min_level: m.min_level})),
@@ -629,6 +661,7 @@ function renderResults(results, profile) {
   header.innerHTML = `
     <h2>Results</h2>
     <span class="result-meta">Profile: <strong>${profile.name ?? 'custom'}</strong> · 
+    Cohort: <code>${profile.cohort ?? 'not set'}</code> ·
     Aggregation: <code>${profile.mixed_aggregation ?? 'mean'}</code> · 
     ${results.length} provider${results.length !== 1 ? 's' : ''} evaluated</span>
     <div style="margin-left:auto">
@@ -667,9 +700,9 @@ function renderSummaryTab(results, container) {
   results.forEach((r, i) => {
     const passed   = r.must_have_passed;
     const card     = document.createElement('div');
-    card.className = 'score-card' + (!passed ? ' fail' : r.stale ? ' stale' : '');
+    card.className = 'score-card' + (!passed || !r.eligible ? ' fail' : r.stale ? ' stale' : '');
 
-    const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const rankClass = r.rank === 1 ? 'gold' : r.rank === 2 ? 'silver' : r.rank === 3 ? 'bronze' : '';
 
     // Build domain bars
     const barRows = DOMAINS.map((d, idx) => {
@@ -707,11 +740,13 @@ function renderSummaryTab(results, container) {
         <div class="rank-badge ${rankClass}">${r.rank}</div>
         <div>
           <div class="provider-name">${r.display_name ?? r.provider}</div>
-          <div style="font-size:.75rem;color:var(--muted)">${r.provider}</div>
+          <div style="font-size:.75rem;color:var(--muted)">${r.provider} · ${r.cohort ?? 'no cohort'}</div>
         </div>
         ${r.stale ? '<span class="stale-badge">⏰ STALE DATA</span>' : ''}
+        ${r.review_status === 'unreviewed' ? '<span class="stale-badge">⚠ HUMAN REVIEW PENDING</span>' : ''}
+        ${!r.eligible ? `<span class="must-badge fail">INELIGIBLE: ${r.eligibility_reasons.join('; ')}</span>` : ''}
         <span class="must-badge ${passed ? 'pass' : 'fail'}">${passed ? '✓ Must-haves PASS' : '✗ Must-haves FAIL'}</span>
-        <div class="overall-score ${passed ? 'pass' : 'fail'}">${r.overall_score}</div>
+        <div class="overall-score ${passed && r.eligible ? 'pass' : 'fail'}">${r.overall_score}</div>
       </div>
       <div class="card-body">
         <div class="domain-bars">${barRows}</div>
@@ -778,10 +813,10 @@ function switchTab(id, btn) {
 function exportCSV() {
   const results = window._lastResults;
   if (!results) return;
-  const rows = [['Rank','Provider','Overall',...DOMAINS.map(d=>DOMAIN_LABELS[d]),'Must-Haves Pass']];
+  const rows = [['Rank','Provider','Cohort','Eligible','Review Status','Overall',...DOMAINS.map(d=>DOMAIN_LABELS[d]),'Must-Haves Pass']];
   results.forEach(r => {
     rows.push([
-      r.rank, r.provider, r.overall_score,
+      r.rank, r.provider, r.cohort, r.eligible, r.review_status, r.overall_score,
       ...DOMAINS.map(d => r.domain_scores[d] !== null ? Math.round(r.domain_scores[d]) : ''),
       r.must_have_passed ? 'PASS' : 'FAIL',
     ]);
@@ -799,6 +834,10 @@ function exportJSON() {
     results: results.map(r => ({
       rank:             r.rank,
       provider:         r.provider,
+      cohort:           r.cohort,
+      eligible:         r.eligible,
+      eligibility_reasons: r.eligibility_reasons,
+      review_status:    r.review_status,
       overall_score:    r.overall_score,
       must_have_passed: r.must_have_passed,
       domain_scores:    r.domain_scores,
@@ -830,6 +869,7 @@ function showError(msg) {
 
 // ── Expose to onclick handlers ────────────────────────────────────────────
 window.onWeightChange      = onWeightChange;
+window.onCohortChange      = onCohortChange;
 window.addMustHave         = addMustHave;
 window.removeMustHave      = removeMustHave;
 window.runEvaluation       = runEvaluation;

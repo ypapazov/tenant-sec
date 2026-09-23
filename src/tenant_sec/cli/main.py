@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Optional
 
@@ -20,7 +21,8 @@ def find_data_dir(explicit: Optional[str]) -> Optional[Path]:
     1. Explicit --data-dir flag
     2. TENANT_SEC_DATA environment variable
     3. Walk up from CWD looking for controls/ + schema/
-    4. Parent of this file (package bundled data — monorepo layout)
+    4. Data bundled in an installed package
+    5. Parent of this file (editable monorepo layout)
     """
     if explicit:
         return Path(explicit)
@@ -39,7 +41,11 @@ def find_data_dir(explicit: Optional[str]) -> Optional[Path]:
             break
         candidate = parent
 
-    # Fall back to monorepo root (3 levels up from this file: cli/ → tenant_sec/ → src/ → root)
+    package_data = Path(__file__).parent.parent / "data"
+    if (package_data / "controls").is_dir() and (package_data / "schema").is_dir():
+        return package_data
+
+    # Fall back to monorepo root (cli/ → tenant_sec/ → src/ → root)
     module_root = Path(__file__).parent.parent.parent.parent
     if (module_root / "controls").is_dir() and (module_root / "schema").is_dir():
         return module_root
@@ -53,8 +59,14 @@ DATA_DIR_HELP = (
 )
 
 
+try:
+    PACKAGE_VERSION = version("tenant-sec")
+except PackageNotFoundError:
+    PACKAGE_VERSION = "1.0.0rc1"
+
+
 @click.group()
-@click.version_option(version="0.1.0", prog_name="tenant-sec")
+@click.version_option(version=PACKAGE_VERSION, prog_name="tenant-sec")
 @click.option("--data-dir", envvar="TENANT_SEC_DATA", default=None, help=DATA_DIR_HELP)
 @click.pass_context
 def cli(ctx: click.Context, data_dir: Optional[str]) -> None:

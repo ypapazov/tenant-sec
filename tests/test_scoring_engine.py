@@ -514,6 +514,37 @@ class TestScoringEngine:
             for reason in result.publication_reasons
         )
 
+    def test_unknown_service_scoped_result_does_not_require_exception(
+        self, control_registry
+    ):
+        provider = _make_provider(
+            "test",
+            {
+                "enc.cmk": LeafControlScore(
+                    score=None,
+                    status=AssessmentStatus.UNKNOWN,
+                    evidence="Insufficient evidence.",
+                )
+            },
+        )
+        provider.methodology_version = "2.0"
+        provider.assessment_id = "test/public/eu/standard"
+        provider.offering = ProviderOffering(
+            id="public",
+            name="Public",
+            partition="commercial",
+            regions=["eu-1"],
+            edition="standard",
+            cohort="eu-public",
+        )
+        profile = _make_scoring_profile(weights={"encryption": 1.0})
+        profile.cohort = "eu-public"
+        result = ScoringEngine(control_registry).score([provider], profile)[0]
+        assert not any(
+            "service-scoped controls require mixed results" in reason
+            for reason in result.publication_reasons
+        )
+
     def test_profile_cohort_is_an_eligibility_gate(self, control_registry):
         provider = _make_provider(
             "test",

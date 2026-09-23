@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tenant-sec"
-version = "0.1.0"
+version = "1.0.0rc1"
 description = "Open-source framework for evaluating cloud provider security capabilities at the tenant level"
 readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "Apache-2.0" }
 keywords = ["cloud", "security", "compliance", "assessment"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "License :: OSI Approved :: Apache Software License",
@@ -25,6 +25,12 @@ dependencies = [
     "click>=8.1",
     "tabulate>=0.9",
 ]
+
+[project.urls]
+Homepage = "https://tenant-sec.io/"
+Documentation = "https://tenant-sec.io/"
+Repository = "https://github.com/ypapazov/tenant-sec"
+Issues = "https://github.com/ypapazov/tenant-sec/issues"
 
 [project.optional-dependencies]
 viz = [
@@ -41,6 +47,14 @@ tenant-sec = "tenant_sec.cli.main:cli"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tenant_sec"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"controls" = "tenant_sec/data/controls"
+"providers" = "tenant_sec/data/providers"
+"mappings" = "tenant_sec/data/mappings"
+"profiles" = "tenant_sec/data/profiles"
+"schema" = "tenant_sec/data/schema"
+"METHODOLOGY.md" = "tenant_sec/data/METHODOLOGY.md"
 
 [tool.hatch.build.targets.sdist]
 include = [

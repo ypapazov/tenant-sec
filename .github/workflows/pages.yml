@@ -4,10 +4,15 @@ on:
   push:
     branches: [main]
     paths:
+      - "index.html"
       - "docs/**"
       - "controls/**"
       - "providers/**"
+      - "profiles/**"
       - "schema/**"
+      - "README.md"
+      - "pyproject.toml"
+      - "CNAME"
   workflow_dispatch:
 
 permissions:
