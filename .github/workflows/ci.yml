@@ -48,24 +48,6 @@ jobs:
           name: dist
           path: dist/
 
-  publish-testpypi:
-    needs: build
-    runs-on: ubuntu-latest
-    if: contains(github.ref_name, 'rc') || contains(github.ref_name, 'dev') || contains(github.ref_name, 'a') || contains(github.ref_name, 'b')
-    permissions:
-      id-token: write
-    environment: testpypi
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: dist/
-
-      - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-
   publish-pypi:
     needs: build
     runs-on: ubuntu-latest
