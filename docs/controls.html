@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controls Explorer — tenant-sec</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="icon.png">
 <style>
   :root {
     --bg:       #0d1117;
@@ -37,7 +39,11 @@
     padding: 0 1.5rem;
     display: flex; align-items: center; gap: 1.5rem; height: 52px;
   }
-  nav .logo { font-weight: 700; font-size: 1rem; color: var(--text); text-decoration: none; }
+  nav .logo {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-weight: 700; font-size: 1rem; color: var(--text); text-decoration: none;
+  }
+  nav .logo img { width: 28px; height: 28px; border-radius: 6px; display: block; }
   nav .logo span { color: var(--accent); }
   nav a { color: var(--muted); text-decoration: none; font-size: .875rem; }
   nav a:hover { color: var(--text); }
@@ -281,8 +287,30 @@
   .detail-id { font-family: 'Fira Code', monospace; font-size: .78rem; color: var(--accent2); margin-bottom: .25rem; }
   .detail-title { font-size: 1.35rem; font-weight: 700; margin-bottom: .25rem; }
   .detail-flags { display: flex; gap: .4rem; margin-bottom: .75rem; flex-wrap: wrap; }
-  .detail-flag {
-    font-size: .68rem; font-weight: 600; padding: .15rem .5rem;
+  .detail-actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: .85rem; }
+  .report-claim-btn {
+    display: inline-flex; align-items: center; gap: .35rem;
+    padding: .45rem .85rem; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--warn); background: #2d1f0a; color: #ffd866;
+    font: 600 .8rem/1.3 'Inter', system-ui, sans-serif;
+  }
+  .report-claim-btn:hover, .report-claim-btn:focus-visible {
+    color: #fff3cd; border-color: #ffd866; outline: none;
+  }
+  .detail-statement {
+    margin-bottom: 1rem; padding: .85rem 1rem;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface2);
+  }
+  .detail-statement-text { font-size: .875rem; color: var(--text); line-height: 1.55; margin-bottom: .5rem; }
+  .see-more-btn {
+    background: none; border: none; padding: 0; cursor: pointer;
+    color: var(--accent2); font: 600 .8rem/1.3 'Inter', system-ui, sans-serif;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .see-more-btn:hover, .see-more-btn:focus-visible { color: var(--text); outline: none; }
+  #controlDefinition:focus { outline: 2px solid var(--accent2); outline-offset: 4px; }
+  .detail-flag {    font-size: .68rem; font-weight: 600; padding: .15rem .5rem;
     border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
   }
   .detail-desc { font-size: .875rem; color: var(--text); line-height: 1.6; margin-bottom: 1rem;
@@ -425,7 +453,7 @@
 <body>
 
 <nav>
-  <a href="index.html" class="logo">tenant<span>-sec</span></a>
+  <a href="index.html" class="logo"><img src="icon.png" width="28" height="28" alt="">tenant<span>-sec</span></a>
   <a href="https://github.com/ypapazov/tenant-sec" style="color:var(--muted);font-size:.8rem">Contribute</a>
   <span class="nav-title">Controls Explorer</span>
   <a href="evaluate.html">Evaluator</a>
@@ -734,11 +762,7 @@ function buildProviderPills() {
   for (const [id, prov] of Object.entries(providers)) {
     const pill = document.createElement('button');
     pill.className = 'provider-pill';
-    pill.textContent = (prov.display_name || id) +
-      (prov.review_status === 'unreviewed' ? ' ⚠' : '');
-    pill.title = prov.review_status === 'unreviewed'
-      ? 'AI-assisted provisional assessment; human review pending'
-      : '';
+    pill.textContent = prov.display_name || id;
     pill.dataset.id = id;
     pill.onclick = () => toggleFocus(id);
     wrap.appendChild(pill);
@@ -945,6 +969,84 @@ function updateStats() {
 
 // ── Detail panel
 
+function plainText(value) {
+  if (value === null || value === undefined) return '';
+  return String(value).replace(/[\u0000-\u001f\u007f]/g, ' ').trim();
+}
+
+function formatOfferingLabel(prov) {
+  if (!prov?.offering) return '';
+  const o = prov.offering;
+  const parts = [o.name || o.id, o.edition, (o.regions || []).join(', ')].filter(Boolean);
+  return parts.join(' · ');
+}
+
+function excerptText(text, limit = 220) {
+  const full = plainText(text);
+  if (!full) return { excerpt: '', truncated: false };
+  if (full.length <= limit) return { excerpt: full, truncated: false };
+  const cut = full.slice(0, limit);
+  const soft = cut.replace(/\s+\S*$/, '');
+  return { excerpt: (soft.length > 40 ? soft : cut) + '\u2026', truncated: true };
+}
+
+function buildReportIssueUrl(ctrlId) {
+  const def = controlDefs[ctrlId];
+  const controlTitle = plainText(def?.name ?? formatIdAsName(ctrlId)) || ctrlId;
+  const pid = focusedProvider;
+  const prov = pid ? providers[pid] : null;
+  const service = expandedService;
+
+  const title = `[Assessment feedback] ${ctrlId}` + (pid ? ` (${pid})` : '');
+
+  const bodyLines = [
+    '## Context',
+    '',
+    `- **Provider:** ${plainText(prov?.display_name || pid || 'All providers (no provider focused)')}`,
+    `- **Assessment ID:** ${plainText(prov?.assessment_id || 'n/a')}`,
+    `- **Offering:** ${plainText(formatOfferingLabel(prov) || 'n/a')}`,
+    `- **Control ID:** ${plainText(ctrlId)}`,
+    `- **Control title:** ${controlTitle}`,
+  ];
+  if (service) bodyLines.push(`- **Selected service:** ${plainText(service)}`);
+  bodyLines.push(`- **Page URL:** ${plainText(location.href)}`);
+  bodyLines.push(
+    '',
+    '## Claimed problem',
+    '',
+    '<!-- Describe what is incorrect about the assessment or control claim. -->',
+    '',
+    '## Suggested correction',
+    '',
+    '<!-- What should the assessment say instead? -->',
+    '',
+    '## Supporting sources',
+    '',
+    '<!-- Links or quotes that support the correction. -->',
+    '',
+  );
+
+  const params = new URLSearchParams({ title, body: bodyLines.join('\n') });
+  return `https://github.com/ypapazov/tenant-sec/issues/new?${params.toString()}`;
+}
+
+function buildStatementBlock(def) {
+  const full = (def?.description || '').trim();
+  if (!full) return '';
+  const { excerpt } = excerptText(full, 220);
+  return `<div class="detail-statement">
+    <p class="detail-statement-text">${escHtml(excerpt)}</p>
+    <button type="button" class="see-more-btn" onclick="scrollToControlDefinition()">See more</button>
+  </div>`;
+}
+
+function scrollToControlDefinition() {
+  const target = document.getElementById('controlDefinition');
+  if (!target) return;
+  target.focus({ preventScroll: true });
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 function openDetail(ctrlId) {
   activeCtrlId = ctrlId;
   location.hash = buildHash(focusedProvider, ctrlId, expandedService);
@@ -962,6 +1064,8 @@ function openDetail(ctrlId) {
   const mappingsHtml = buildMappingsHtml(def);
   const descHtml = def?.description
     ? `<div class="detail-desc">${escHtml(def.description.trim())}</div>` : '';
+  const statementHtml = buildStatementBlock(def);
+  const reportUrl = buildReportIssueUrl(ctrlId);
 
   let assessmentHtml, otherHtml = '';
 
@@ -977,11 +1081,15 @@ function openDetail(ctrlId) {
     ? ` &middot; <span style="color:var(--accent2)">${escHtml(providers[focusedProvider]?.display_name || focusedProvider)}</span>` : '';
 
   el.innerHTML = `
-    <div class="detail-id">${ctrlId}${provLabel}${def?.service_scoped ? ' &middot; <span style="color:var(--purple)">service-scoped</span>' : ''}</div>
+    <div class="detail-id">${escHtml(ctrlId)}${provLabel}${def?.service_scoped ? ' &middot; <span style="color:var(--purple)">service-scoped</span>' : ''}</div>
     <div class="detail-title">${escHtml(def?.name ?? formatIdAsName(ctrlId))}</div>
     <div class="detail-flags">${flags.map(f => `<span class="detail-flag">${escHtml(f)}</span>`).join('')}</div>
+    <div class="detail-actions">
+      <a class="report-claim-btn" href="${escHtml(reportUrl)}" target="_blank" rel="noopener noreferrer">Report incorrect claim</a>
+    </div>
+    ${statementHtml}
     ${assessmentHtml}
-    <div class="section-title">Control definition</div>
+    <div class="section-title" id="controlDefinition" tabindex="-1">Control definition</div>
     ${descHtml}
     <div class="section-title" style="margin-top:.75rem">Maturity criteria</div>
     <div class="criteria-list">${criteriaHtml}</div>
@@ -1202,6 +1310,7 @@ document.getElementById('levelGuide').addEventListener('click', function (event)
 });
 
 window.toggleServiceExpand = toggleServiceExpand;
+window.scrollToControlDefinition = scrollToControlDefinition;
 
 init();
 </script>
