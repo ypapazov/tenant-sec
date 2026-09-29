@@ -80,7 +80,8 @@
   .btn-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
   .btn {
     padding: .65rem 1.5rem; border-radius: var(--radius); font-weight: 600;
-    font-size: .95rem; text-decoration: none; transition: all .15s;
+    font: 600 .95rem/1.65 'Inter', system-ui, sans-serif;
+    text-decoration: none; transition: all .15s; cursor: pointer;
   }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:hover { background: #3fb950; }
@@ -89,6 +90,62 @@
     border: 1px solid var(--border);
   }
   .btn-secondary:hover { border-color: var(--muted); }
+  .legend-trigger {
+    display: inline-flex; align-items: center; justify-content: center; gap: .65rem;
+  }
+  .legend-trigger-swatches { display: inline-flex; gap: 3px; }
+  .legend-trigger-swatches span {
+    width: 8px; height: 16px; border-radius: 2px;
+  }
+
+  /* ── Map legend dialog ── */
+  .map-legend {
+    width: min(760px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem);
+    margin: auto; padding: 0; overflow: auto;
+    color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.7);
+  }
+  .map-legend::backdrop { background: rgba(0,0,0,.75); backdrop-filter: blur(3px); }
+  .map-legend-inner { position: relative; padding: 2rem; }
+  .map-legend-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--code-bg);
+    color: var(--muted); font-size: 1.25rem; cursor: pointer;
+  }
+  .map-legend-close:hover, .map-legend-close:focus-visible {
+    color: var(--text); border-color: var(--muted);
+  }
+  .map-legend h2 { padding-right: 2.5rem; }
+  .legend-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem; margin: 1.5rem 0;
+  }
+  .legend-card {
+    display: grid; grid-template-columns: 44px 1fr; gap: .85rem; align-items: start;
+    padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--code-bg);
+  }
+  .legend-card .badge { width: 44px; height: 32px; }
+  .legend-card strong { display: block; font-size: .9rem; }
+  .legend-card p { margin: .2rem 0 0; font-size: .78rem; line-height: 1.45; }
+  .legend-note {
+    padding: 1rem; border-left: 3px solid var(--accent2);
+    background: #0a1a2d; border-radius: 0 var(--radius) var(--radius) 0;
+  }
+  .legend-note p { margin: 0; font-size: .85rem; }
+  .legend-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-top: 1.25rem;
+  }
+  .legend-footer a { color: var(--accent2); text-decoration: none; }
+  .legend-footer a:hover { text-decoration: underline; }
+  @media (max-width: 620px) {
+    .legend-grid { grid-template-columns: 1fr; }
+    .map-legend-inner { padding: 1.5rem; }
+    .legend-footer { align-items: flex-start; flex-direction: column; }
+  }
 
   /* ── Visual preview ── */
   #preview { padding: 0 2rem 4rem; text-align: center; }
@@ -282,6 +339,15 @@
     <div class="btn-row">
       <a href="controls.html" class="btn btn-primary">Explore controls →</a>
       <a href="evaluate.html" class="btn btn-secondary">▶ Try the evaluator</a>
+      <button type="button" class="btn btn-secondary legend-trigger" onclick="openLegend()">
+        <span class="legend-trigger-swatches" aria-hidden="true">
+          <span style="background:var(--danger)"></span>
+          <span style="background:var(--warn)"></span>
+          <span style="background:var(--accent2)"></span>
+          <span style="background:var(--accent)"></span>
+        </span>
+        Understand L0–L3
+      </button>
       <a href="#cli" class="btn btn-secondary">CLI quickstart</a>
     </div>
   </div>
@@ -847,6 +913,54 @@ mixed_aggregation: "p20"</pre>
   </p>
 </footer>
 
+<dialog class="map-legend" id="mapLegend" aria-labelledby="mapLegendTitle">
+  <div class="map-legend-inner">
+    <button type="button" class="map-legend-close" aria-label="Close map legend"
+            onclick="document.getElementById('mapLegend').close()">×</button>
+    <div class="label">Capability levels</div>
+    <h2 id="mapLegendTitle">How to read the capability map</h2>
+    <p>
+      Colors show how much tenant engineering is required to achieve a capability.
+      They are maturity signals—not pass/fail grades, certifications, or security verdicts.
+    </p>
+    <div class="legend-grid">
+      <div class="legend-card">
+        <div class="badge l0">L0</div>
+        <div><strong>Unavailable from tenant space</strong><p>Red · The provider does not expose the capability.</p></div>
+      </div>
+      <div class="legend-card">
+        <div class="badge l1">L1</div>
+        <div><strong>Build and operate it yourself</strong><p>Amber · Possible through custom automation or external tooling.</p></div>
+      </div>
+      <div class="legend-card">
+        <div class="badge l2">L2</div>
+        <div><strong>Managed, with limitations</strong><p>Blue · Provider-managed, but constrained in scope or configurability.</p></div>
+      </div>
+      <div class="legend-card">
+        <div class="badge l3">L3</div>
+        <div><strong>Managed and customizable</strong><p>Green · Provider-managed with tenant-configurable policy or scope.</p></div>
+      </div>
+      <div class="legend-card">
+        <div class="badge lm">MIX</div>
+        <div><strong>Varies by service</strong><p>Purple · The control contains different L0–L3 results across services.</p></div>
+      </div>
+      <div class="legend-card">
+        <div class="badge" style="background:#30363d;color:var(--muted)">—</div>
+        <div><strong>Unknown or unscored</strong><p>Grey · Evidence is insufficient, not applicable, or not yet assessed.</p></div>
+      </div>
+    </div>
+    <div class="legend-note">
+      <p><strong>Important:</strong> higher levels mean less tenant-owned implementation work.
+      The right target still depends on your threat model, service scope, and required controls.</p>
+    </div>
+    <div class="legend-footer">
+      <a href="#levels" onclick="document.getElementById('mapLegend').close()">Read the full maturity model →</a>
+      <button type="button" class="btn btn-secondary"
+              onclick="document.getElementById('mapLegend').close()">Close</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
   function showCmd(name) {
     document.querySelectorAll('.cmd-block').forEach(el => el.classList.remove('active'));
@@ -854,6 +968,14 @@ mixed_aggregation: "p20"</pre>
     document.getElementById('cmd-' + name).classList.add('active');
     event.target.classList.add('active');
   }
+
+  function openLegend() {
+    document.getElementById('mapLegend').showModal();
+  }
+
+  document.getElementById('mapLegend').addEventListener('click', function (event) {
+    if (event.target === this) this.close();
+  });
 </script>
 
 </body>
