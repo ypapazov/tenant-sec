@@ -56,9 +56,13 @@ def test_evaluate_drops_per_card_review_badge_but_keeps_data_field():
 def test_controls_detail_report_and_excerpt_controls():
     html = (DOCS / "controls.html").read_text(encoding="utf-8")
     assert "Report incorrect claim" in html
+    assert 'id="navReportClaim"' in html
+    assert "onclick=\"this.href=buildReportIssueUrl(activeCtrlId)\"" in html
+    assert html.index('id="navReportClaim"') < html.index('class="gh-icon"')
     assert "buildReportIssueUrl" in html
     assert "github.com/ypapazov/tenant-sec/issues/new" in html
     assert "URLSearchParams" in html
+    assert "const hasControl" in html
     assert "## Claimed problem" in html
     assert "## Suggested correction" in html
     assert "## Supporting sources" in html
