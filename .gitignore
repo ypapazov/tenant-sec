@@ -64,6 +64,8 @@ cover/
 # Output files
 *.html
 !index.html
+!controls.html
+!evaluate.html
 !docs/*.html
 *.png
 !docs/*.png

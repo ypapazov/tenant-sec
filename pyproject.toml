@@ -28,7 +28,7 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://tenant-sec.io/"
-Documentation = "https://tenant-sec.io/"
+Documentation = "https://tenant-sec.io/docs/"
 Repository = "https://github.com/ypapazov/tenant-sec"
 Issues = "https://github.com/ypapazov/tenant-sec/issues"
 
