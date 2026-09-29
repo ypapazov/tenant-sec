@@ -35,10 +35,10 @@
     white-space: nowrap; overflow-x: auto;
   }
   nav .logo {
-    display: inline-flex; align-items: center; gap: .45rem;
+    display: inline-flex; align-items: center;
     font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; flex-shrink: 0;
   }
-  nav .logo img { width: 28px; height: 28px; border-radius: 6px; display: block; }
+  nav .logo img { width: 28px; height: 28px; margin-right: .45rem; border-radius: 6px; display: block; }
   nav .logo span { color: var(--accent); }
   nav a { color: var(--muted); text-decoration: none; font-size: .82rem; transition: color .15s; flex-shrink: 0; }
   nav a:hover { color: var(--text); }
@@ -73,12 +73,12 @@
   /* ── Hero ── */
   #hero { padding: 4rem 2rem 5rem; text-align: center; }
   .hero-brand {
-    display: inline-flex; align-items: center; justify-content: center; gap: .35em;
+    display: inline-flex; align-items: center; justify-content: center;
     font-size: clamp(4rem, 10vw, 7rem); font-weight: 800; line-height: 1;
     color: var(--text); margin-bottom: 1.5rem; letter-spacing: -.03em;
   }
   .hero-brand img {
-    width: 0.72em; height: 0.72em; border-radius: 0.14em; display: block;
+    width: 0.72em; height: 0.72em; margin-right: .35em; border-radius: 0.14em; display: block;
   }
   .hero-brand span { color: var(--accent); }
   #hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; }
