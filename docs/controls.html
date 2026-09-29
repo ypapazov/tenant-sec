@@ -38,10 +38,12 @@
     border-bottom: 1px solid var(--border);
     padding: 0 1.5rem;
     display: flex; align-items: center; gap: 1.5rem; height: 52px;
+    white-space: nowrap; overflow-x: auto;
   }
   nav .logo {
     display: inline-flex; align-items: center;
     font-weight: 700; font-size: 1rem; color: var(--text); text-decoration: none;
+    white-space: nowrap; flex-shrink: 0;
   }
   nav .logo img { width: 28px; height: 28px; margin-right: .45rem; border-radius: 6px; display: block; }
   nav .logo span { color: var(--accent); }
@@ -49,10 +51,10 @@
   nav a:hover { color: var(--text); }
   .nav-title { font-weight: 600; color: var(--text); font-size: .875rem; }
   .report-nav {
-    margin-left: auto; color: #ffd866; font-weight: 600;
+    margin-left: auto; color: #ffd866; font-weight: 600; flex-shrink: 0;
   }
   .report-nav:hover { color: #fff3cd; }
-  .gh-icon { display: flex; align-items: center; }
+  .gh-icon { display: flex; align-items: center; flex-shrink: 0; }
   .gh-icon svg { width: 20px; height: 20px; fill: var(--muted); transition: fill .15s; }
   .gh-icon:hover svg { fill: var(--text); }
   .rc-warning {
@@ -452,13 +454,17 @@
   }
 
   @media (max-width: 1100px) { .legend { margin-left: 0; } }
+  @media (max-width: 760px) {
+    nav { gap: .85rem; padding: 0 .75rem; }
+    nav .contribute, nav .nav-title { display: none; }
+  }
 </style>
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="logo"><img src="icon.png" width="28" height="28" alt="">tenant<span>-sec</span></a>
-  <a href="https://github.com/ypapazov/tenant-sec" style="color:var(--muted);font-size:.8rem">Contribute</a>
+  <a href="https://github.com/ypapazov/tenant-sec" class="contribute" style="color:var(--muted);font-size:.8rem">Contribute</a>
   <span class="nav-title">Controls Explorer</span>
   <a href="evaluate.html">Evaluator</a>
   <a id="navReportClaim" class="report-nav"

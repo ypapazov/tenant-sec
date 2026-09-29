@@ -33,6 +33,7 @@ def test_pages_link_favicon_and_logo_mark(page: str):
     assert 'href="favicon.ico"' in html
     assert 'src="icon.png"' in html
     assert 'class="logo"' in html
+    assert "tenant<span>-sec</span>" in html
     assert "rc-warning" in html
     assert "1.0-RC2" in html
 
