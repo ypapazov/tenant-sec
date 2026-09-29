@@ -73,6 +73,62 @@
   .legend { display: flex; gap: .75rem; align-items: center; margin-left: auto; }
   .legend-item { display: flex; align-items: center; gap: .3rem; font-size: .72rem; color: var(--muted); }
   .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+  .legend-help {
+    padding: .28rem .65rem; border-radius: 16px; cursor: pointer;
+    border: 1px solid var(--accent2); background: var(--l2-bg);
+    color: var(--accent2); font: 600 .72rem/1.4 'Inter', system-ui, sans-serif;
+  }
+  .legend-help:hover, .legend-help:focus-visible {
+    color: var(--text); border-color: var(--text);
+  }
+
+  .level-guide {
+    width: min(760px, calc(100vw - 2rem)); max-height: calc(100vh - 2rem);
+    margin: auto; padding: 0; overflow: auto;
+    color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.7);
+  }
+  .level-guide::backdrop { background: rgba(0,0,0,.75); backdrop-filter: blur(3px); }
+  .level-guide-inner { position: relative; padding: 2rem; }
+  .level-guide-close {
+    position: absolute; top: 1rem; right: 1rem;
+    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--muted); font-size: 1.25rem;
+  }
+  .level-guide-close:hover, .level-guide-close:focus-visible {
+    color: var(--text); border-color: var(--muted);
+  }
+  .level-guide-label {
+    color: var(--accent); font-size: .7rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .level-guide h2 { margin: .5rem 2.5rem .75rem 0; font-size: 1.65rem; }
+  .level-guide-intro { color: #b0bac6; margin-bottom: 1.5rem; }
+  .level-guide-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem;
+  }
+  .level-guide-card {
+    display: grid; grid-template-columns: 46px 1fr; gap: .8rem; align-items: start;
+    padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius);
+    background: var(--surface2);
+  }
+  .level-guide-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 46px; height: 32px; border-radius: 6px; font-weight: 800;
+  }
+  .level-guide-card strong { display: block; font-size: .88rem; }
+  .level-guide-card p { margin-top: .2rem; color: var(--muted); font-size: .75rem; }
+  .level-guide-note {
+    margin-top: 1rem; padding: 1rem; border-left: 3px solid var(--accent2);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--l2-bg); color: #b0bac6; font-size: .82rem;
+  }
+  @media (max-width: 620px) {
+    .level-guide-grid { grid-template-columns: 1fr; }
+    .level-guide-inner { padding: 1.5rem; }
+  }
 
   .stats-bar {
     width: 100%; padding: .5rem 1.5rem;
@@ -392,6 +448,9 @@
     <div class="legend-item"><div class="legend-swatch" style="background:var(--l0)"></div>L0</div>
     <div class="legend-item"><div class="legend-swatch" style="background:var(--mix)"></div>Mixed</div>
     <div class="legend-item"><div class="legend-swatch" style="background:var(--na)"></div>Unknown / unscored</div>
+    <button type="button" class="legend-help" onclick="openLevelGuide()">
+      ⓘ Understand L0–L3
+    </button>
   </div>
 </div>
 <div class="stats-bar" id="statsBar"></div>
@@ -422,6 +481,49 @@
   <button class="detail-close" id="detailClose">&times;</button>
   <div id="detailContent"></div>
 </div>
+
+<dialog class="level-guide" id="levelGuide" aria-labelledby="levelGuideTitle">
+  <div class="level-guide-inner">
+    <button type="button" class="level-guide-close" aria-label="Close capability levels"
+            onclick="document.getElementById('levelGuide').close()">×</button>
+    <div class="level-guide-label">Capability levels</div>
+    <h2 id="levelGuideTitle">How to read the capability map</h2>
+    <p class="level-guide-intro">
+      Colors show how much tenant engineering is required to achieve a capability.
+      They are maturity signals—not pass/fail grades, certifications, or security verdicts.
+    </p>
+    <div class="level-guide-grid">
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--l0-bg);color:var(--l0)">L0</div>
+        <div><strong>Unavailable from tenant space</strong><p>Red · The provider does not expose the capability.</p></div>
+      </div>
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--l1-bg);color:var(--l1)">L1</div>
+        <div><strong>Build and operate it yourself</strong><p>Amber · Possible through custom automation or external tooling.</p></div>
+      </div>
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--l2-bg);color:var(--l2)">L2</div>
+        <div><strong>Managed, with limitations</strong><p>Blue · Provider-managed, but constrained in scope or configurability.</p></div>
+      </div>
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--l3-bg);color:var(--l3)">L3</div>
+        <div><strong>Managed and customizable</strong><p>Green · Provider-managed with tenant-configurable policy or scope.</p></div>
+      </div>
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--mix-bg);color:var(--mix)">MIX</div>
+        <div><strong>Varies by service</strong><p>Purple · The control contains different L0–L3 results across services.</p></div>
+      </div>
+      <div class="level-guide-card">
+        <div class="level-guide-badge" style="background:var(--na);color:var(--muted)">—</div>
+        <div><strong>Unknown or unscored</strong><p>Grey · Evidence is insufficient, not applicable, or not yet assessed.</p></div>
+      </div>
+    </div>
+    <div class="level-guide-note">
+      <strong>Important:</strong> higher levels mean less tenant-owned implementation work.
+      The right target still depends on your threat model, service scope, and required controls.
+    </div>
+  </div>
+</dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 <script>
@@ -1090,6 +1192,14 @@ function showError(msg) {
 document.getElementById('detailClose').onclick = closeDetail;
 document.getElementById('detailBackdrop').onclick = closeDetail;
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+
+function openLevelGuide() {
+  document.getElementById('levelGuide').showModal();
+}
+
+document.getElementById('levelGuide').addEventListener('click', function (event) {
+  if (event.target === this) this.close();
+});
 
 window.toggleServiceExpand = toggleServiceExpand;
 
