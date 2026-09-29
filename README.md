@@ -5,7 +5,7 @@ An open-source framework for evaluating cloud provider security capabilities at 
 > [!WARNING]
 > **1.0-RC1.1 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
 
-> **[Explore controls visually](https://tenant-sec.io/controls.html)** · **[Try the in-browser evaluator](https://tenant-sec.io/evaluate.html)** · **[Read the docs](https://tenant-sec.io/)**
+> **[Explore controls visually](https://tenant-sec.io/docs/controls.html)** · **[Try the in-browser evaluator](https://tenant-sec.io/docs/evaluate.html)** · **[Read the docs](https://tenant-sec.io/docs/)**
 
 ## Why this exists
 
@@ -38,7 +38,7 @@ non-score states.
 - **4 provisional methodology-2 assessments** (AWS, Azure, GCP, Scaleway), explicitly marked unreviewed
 - **Scoring engine** — cohort-aware eligibility gates, catalogue completeness, service coverage, and a labelled heuristic index
 - **Framework mappings** — CSA CCM v4.1 and NIST SP 800-53 Rev 5
-- **Interactive tools** — browser-based [Controls Explorer](https://tenant-sec.io/controls.html) and [Evaluator](https://tenant-sec.io/evaluate.html) (no install required)
+- **Interactive tools** — browser-based [Controls Explorer](https://tenant-sec.io/docs/controls.html) and [Evaluator](https://tenant-sec.io/docs/evaluate.html) (no install required)
 
 ## Quick start
 
