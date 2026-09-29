@@ -3,7 +3,7 @@
 An open-source framework for evaluating cloud provider security capabilities at the **tenant level** — the controls and features a cloud customer can actually use, configure, and rely on.
 
 > [!WARNING]
-> **1.0-RC1.1 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
+> **1.0-RC2 is an AI-assisted provisional release. Its provider recommendations have not completed human review. Do not use them as the sole basis for security, compliance, or procurement decisions.**
 
 > **[Explore controls visually](https://tenant-sec.io/docs/controls.html)** · **[Try the in-browser evaluator](https://tenant-sec.io/docs/evaluate.html)** · **[Read the docs](https://tenant-sec.io/docs/)**
 
@@ -35,7 +35,7 @@ non-score states.
 ## What's in the box
 
 - **71 controls** across 9 domains, including 62 tenant-operable controls
-- **4 provisional methodology-2 assessments** (AWS, Azure, GCP, Scaleway), explicitly marked unreviewed
+- **6 provisional methodology-2 assessments** (AWS, Azure, GCP, Hetzner Cloud, OVHcloud Public Cloud, Scaleway), explicitly marked unreviewed
 - **Scoring engine** — cohort-aware eligibility gates, catalogue completeness, service coverage, and a labelled heuristic index
 - **Framework mappings** — CSA CCM v4.1 and NIST SP 800-53 Rev 5
 - **Interactive tools** — browser-based [Controls Explorer](https://tenant-sec.io/docs/controls.html) and [Evaluator](https://tenant-sec.io/docs/evaluate.html) (no install required)
@@ -78,7 +78,7 @@ tenant-sec/
 ├── METHODOLOGY.md     # How scores, coverage, evidence, and certifications work
 ├── schema/            # JSON Schemas (draft 2020-12) + service and certification catalogues
 ├── controls/          # 71 control definitions (one YAML per control)
-├── providers/         # Provider assessment profiles (AWS, Azure, GCP, Scaleway)
+├── providers/         # Six provisional cloud-provider assessment profiles
 ├── mappings/          # Framework cross-references (CCM, NIST 800-53)
 ├── profiles/          # Example scoring profiles
 ├── docs/              # Static site — Controls Explorer, Evaluator, landing page
