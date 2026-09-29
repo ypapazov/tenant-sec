@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>tenant-sec — Cloud Provider Security Capability Framework</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="icon.png">
 <style>
   :root {
     --bg:        #0d1117;
@@ -32,7 +34,11 @@
     display: flex; align-items: center; gap: 1rem; height: 52px;
     white-space: nowrap; overflow-x: auto;
   }
-  nav .logo { font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; flex-shrink: 0; }
+  nav .logo {
+    display: inline-flex; align-items: center; gap: .45rem;
+    font-weight: 700; font-size: 1.05rem; color: var(--text); text-decoration: none; flex-shrink: 0;
+  }
+  nav .logo img { width: 28px; height: 28px; border-radius: 6px; display: block; }
   nav .logo span { color: var(--accent); }
   nav a { color: var(--muted); text-decoration: none; font-size: .82rem; transition: color .15s; flex-shrink: 0; }
   nav a:hover { color: var(--text); }
@@ -67,8 +73,12 @@
   /* ── Hero ── */
   #hero { padding: 4rem 2rem 5rem; text-align: center; }
   .hero-brand {
+    display: inline-flex; align-items: center; justify-content: center; gap: .35em;
     font-size: clamp(4rem, 10vw, 7rem); font-weight: 800; line-height: 1;
     color: var(--text); margin-bottom: 1.5rem; letter-spacing: -.03em;
+  }
+  .hero-brand img {
+    width: 0.72em; height: 0.72em; border-radius: 0.14em; display: block;
   }
   .hero-brand span { color: var(--accent); }
   #hero h1 { font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; line-height: 1.15; margin-bottom: 1.25rem; }
@@ -305,7 +315,7 @@
 
 <!-- ── Nav ─────────────────────────────────────────────────────────────── -->
 <nav>
-  <a href="#" class="logo">tenant<span>-sec</span></a>
+  <a href="#" class="logo"><img src="icon.png" width="28" height="28" alt="">tenant<span>-sec</span></a>
   <a href="controls.html">Controls Explorer</a>
   <a href="#levels">Scale</a>
   <a href="#problem">Problem</a>
@@ -325,7 +335,7 @@
 <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
 <section id="hero">
   <div class="inner">
-    <div class="hero-brand">tenant<span>-sec</span></div>
+    <div class="hero-brand"><img src="icon.png" width="40" height="40" alt="">tenant<span>-sec</span></div>
     <div class="label">Open Source · Cloud Security</div>
     <h1>
       Security capability assessment<br>
