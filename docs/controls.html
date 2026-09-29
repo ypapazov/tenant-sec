@@ -368,12 +368,22 @@
     letter-spacing: .04em; margin-bottom: .35rem;
   }
   .pa-no-refs { font-size: .78rem; color: var(--muted); font-style: italic; }
+  .ref-item {
+    display: flex; align-items: baseline; flex-wrap: wrap; gap: .25rem .55rem;
+    padding: .2rem 0;
+  }
   .ref-link {
-    display: flex; align-items: center; gap: .4rem; font-size: .78rem;
-    color: var(--accent2); text-decoration: none; padding: .15rem 0;
+    display: inline-flex; align-items: center; gap: .4rem; font-size: .78rem;
+    color: var(--accent2); text-decoration: none; line-height: 1.35;
+    word-break: break-word;
   }
   .ref-link:hover { text-decoration: underline; }
-  .ref-link::before { content: '\2192'; color: var(--muted); }
+  .ref-link::before { content: '\2192'; color: var(--muted); flex-shrink: 0; }
+  .ref-services {
+    font-size: .68rem; color: var(--muted); font-family: 'Fira Code', monospace;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 3px; padding: .05rem .35rem; white-space: nowrap;
+  }
 
   /* Expandable service rows (provider focus) */
   .svc-expandable { display: flex; flex-direction: column; gap: 2px; margin-top: .5rem; }
@@ -526,6 +536,7 @@
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+<script src="source-links.js"></script>
 <script>
 const DATA_BASE = '../';
 const KNOWN_PROVIDERS = ['aws', 'gcp', 'azure', 'scaleway', 'hetzner', 'ovhcloud'];
@@ -1027,7 +1038,7 @@ function renderFocusedProvider(pid, ctrlId) {
         if (isExp) {
           html += `<div class="svc-expand-detail">
             <div class="psc-evidence">${escHtml(ev)}</div>
-            ${renderRefs(svc.references)}
+            ${renderServiceSourceLinks(svc, svcId)}
           </div>`;
         }
         return html;
@@ -1039,9 +1050,7 @@ function renderFocusedProvider(pid, ctrlId) {
     }
   }
 
-  const refsHtml = ctrl.references
-    ? renderRefs(ctrl.references)
-    : '<div class="pa-no-refs">No reference links yet</div>';
+  const refsHtml = renderControlSourceLinks(ctrl);
 
   return heading + `<div class="provider-assessment">
     <div class="pa-score-row">
@@ -1050,7 +1059,7 @@ function renderFocusedProvider(pid, ctrlId) {
     </div>
     ${bodyHtml}
     <div class="pa-refs-section">
-      <div class="pa-refs-label">Documentation references</div>
+      <div class="pa-refs-label">Source references</div>
       ${refsHtml}
     </div>
   </div>`;
@@ -1117,6 +1126,8 @@ function renderProviderCard(pid, prov, ctrlId) {
     </div>`;
   }
 
+  const refsHtml = renderControlSourceLinks(ctrl);
+
   return `<div class="provider-score-card">
     <div class="psc-header">
       <span class="psc-name">${escHtml(prov.display_name || pid)}</span>
@@ -1124,6 +1135,10 @@ function renderProviderCard(pid, prov, ctrlId) {
       <span class="psc-score score-badge-${cls}">${label}</span>
     </div>
     ${body}
+    <div class="pa-refs-section">
+      <div class="pa-refs-label">Source references</div>
+      ${refsHtml}
+    </div>
   </div>`;
 }
 
@@ -1150,11 +1165,17 @@ function buildMappingsHtml(def) {
     </div>`).join('');
 }
 
-function renderRefs(refs) {
-  if (!refs || !refs.length) return '';
-  return refs.map(r =>
-    `<a class="ref-link" href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.title || r.url)}</a>`
-  ).join('');
+function renderControlSourceLinks(ctrl) {
+  const sources = TenantSecSourceLinks.collectControlSources(ctrl);
+  return TenantSecSourceLinks.renderSourceLinksHtml(sources, escHtml);
+}
+
+function renderServiceSourceLinks(svc, svcId) {
+  const sources = TenantSecSourceLinks.collectServiceSources(svc, svcId);
+  return TenantSecSourceLinks.renderSourceLinksHtml(sources, escHtml, {
+    emptyHtml: '',
+    showServices: false,
+  });
 }
 
 function toggleServiceExpand(svcId) {
