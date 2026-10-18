@@ -30,6 +30,7 @@ from .models import (
 )
 from .registry import ControlRegistry, ServiceCatalog
 from .certifications import CertificationCatalog
+from .trust import TrustMode, verify_provider_trust
 
 # Schema file names
 SCHEMA_NAMES = {
@@ -566,6 +567,7 @@ def validate_file(
     file_type: Optional[str] = None,
     controls_dir: Optional[Path] = None,
     catalog_path: Optional[Path] = None,
+    trust_mode: Optional[TrustMode] = None,
 ) -> list[str]:
     """Validate a YAML file. Returns list of error messages (empty = valid)."""
     errors: list[str] = []
@@ -659,5 +661,18 @@ def validate_file(
                         errors.append(
                             f"Unknown certification id '{cid}' — not in certification-catalog.yaml"
                         )
+
+    if detected_type == "provider" and trust_mode:
+        if not controls_dir:
+            errors.append("Trust verification requires a controls directory")
+        else:
+            registry = load_control_registry(controls_dir)
+            provider = _parse_provider(data)
+            errors.extend(
+                finding.format()
+                for finding in verify_provider_trust(
+                    provider, registry, mode=trust_mode
+                )
+            )
 
     return errors

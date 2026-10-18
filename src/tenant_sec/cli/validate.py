@@ -21,8 +21,23 @@ from ..core.loader import validate_file
     default=None,
     help="File type to validate against. Auto-detected if omitted.",
 )
+@click.option(
+    "--trust",
+    "trust_mode",
+    type=click.Choice(["strict", "publication"]),
+    default=None,
+    help=(
+        "Verify the methodology-2 evidence-to-score chain. Publication mode "
+        "also enforces review, source titles, and service-scope exceptions."
+    ),
+)
 @click.pass_context
-def validate(ctx: click.Context, path: Path, file_type: Optional[str]) -> None:
+def validate(
+    ctx: click.Context,
+    path: Path,
+    file_type: Optional[str],
+    trust_mode: Optional[str],
+) -> None:
     """Validate a YAML file against the tenant-sec schemas.
 
     PATH is the YAML file to validate (control, provider profile, or scoring profile).
@@ -30,6 +45,8 @@ def validate(ctx: click.Context, path: Path, file_type: Optional[str]) -> None:
     Examples:
 
       tenant-sec validate providers/scaleway.yaml
+
+      tenant-sec validate providers/scaleway.yaml --trust strict
 
       tenant-sec validate controls/iam/abac.yaml --type control
     """
@@ -55,6 +72,7 @@ def validate(ctx: click.Context, path: Path, file_type: Optional[str]) -> None:
         file_type=file_type,
         controls_dir=controls_dir if controls_dir.exists() else None,
         catalog_path=catalog_path if catalog_path.exists() else None,
+        trust_mode=trust_mode,
     )
 
     if errors:

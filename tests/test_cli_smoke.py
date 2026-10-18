@@ -57,6 +57,16 @@ class TestValidateCommand:
         )
         assert result.exit_code == 0, result.output
 
+    def test_validate_strict_trust_fixture(self, runner):
+        result = _invoke(
+            runner,
+            "validate",
+            str(REPO_ROOT / "tests" / "fixtures" / "provider-v2-minimal.yaml"),
+            "--trust",
+            "strict",
+        )
+        assert result.exit_code == 0, result.output
+
     def test_validate_bundled_relative_path_outside_repo(
         self, runner, tmp_path, monkeypatch
     ):
