@@ -28,8 +28,7 @@ criteria:
     Strong data residency: technical controls prevent data leaving the specified
     region even with misconfigured services. Contractual commitment covers both
     primary data and metadata (logs, backups, replicas). Residency scope is
-    auditable (tenant can verify where their data is). Available as a standard
-    offering, not a premium add-on.
+    auditable (tenant can verify where their data is).
 
 framework_mappings:
   ccm: ["DSP-01", "DSP-17"]

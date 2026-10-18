@@ -67,6 +67,19 @@ def _claim_bundle_to_dict(entry) -> dict:
     return out
 
 
+def _licensing_to_dict(entry) -> dict | None:
+    licensing = entry.licensing
+    if licensing is None:
+        return None
+    out = {
+        "status": licensing.status,
+        "evidence": licensing.evidence,
+    }
+    if licensing.references:
+        out["references"] = _references_to_dict(licensing.references)
+    return out
+
+
 def _provider_to_dict(provider) -> dict:
     """Convert a ProviderProfile to a JSON-serializable dict."""
     controls = {}
@@ -87,6 +100,9 @@ def _provider_to_dict(provider) -> dict:
                 c["compensating_controls"] = entry.compensating_controls
             if entry.verified_at:
                 c["verified_at"] = entry.verified_at.isoformat()
+            licensing = _licensing_to_dict(entry)
+            if licensing:
+                c["licensing"] = licensing
             c.update(_claim_bundle_to_dict(entry))
             controls[control_id] = c
         elif isinstance(entry, MixedControlScore):
@@ -129,6 +145,9 @@ def _provider_to_dict(provider) -> dict:
                 c["confidence"] = entry.confidence
             if entry.references:
                 c["references"] = _references_to_dict(entry.references)
+            licensing = _licensing_to_dict(entry)
+            if licensing:
+                c["licensing"] = licensing
             c.update(_claim_bundle_to_dict(entry))
             controls[control_id] = c
 

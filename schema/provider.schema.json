@@ -28,6 +28,23 @@
       "required": ["url", "title"],
       "additionalProperties": false
     },
+    "licensing_observation": {
+      "type": "object",
+      "description": "Commercial availability, tracked separately from L0-L3 maturity.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["included", "paid_add_on", "contract_dependent", "unknown"]
+        },
+        "evidence": { "type": "string", "minLength": 1 },
+        "references": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/reference" }
+        }
+      },
+      "required": ["status", "evidence"],
+      "additionalProperties": false
+    },
     "evidence_item": {
       "type": "object",
       "properties": {
@@ -317,6 +334,7 @@
             "properties": {
               "score": { "type": "integer", "enum": [0, 1, 2, 3] },
               "evidence": { "type": "string", "minLength": 1 },
+              "licensing": { "$ref": "#/$defs/licensing_observation" },
               "compensating_controls": { "type": "string" },
               "references": {
                 "type": "array",
@@ -357,6 +375,7 @@
                 ]
               },
               "evidence": { "type": "string", "minLength": 1 },
+              "licensing": { "$ref": "#/$defs/licensing_observation" },
               "references": {
                 "type": "array",
                 "items": { "$ref": "#/$defs/reference" }
@@ -372,6 +391,7 @@
             "properties": {
               "score": { "const": "mixed" },
               "summary": { "type": "string" },
+              "licensing": { "$ref": "#/$defs/licensing_observation" },
               "references": {
                 "type": "array",
                 "items": { "$ref": "#/$defs/reference" }

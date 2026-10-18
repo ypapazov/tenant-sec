@@ -20,8 +20,8 @@ criteria:
   L2: >
     Managed shielded VM or secure launch features exist (secure boot, vTPM,
     integrity monitoring on VM startup) but runtime behavioral detection is
-    not included. Or managed endpoint detection and response is available
-    as a paid add-on with limited integration into the broader security tooling.
+    not included. Or managed endpoint detection and response has limited
+    integration into the broader security tooling.
   L3: >
     Full managed runtime security: shielded instances with secure boot, vTPM,
     and integrity monitoring by default. Optional managed host-based detection

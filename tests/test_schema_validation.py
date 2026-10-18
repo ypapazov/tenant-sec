@@ -156,6 +156,9 @@ def test_minimal_v2_provider_loads_and_round_trips():
     assert exported["assessment_id"] == "aws/public/eu/standard"
     assert exported["offering"]["id"] == "public"
     assert exported["controls"]["iam.abac"]["confidence"] == "high"
+    assert exported["controls"]["iam.abac"]["licensing"]["status"] == (
+        "paid_add_on"
+    )
     assert exported["controls"]["iam.abac"]["claims"][0]["id"] == (
         "cl-abac-managed"
     )

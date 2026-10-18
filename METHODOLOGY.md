@@ -110,6 +110,11 @@ These are **ordinal**. L3 is not “three times L1”. A 0–100 domain average 
 - coverage fractions
 - unknowns and conflicts listed explicitly
 
+Commercial availability is recorded separately from maturity. Whether a
+capability is included, a paid add-on, contract-dependent, or unknown must not
+raise or lower L0–L3. Profiles may use that separate licensing observation as
+an eligibility or procurement filter.
+
 ---
 
 ## 5. Coverage (what “medium coverage” means)

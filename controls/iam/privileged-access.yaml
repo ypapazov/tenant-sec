@@ -22,8 +22,7 @@ criteria:
   L2: >
     A native JIT or privileged identity management capability exists but is
     limited: no custom approval workflows, fixed time windows only (no flexible
-    duration), limited to a subset of roles/services, or requires a paid add-on
-    that is not part of the standard IAM offering.
+    duration), or limited to a subset of roles/services.
   L3: >
     Full managed PAM: JIT role elevation with configurable time windows,
     multi-stage approval workflows, integration with ticketing systems (via

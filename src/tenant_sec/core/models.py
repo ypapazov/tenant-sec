@@ -88,6 +88,15 @@ class CriteriaResult:
     claim_ids: list[str] = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class LicensingObservation:
+    """Commercial availability kept separate from maturity."""
+
+    status: str
+    evidence: str
+    references: list[Reference] = field(default_factory=list)
+
+
 @dataclass
 class Control:
     """A single control definition from controls/{domain}/*.yaml."""
@@ -129,6 +138,7 @@ class LeafControlScore:
     evidence_items: list[EvidenceItem] = field(default_factory=list)
     claims: list[AssessmentClaim] = field(default_factory=list)
     criteria_results: list[CriteriaResult] = field(default_factory=list)
+    licensing: Optional[LicensingObservation] = None
 
 
 @dataclass
@@ -144,6 +154,7 @@ class MixedControlScore:
     evidence_items: list[EvidenceItem] = field(default_factory=list)
     claims: list[AssessmentClaim] = field(default_factory=list)
     criteria_results: list[CriteriaResult] = field(default_factory=list)
+    licensing: Optional[LicensingObservation] = None
 
 
 # Union type for a control score entry in a provider profile

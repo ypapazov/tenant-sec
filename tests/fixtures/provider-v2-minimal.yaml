@@ -25,6 +25,12 @@ controls:
     score: 2
     confidence: high
     evidence: Managed attribute conditions are available with limited policy scope.
+    licensing:
+      status: paid_add_on
+      evidence: The capability requires the example enterprise IAM tier.
+      references:
+        - url: https://example.com/pricing/iam
+          title: Example IAM pricing
     references:
       - url: https://example.com/docs/abac
         title: Example ABAC documentation

@@ -3,10 +3,10 @@ id: iam.permission-boundaries
 domain: iam
 name: "Permission Boundaries"
 description: >
-  Mechanisms to cap the maximum permissions a principal can exercise, regardless
-  of what individual policies grant. Enables safe delegation: an administrator
-  can grant another principal the ability to create IAM roles, constrained by
-  a boundary that prevents privilege escalation beyond an allowed scope.
+  Managed mechanisms that constrain either the maximum permissions a principal
+  can exercise or the permissions a delegated IAM administrator can grant.
+  Both patterns support safer delegation by enforcing a provider-side ceiling
+  rather than relying only on organizational convention and monitoring.
 
 criteria:
   L0: >
@@ -15,21 +15,22 @@ criteria:
     privilege escalation. Delegation of IAM administration is not safe without
     full administrative trust.
   L1: >
-    Permission boundaries are achievable through organizational convention and
-    monitoring: SCPs or equivalent limit what any role can do at the account
-    level, and custom automation detects and remediates policy violations.
-    No per-principal boundary that follows delegation is available natively.
+    Permission ceilings are achievable only through coarse organization or
+    account policy plus convention and monitoring. Custom automation detects
+    and remediates grants outside the delegated administrator's allowed scope;
+    no managed per-principal ceiling or delegated-grant constraint exists.
   L2: >
-    A permission boundary mechanism exists but is limited to specific principal
-    types (e.g., only IAM users, not roles, or not service accounts), or
-    boundaries can only be set from a predefined list of managed policies
-    rather than arbitrary boundary documents.
+    A managed permission-ceiling mechanism exists but is limited to specific
+    principal types or predefined policies; OR managed conditions constrain
+    which roles or permissions a delegated IAM administrator may grant and
+    revoke. At least one safe-delegation path is enforced by the provider, but
+    it does not provide broad per-principal ceilings plus grant constraints.
   L3: >
-    Per-principal permission boundaries supported for all principal types
-    (users, roles, service accounts, federated identities). Boundaries are
-    evaluated as an intersection with the principal's attached policies. The
-    boundary is enforced at policy evaluation time, not monitored post-hoc.
-    Supports boundary inheritance in delegation scenarios.
+    Provider-enforced permission ceilings cover the principal types used for
+    delegation and are evaluated at authorization time as an intersection with
+    granted permissions. Delegated administrators can also be constrained in
+    what they grant, or boundary inheritance/equivalent enforcement prevents
+    created principals from escaping the allowed scope.
 
 framework_mappings:
   ccm: ["IAM-06", "IAM-09"]

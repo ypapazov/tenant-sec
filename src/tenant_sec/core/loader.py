@@ -19,6 +19,7 @@ from .models import (
     EvidenceApplicability,
     EvidenceItem,
     LeafControlScore,
+    LicensingObservation,
     MixedControlScore,
     MustHaveEntry,
     ProviderOffering,
@@ -376,6 +377,19 @@ def _parse_references(values: Any) -> list[Reference]:
     ]
 
 
+def _parse_licensing(value: Any) -> Optional[LicensingObservation]:
+    if not isinstance(value, dict):
+        return None
+    return LicensingObservation(
+        status=str(value.get("status") or "unknown"),
+        evidence=str(
+            value.get("evidence")
+            or "Commercial availability was not established."
+        ),
+        references=_parse_references(value.get("references")),
+    )
+
+
 def _parse_evidence_items(values: Any) -> list[EvidenceItem]:
     items: list[EvidenceItem] = []
     for raw in values or []:
@@ -452,6 +466,7 @@ def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
             criteria_results=_parse_criteria_results(
                 data.get("criteria_results")
             ),
+            licensing=_parse_licensing(data.get("licensing")),
         )
     else:
         return LeafControlScore(
@@ -467,6 +482,7 @@ def _parse_control_score(data: dict) -> LeafControlScore | MixedControlScore:
             criteria_results=_parse_criteria_results(
                 data.get("criteria_results")
             ),
+            licensing=_parse_licensing(data.get("licensing")),
         )
 
 
