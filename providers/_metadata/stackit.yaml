@@ -1,0 +1,171 @@
+vignette:
+  legal:
+    summary: STACKIT emphasizes data sovereignty, which includes where data resides,
+      the governing law, and who can technically access it. This goes beyond mere
+      data residency to ensure that data in a specific location, like Frankfurt, is
+      not technically decryptable by parties outside the EU. The provider also considers
+      operational sovereignty, which addresses who can affect the ability to operate,
+      and software sovereignty, which concerns the technical ability to migrate away
+      from the platform.
+    facts: {}
+    references:
+    - url: https://framework.stackit.cloud/architecture/pillars/sovereignty/
+      title: https://framework.stackit.cloud/architecture/pillars/sovereignty/
+  operations:
+    summary: STACKIT offers 24/7 managed cloud operations, including automated monitoring,
+      incident management, patch management, and backup with SLA guarantees. This
+      aims to reduce incidents compared to on-premises solutions. The provider also
+      offers professional services for IT migration with a focus on sovereignty and
+      security-by-design. For secure configuration of virtual machines, STACKIT recommends
+      system hardening measures such as installing only necessary packages, disabling
+      root login, implementing strong password policies, and using firewalls.
+    facts: {}
+    references:
+    - url: https://marketplace.stackit.cloud/en/products
+      title: STACKIT Marketplace - Product Catalog
+    - url: https://docs.stackit.cloud/products/security/security-hardening/security-in-compute-engine/
+      title: Security in Compute Engine | Docs
+  privileged_access:
+    summary: STACKIT uses Role Based Access Control (RBAC) to manage access to its
+      services, where permissions define specific actions users can perform. Roles
+      are collections of permissions, and general roles like Owner, Editor, and Reader
+      provide broad access. The STACKIT Identity Provider (IdP) is an authentication
+      system that offers fine-grained access management, supporting user accounts,
+      service accounts, and client accounts. It handles authentication by confirming
+      a user's identity and provides identity information for authorization.
+    facts: {}
+    references:
+    - url: https://docs.stackit.cloud/platform/access-and-identity/roles-permissions/roles-permissions/
+      title: Understand roles and permissions | Docs
+    - url: https://docs.stackit.cloud/platform/access-and-identity/stackit-idp/
+      title: Understand STACKIT IdP | Docs
+    - url: https://docs.stackit.cloud/platform/access-and-identity/
+      title: Understand STACKIT IAM | Docs
+  subcontracting:
+    summary: STACKIT advises customers to maintain a current inventory of every party
+      that processes their data, extending beyond infrastructure to include support
+      tools, analytics services, payment processors, and email delivery services.
+      This inventory should establish the jurisdiction of each party, not just their
+      location, and treat third-party and marketplace services as part of the data
+      processing chain. The platform-side facts, such as region and operating entity,
+      are documented and stable, but customers are responsible for enumerating parties
+      beyond the platform.
+    facts: {}
+    references:
+    - url: https://framework.stackit.cloud/architecture/pillars/sovereignty/sov-06-jurisdictional-chain/
+      title: https://framework.stackit.cloud/architecture/pillars/sovereignty/sov-06-jurisdictional-chain/
+  audit_and_exit:
+    summary: The STACKIT Audit Log is a centralized service that records administrative
+      and access events across cloud products for compliance and security monitoring.
+      It captures events from most managed services and core platform services, including
+      membership, resource manager, and service account services. Audit logs are processed
+      and forwarded according to the OpenTelemetry Schema. STACKIT also supports the
+      FinOps Open Cost and Usage Specification (FOCUS) versions 1.1 and 1.2, providing
+      standardized cost and usage data in compressed CSV format for cost allocation,
+      analysis, and monitoring.
+    facts: {}
+    references:
+    - url: https://docs.stackit.cloud/platform/audit-log/
+      title: Understand STACKIT Audit Log | Docs
+    - url: https://docs.stackit.cloud/products/logging-and-monitoring/telemetry-router/basics/dataformats/
+      title: Data Formats | Docs
+    - url: https://docs.stackit.cloud/platform/cost-and-billing/focus/
+      title: FOCUS report | Docs
+  continuity:
+    summary: STACKIT emphasizes the importance of defining Recovery Time Objective
+      (RTO) and Recovery Point Objective (RPO) targets for disaster recovery. The
+      provider notes that more aggressive RTO and RPO targets lead to higher ongoing
+      costs, suggesting a proportionate approach. For regulated industries, disaster
+      recovery is a regulatory requirement, with examples like BAIT (banking) and
+      KRITIS (critical infrastructure) requiring documented contingency plans and
+      regular tests.
+    facts: {}
+    references:
+    - url: https://framework.stackit.cloud/adoption/adapting-operating-models/disaster-recovery/
+      title: https://framework.stackit.cloud/adoption/adapting-operating-models/disaster-recovery/
+  vulnerability_disclosure:
+    summary: STACKIT provides a security bulletin hub for transparent information
+      regarding security advisories, vulnerability disclosures, and mitigation guidance.
+      Each advisory includes an impact analysis, a severity assessment based on the
+      Common Vulnerability Scoring System (CVSS), and clear instructions for mitigation
+      and remediation. STACKIT prioritizes CVSS v4.0 scoring. The provider encourages
+      security researchers, customers, and partners to report potential security issues
+      to the STACKIT security team.
+    facts: {}
+    references:
+    - url: https://docs.stackit.cloud/platform/security-bulletin/
+      title: Security bulletin | Docs
+  transfers:
+    summary: STACKIT hosts all regions exclusively in Germany (eu01) and Austria (eu02),
+      ensuring compliance with European data protection laws like GDPR. Each region
+      is physically separate, preventing service disruptions in one from affecting
+      others. Within each region, there are at least three physically separate availability
+      zones (AZs) with independent power, cooling, and network infrastructure. The
+      Metro Availability Zone feature automatically distributes virtual machines and
+      data across two or more AZs within a region for high availability.
+    facts: {}
+    references:
+    - url: https://docs.stackit.cloud/platform/regions/
+      title: Regions | Docs
+certifications:
+- id: iso-27001
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - eu01
+  services: []
+  all_services: false
+  evidence:
+  - url: https://docs.stackit.cloud/platform/regions/
+    title: Regions | Docs
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+_provenance:
+  generated_at: '2026-10-26T11:06:52.427494+00:00'
+  model: vertex_ai/gemini-2.5-flash
+  input_sha256: 00a29139969f063dd449ee554777b295b57f18053f3247ebbddb29990a970e37
+  source_index:
+  - url: https://framework.stackit.cloud/architecture/pillars/sovereignty/
+    title: https://framework.stackit.cloud/architecture/pillars/sovereignty/
+    content_sha256: 3f40d3b0b409f3bea08a46e2a9b4b7b16659eaaef247ac83bf2868212f001a78
+  - url: https://marketplace.stackit.cloud/en/products
+    title: STACKIT Marketplace - Product Catalog
+    content_sha256: 06bda518ee94a191ae0ed31a4baf3a4d0e6c5758b4599271930c1c1620007653
+  - url: https://docs.stackit.cloud/platform/access-and-identity/roles-permissions/roles-permissions/
+    title: Understand roles and permissions | Docs
+    content_sha256: d80d59cf92a6f03b21bb008a3f241ec5e81c0642f7006385012f480c89250987
+  - url: https://framework.stackit.cloud/architecture/pillars/sovereignty/sov-06-jurisdictional-chain/
+    title: https://framework.stackit.cloud/architecture/pillars/sovereignty/sov-06-jurisdictional-chain/
+    content_sha256: c2f7b752d1d8d9f180e255bc460d55f0045e9d5d9d38f622e9fb068aa7b6e667
+  - url: https://docs.stackit.cloud/products/logging-and-monitoring/telemetry-router/basics/dataformats/
+    title: Data Formats | Docs
+    content_sha256: 7ea34846873b0f8d8babf5b9e9af929c65f24312b603f19e4fb0415020fff96e
+  - url: https://framework.stackit.cloud/adoption/adapting-operating-models/disaster-recovery/
+    title: https://framework.stackit.cloud/adoption/adapting-operating-models/disaster-recovery/
+    content_sha256: 9a61da74e8a6e8d270d5c20b2c797af9be8724719dbb83560e859e472aa7ff73
+  - url: https://docs.stackit.cloud/platform/security-bulletin/
+    title: https://docs.stackit.cloud/platform/security-bulletin/
+    content_sha256: 1d4e2106a22ca0941dd905db5ed05ed62cf39de6409882d41851f58df5047c8d
+  - url: https://docs.stackit.cloud/platform/regions/
+    title: https://docs.stackit.cloud/platform/regions/
+    content_sha256: 5d3c32636d1ddc0cd7cde95e9aa71e287228d72d0b94628dc256509133151d11
+  - url: https://docs.stackit.cloud/
+    title: Welcome to the STACKIT Docs | Docs
+    content_sha256: faf5d3e2b140324675e114e54079509b0149bff87a9017c1c0b8f5299e3abae4
+  - url: https://docs.stackit.cloud/platform/access-and-identity/stackit-idp/
+    title: Understand STACKIT IdP | Docs
+    content_sha256: eb2b13e3b7972fd5c56127827a6c1c9a5d44698c8eb5a0c04e83eb2f81fe8a36
+  - url: https://docs.stackit.cloud/platform/audit-log/
+    title: Understand STACKIT Audit Log | Docs
+    content_sha256: 461c32447f323f48e5103d30c669ba670330186e858f40235808bc5a1ca08406
+  - url: https://docs.stackit.cloud/products/security/security-hardening/security-in-compute-engine/
+    title: Security in Compute Engine | Docs
+    content_sha256: c899356aa2a3fd7c3df9917aac7d26f4f8df1024e33f14385d6e448fbad5aa99
+  - url: https://docs.stackit.cloud/platform/access-and-identity/
+    title: Understand STACKIT IAM | Docs
+    content_sha256: ce6ef188838264e10065ab92c79ab4a7b37854259c4adb16451170505e8a00be
+  - url: https://docs.stackit.cloud/platform/cost-and-billing/focus/
+    title: FOCUS report | Docs
+    content_sha256: 336959c42cdca3b975d5d988b54e00d662131a5d1c36167838436ede9995a76e

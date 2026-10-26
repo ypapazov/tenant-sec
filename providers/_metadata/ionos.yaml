@@ -1,0 +1,242 @@
+vignette:
+  legal:
+    summary: IONOS Cloud operates under the EU's GDPR, acting as a processor for customer
+      data and processing personal information according to national and international
+      data protection standards. Customers are responsible for the legality of data
+      processed in the Virtual Data Center (VDC)/Data Center Designer (DCD) and for
+      pseudonymization and encryption of their own customer data, including backups.
+      IONOS Cloud Object Storage meets EU GDPR requirements for data storage and archiving.
+    facts:
+      data_processor_role: IONOS Cloud acts as a data processor for customer data.
+      customer_data_responsibility: Customers are responsible for the legality, pseudonymization,
+        and encryption of their data.
+      gdpr_compliance: IONOS Cloud Object Storage complies with EU GDPR for data storage
+        and archiving.
+    references:
+    - url: https://cloud.ionos.com/protection
+      title: Data Protection and Cloud Security | IONOS
+    - url: https://cloud.ionos.com/solutions/eu-gdpr-requirements
+      title: GDPR requirements regarding Storage as a Service (STaaS)| IONOS CLOUD
+    - url: https://www.ionos.com/digitalguide/websites/digital-law/gain-users-confidence-with-a-privacy-policy/
+      title: 'Privacy policy for Websites 2022: Templates - IONOS'
+  operations:
+    summary: IONOS Cloud is responsible for maintaining the underlying infrastructure,
+      including physical servers, virtualization layers, and hypervisors, ensuring
+      their availability, reliability, and performance. They implement security controls
+      at the infrastructure level, such as network security, host-based firewalls,
+      and intrusion detection systems. Customers are responsible for securing their
+      compute instances, including access controls, operating systems, and applications.
+    facts:
+      provider_infrastructure_responsibility: IONOS Cloud maintains physical servers,
+        virtualization, and hypervisors.
+      provider_security_controls: IONOS Cloud implements network security, host-based
+        firewalls, and intrusion detection systems.
+      customer_instance_responsibility: Customers secure compute instances, access
+        controls, OS, and applications.
+    references:
+    - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-server-security-products
+      title: Best Practices for IONOS CLOUD Server Security Products | Products
+    - url: https://cloud.ionos.com/protection
+      title: Data Protection and Cloud Security | IONOS
+    - url: https://docs.ionos.com/cloud/security-safeguards/report-security-event/malfunctions-and-incidents
+      title: Malfunctions and Security Incidents | Products
+  privileged_access:
+    summary: IONOS Cloud customers are responsible for configuring and managing access
+      controls for their VM operating systems and applications, including setting
+      up user accounts with appropriate credentials. The principle of least privilege
+      access applies to these systems. IONOS Cloud provides interfaces like the Data
+      Center Designer (DCD) for customers to control and manage their services, including
+      creating and managing SSH keys.
+    facts:
+      customer_access_control_responsibility: Customers configure and manage access
+        controls for VMs and applications.
+      least_privilege_principle: The principle of least privilege applies to VM operating
+        systems and applications.
+      ssh_key_management: Customers can create and manage SSH keys via the Data Center
+        Designer.
+    references:
+    - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-server-security-products
+      title: Best Practices for IONOS CLOUD Server Security Products | Products
+    - url: https://docs.ionos.com/cloud/support/general-information/service-catalog
+      title: Service Catalog | Support | Products
+  subcontracting:
+    summary: IONOS Cloud's price list applies to IONOS CLOUD GmbH, IONOS Cloud Solutions
+      Spain, S.L.U., and IONOS CLOUD France SAS. The company offers various cloud
+      services and solutions, including AI Model Hub, Backup and Storage, Block Storage,
+      IONOS Cloud Object Storage, Network File Storage, Compute Engine, Cloud GPU
+      VM, and Managed Kubernetes. IONOS Cloud also provides a partner program for
+      ISVs.
+    facts:
+      applicable_entities: Price list applies to IONOS CLOUD GmbH, IONOS Cloud Solutions
+        Spain, S.L.U., and IONOS CLOUD France SAS.
+      service_offerings: Services include AI Model Hub, various storage options, compute,
+        and managed Kubernetes.
+      isv_partner_program: IONOS Cloud offers an ISV Partner Program.
+    references:
+    - url: https://docs.ionos.com/cloud/support/general-information/price-list/ionos-cloud-eur-en
+      title: IONOS CLOUD (EUR) | Support | Products
+    - url: https://cloud.ionos.com/partner/isv
+      title: IONOS CLOUD ISV Partner Program
+    - url: https://docs.ionos.com/cloud/support/general-information/service-catalog
+      title: Service Catalog | Support | Products
+  audit_and_exit:
+    summary: IONOS Cloud Object Storage can record logs of all activities within a
+      bucket, storing data in a specified destination bucket to provide an audit trail.
+      This helps ensure only authorized users access buckets and objects and tracks
+      changes. In combination with versioning, it aids in transparency and object
+      recovery. Customers are responsible for ensuring the legality of data processed
+      in the VDC/DCD.
+    facts:
+      object_storage_logging: IONOS Cloud Object Storage records activity logs for
+        audit trails.
+      audit_trail_benefits: Logs ensure authorized access, track changes, and aid
+        in recovery with versioning.
+      customer_data_legality_responsibility: Customers are responsible for the legality
+        of data processed in VDC/DCD.
+    references:
+    - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-storage-products
+      title: Best Practices for IONOS CLOUD Storage Products | Products
+    - url: https://cloud.ionos.com/protection
+      title: Data Protection and Cloud Security | IONOS
+    - url: https://docs.ionos.com/cloud/support/general-information/service-catalog
+      title: Service Catalog | Support | Products
+  continuity:
+    summary: IONOS Cloud offers Cloud Disaster Recovery (Cloud DR) as an emergency
+      backup strategy for data, applications, and hardware, relying on cloud storage.
+      This allows for quick restoration of affected resources in case of failure.
+      IONOS Cloud backup policies support business continuity with automated backups
+      and fast restore capabilities, ensuring data integrity and reducing the risk
+      of data loss.
+    facts:
+      cloud_disaster_recovery: IONOS Cloud offers Cloud DR for emergency backup and
+        restoration.
+      automated_backups: Automated backups and fast restore capabilities support business
+        continuity.
+      data_integrity: Backup policies protect data integrity and reduce data loss
+        risk.
+    references:
+    - url: https://www.ionos.com/digitalguide/server/security/cloud-disaster-recovery/
+      title: Cloud Disaster Recovery | Definition, Tips and How to - IONOS
+    - url: https://cloud.ionos.com/managed/dbaas
+      title: Database as a Service (DBaaS) | IONOS CLOUD
+    - url: https://cloud.ionos.com/solutions/disaster-recovery
+      title: Data backup and disaster recovery for companies
+  vulnerability_disclosure:
+    summary: IONOS Cloud encourages reporting of vulnerabilities in its systems, configurations,
+      or services that could impact confidentiality, integrity, or availability. Reports
+      should be sent to security@ionos.com with detailed information, including affected
+      systems, exploitation methods, and reproduction steps. IONOS Cloud will not
+      prosecute security researchers who report in good faith and investigates all
+      reports to protect customers.
+    facts:
+      reporting_vulnerabilities: Vulnerabilities impacting confidentiality, integrity,
+        or availability should be reported.
+      reporting_email: Reports should be sent to security@ionos.com.
+      no_prosecution_for_good_faith: IONOS Cloud will not prosecute good-faith security
+        researchers.
+    references:
+    - url: https://docs.ionos.com/cloud/security-safeguards/report-security-event/vulnerabilities
+      title: Vulnerabilities | Products
+    - url: https://www.ionos.com/it-security
+      title: IT Security - Reporting security threats
+    - url: https://docs.ionos.com/cloud/release-notes/october-2026
+      title: October 2026 | Products
+  transfers:
+    summary: IONOS Cloud stores information encrypted and redundantly within its data
+      centers, often using distributed object storage systems. Data transfers between
+      user devices and the cloud are protected through encrypted connections like
+      TLS. The cloud provider manages internal data organization, redundancy, and
+      routine backup processes. IONOS Cloud Object Storage offers no vendor lock-in
+      of data due to the S3 standard, allowing data migration at any time.
+    facts:
+      data_encryption_at_rest: Information is encrypted and stored redundantly within
+        data centers.
+      data_in_transit_encryption: Data transfers are protected via encrypted connections
+        like TLS.
+      no_vendor_lock_in: IONOS Cloud Object Storage uses S3 standard, allowing data
+        migration.
+    references:
+    - url: https://www.ionos.com/digitalguide/server/know-how/what-is-the-cloud/
+      title: What is the cloud? Definition, uses, and how cloud computing works -
+        IONOS
+    - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-storage-products
+      title: Best Practices for IONOS CLOUD Storage Products | Products
+    - url: https://cloud.ionos.com/protection
+      title: Data Protection and Cloud Security | IONOS
+certifications:
+- id: iso-27001
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - de/fra/1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.ionos.com/about
+    title: About us - The company at a glance | IONOS
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+_provenance:
+  generated_at: '2026-10-26T11:07:19.360865+00:00'
+  model: vertex_ai/gemini-2.5-flash
+  input_sha256: 6cf1bdad61e01c1a330e1f9d53fc150fe527f71fdbe281d5ae7cd4fa3ce28f20
+  source_index:
+  - url: https://cloud.ionos.com/protection
+    title: Data Protection and Cloud Security | IONOS
+    content_sha256: af55f47caae2adbd4ab4c03e4aa3055fc510cdc0f1a2cbba807b5d88af2394c2
+  - url: https://docs.ionos.com/cloud/security-safeguards/report-security-event/malfunctions-and-incidents
+    title: Malfunctions and Security Incidents | Products
+    content_sha256: b7d280cb7ffef18ac429cff7f88d957544a67551d692a770fc466745bbffca80
+  - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-server-security-products
+    title: Best Practices for IONOS CLOUD Server Security Products | Products
+    content_sha256: eb6a5a3dd104bd9f732bf23525a9cb591e16a7dc345e732a6baa8a37a40c4be7
+  - url: https://docs.ionos.com/cloud/support/general-information/price-list/ionos-cloud-eur-en
+    title: IONOS CLOUD (EUR) | Support | Products
+    content_sha256: c10ab41e77971b05ed66d10fbf88a43c67b7f25490f4915656777d9f31ab6138
+  - url: https://www.ionos.com/digitalguide/server/security/cloud-disaster-recovery/
+    title: Cloud Disaster Recovery | Definition, Tips and How to - IONOS
+    content_sha256: f93fa154e5c3a76e1499e5c4ef256185291fd1f07ba4d269be52cb20aef66fa2
+  - url: https://docs.ionos.com/cloud/security-safeguards/report-security-event/vulnerabilities
+    title: Vulnerabilities | Products
+    content_sha256: 0d6b05356c80bba94ef82b6344dbe3b87ce83050aeb950890fddddf67735e1a7
+  - url: https://www.ionos.com/about
+    title: About us - The company at a glance | IONOS
+    content_sha256: 6e1f50af26c17790e462a9208e6b382b6f2ccfd639f0242813d34690304190a6
+  - url: https://www.ionos.com/digitalguide/websites/digital-law/gain-users-confidence-with-a-privacy-policy/
+    title: 'Privacy policy for Websites 2022: Templates - IONOS'
+    content_sha256: 62bcd3c291f1d9915930d08f28eb6452b2a0913d7943d12ddd244feb17a60e85
+  - url: https://docs.ionos.com/cloud/support/general-information/service-catalog
+    title: Service Catalog | Support | Products
+    content_sha256: ffe5585d66c43691b867642e6da0d9f3097a2ef64333600b505c780cc8e0f03e
+  - url: https://docs.ionos.com/cloud/security-safeguards/best-practice-guideline/best-practice-cloud-storage-products
+    title: Best Practices for IONOS CLOUD Storage Products | Products
+    content_sha256: a29a91dc2dda5011c4adb713150c103d803c3ca7ef73a760ddde13ee150bc815
+  - url: https://cloud.ionos.com/managed/dbaas
+    title: Database as a Service (DBaaS) | IONOS CLOUD
+    content_sha256: 5614d43f0a6e8bc7d36500889d723703e4d65471cbc6812e6bcb171c62a488be
+  - url: https://www.ionos.com/it-security
+    title: IT Security - Reporting security threats
+    content_sha256: f95adb198a68240a88cb021cbbeae2d7ddd7d0642ed9ebc8b77e7b70e5391867
+  - url: https://www.ionos.com/hosting/web-hosting
+    title: Web Hosting | Fast Hosting Services | 99.99% Uptime
+    content_sha256: 67a206fa2ddb752d89d935c9e8c0dd71b8a9e9dda2ae75aceb142bf0caa525c7
+  - url: https://cloud.ionos.com/solutions/eu-gdpr-requirements
+    title: GDPR requirements regarding Storage as a Service (STaaS)| IONOS CLOUD
+    content_sha256: 6b228b0b6277e9a99e1478bc552c6539a01420f98cfec81031e6ea92ad193b4b
+  - url: https://cloud.ionos.com/partner/isv
+    title: IONOS CLOUD ISV Partner Program
+    content_sha256: 546053641c279c1843ecb7502cad2de3669422816ad83e05cd3bee1e8524eea1
+  - url: https://cloud.ionos.com/solutions/disaster-recovery
+    title: Data backup and disaster recovery for companies
+    content_sha256: db6f8cb468b6dc50fa0de446fb10b63aa700b9e9c68d393a5c4217c8aa21896f
+  - url: https://docs.ionos.com/cloud/release-notes/october-2026
+    title: October 2026 | Products
+    content_sha256: bd14368b14d631833390bb6a042b31d324e1d7a0ecf8f31276be06bd47bca5d8
+  - url: https://www.ionos.com/digitalguide/server/know-how/what-is-the-cloud/
+    title: What is the cloud? Definition, uses, and how cloud computing works - IONOS
+    content_sha256: 5ca62a6eb4291c3cf9f11c756396774ab8c7075b86ae1480fa5fdc452c7db393
+  - url: https://www.ionos.com/
+    title: IONOS » Hosting Provider | Websites. Domains. Server.
+    content_sha256: ec584c22e4a4eb7c126f94abacaffc6d208311a1e66273f702225f223cc20b9f

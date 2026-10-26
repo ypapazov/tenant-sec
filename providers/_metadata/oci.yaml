@@ -1,0 +1,247 @@
+vignette:
+  legal:
+    summary: Oracle's Services Privacy Policy outlines the privacy and security practices
+      for handling Services Personal Information and System Operations Data. It details
+      how Oracle processes personal information on behalf of customers for various
+      services and the practices for data incidentally contained in system operation
+      data.
+    facts:
+      policy_scope: services personal information, system operations data
+      data_types_covered: family, lifestyle, employment, financial, online identifiers,
+        geolocation, online behavior, log files, statistical information
+    references:
+    - url: https://www.oracle.com/legal/privacy/services-privacy-policy/
+      title: https://www.oracle.com/legal/privacy/services-privacy-policy/
+  operations:
+    summary: Oracle Cloud Infrastructure (OCI) is designed with a security-first approach
+      across compute, network, and storage. Oracle has a Security Incident Management
+      Policy that defines requirements for reporting and responding to security events,
+      with the Integrated Cyber Center (ICC) coordinating responses. Oracle also releases
+      Critical Patch Updates and Critical Security Patch Updates to address vulnerabilities.
+    facts:
+      security_approach: security-first across compute, network, storage
+      incident_response_coordination: Integrated Cyber Center (ICC)
+      patch_release_frequency: quarterly Critical Patch Updates, targeted Critical
+        Security Patch Updates
+    references:
+    - url: https://www.oracle.com/trust/
+      title: Security, Privacy, and Compliance | Oracle
+    - url: https://www.oracle.com/corporate/security-practices/corporate/security-incident-response/
+      title: Information Security Incident Response | Oracle
+    - url: https://www.oracle.com/security-alerts/cspusep2026.html
+      title: Oracle Critical Security Patch Update Advisory - September 2026
+  privileged_access:
+    summary: Oracle Access Governance allows for sequential processing of multiple
+      access requests for a single identity and supports generating downloadable reports
+      for identities, access bundle assignments, accounts, and access bundles. It
+      also enables the use of OCI Vault as a credential store for Microsoft Entra
+      ID Orchestrated systems.
+    facts:
+      access_request_processing: sequential processing for single identity
+      reporting_capabilities: downloadable reports for identities, access bundles,
+        accounts
+      credential_storage: OCI Vault for Microsoft Entra ID Orchestrated systems
+    references:
+    - url: https://docs.oracle.com/en-us/iaas/Content/access-governance/whats-new.htm
+      title: What's New in Oracle Access Governance
+  subcontracting:
+    summary: Oracle identifies sub-processors for cloud services and distributes these
+      lists to customers via the Oracle Cloud Customer Support Portal. Customers can
+      subscribe to notifications for updates to these lists. Oracle also provides
+      strategic subcontractor lists for Oracle Cloud Services and NetSuite products.
+    facts:
+      subprocessor_identification: lists distributed via Oracle Cloud Customer Support
+        Portal
+      notification_availability: customers can subscribe to subprocessor list updates
+      strategic_subcontractor_lists: available for Oracle Cloud Services and NetSuite
+    references:
+    - url: https://www.oracle.com/corporate/security-practices/corporate/supply-chain/suppliers/
+      title: Supplier Security | Oracle
+    - url: https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/article_11140441968.html
+      title: NetSuite Applications Suite - Viewing the Oracle Cloud Services Strategic
+        Subcontractor List
+    - url: https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/article_34140437468.html
+      title: NetSuite Applications Suite - Viewing the Oracle NetSuite Subprocessors
+        List
+  audit_and_exit:
+    summary: Oracle will retire the Oracle Identity Cloud Service (IDCS) AuditEvents
+      APIs and associated out-of-the-box reports in February 2027. Customers are advised
+      to migrate their integrations and reporting workflows to OCI Audit before this
+      date and use OCI Audit service APIs to retrieve audit events.
+    facts:
+      api_retirement_date: February 2027
+      replacement_service: OCI Audit
+      migration_recommendation: migrate integrations and reporting workflows to OCI
+        Audit
+    references:
+    - url: https://docs.oracle.com/en-us/iaas/Content/servicechanges.htm
+      title: Service Change Announcements
+  continuity:
+    summary: Oracle provides safeguards against computing downtime through its Oracle
+      Cloud Infrastructure (OCI), which separates global cloud regions into isolated
+      availability domains with independent power and cooling systems. Oracle Lines
+      of Business (LOBs) are required to maintain and test Disaster Recovery (DR)
+      plans, including backup and recovery strategies, with annual DR exercises conducted
+      for internal infrastructure.
+    facts:
+      disaster_recovery_architecture: isolated availability domains within regions
+      dr_plan_requirement: LOBs must maintain and test DR plans
+      dr_exercise_frequency: annual for internal infrastructure
+    references:
+    - url: https://www.oracle.com/business-continuity/business-continuity-disaster-recovery/
+      title: What Is Business Continuity and Disaster Recovery (BCDR)?
+    - url: https://www.oracle.com/corporate/security-practices/corporate/resilience-management/disaster-recovery/
+      title: Disaster Recovery | Risk Management Resiliency Program | Oracle
+  vulnerability_disclosure:
+    summary: Oracle encourages reporting security vulnerabilities through designated
+      support mechanisms for customers and partners, or via email for non-customers.
+      Reporters are encouraged to use Oracle's public PGP key for encrypting sensitive
+      information. Oracle credits researchers who follow responsible disclosure practices
+      in its Critical Patch Update or Critical Security Patch Update advisories.
+    facts:
+      reporting_channels: designated support mechanism or email secalert_us@oracle.com
+      encryption_recommendation: use Oracle's public PGP key for sensitive information
+      researcher_credit_policy: credited in advisories for responsible disclosure
+    references:
+    - url: https://www.oracle.com/corporate/security-practices/testing/faq/
+      title: FAQs | Security Testing Policy | Oracle
+    - url: https://www.oracle.com/corporate/security-practices/assurance/vulnerability/reporting/
+      title: How to Report Security Vulnerabilities to Oracle | Oracle
+    - url: https://www.oracle.com/security-alerts/cpujul2026.html
+      title: Oracle Critical Patch Update Advisory - July 2026
+  transfers:
+    summary: Oracle's Services Privacy Policy details how Services Personal Information,
+      provided by customers and residing on Oracle, customer, or third-party systems,
+      is processed by Oracle on behalf of customers to perform services. This information
+      may include various personal details and online identifiers related to customer
+      representatives and end-users.
+    facts:
+      data_residency: on Oracle, customer, or third-party systems
+      processing_purpose: to perform services on customer's behalf
+      data_subjects: customer representatives and end-users
+    references:
+    - url: https://www.oracle.com/legal/privacy/services-privacy-policy/
+      title: https://www.oracle.com/legal/privacy/services-privacy-policy/
+certifications:
+- id: iso-27001
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - eu-frankfurt-1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+- id: iso-27017
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - eu-frankfurt-1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+- id: iso-27018
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - eu-frankfurt-1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+- id: iso-27701
+  kind: certification
+  status: unknown
+  validity: unknown
+  regions:
+  - eu-frankfurt-1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+- id: soc2-type2
+  kind: attestation
+  status: unknown
+  validity: unknown
+  regions:
+  - eu-frankfurt-1
+  services: []
+  all_services: false
+  evidence:
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+  scope: Provider programme scope; not assumed to cover every assessed service.
+  offering: public
+  report_access: public
+_provenance:
+  generated_at: '2026-10-26T11:06:46.720672+00:00'
+  model: vertex_ai/gemini-2.5-flash
+  input_sha256: bb25138b5c5d077292337529da4c1f2bf9621ab74d260a1d2d07ee7a9ebec73c
+  source_index:
+  - url: https://www.oracle.com/trust/
+    title: Security, Privacy, and Compliance | Oracle
+    content_sha256: 284d72300b9b22df62cfffa8e1dbccd8646cfb4e8864154b576071c2d9edaf4a
+  - url: https://www.oracle.com/corporate/security-practices/corporate/supply-chain/suppliers/
+    title: Supplier Security | Oracle
+    content_sha256: b73230d89031d70bd1c80a40421bd413690c4e3e8767ff472915e40385304af0
+  - url: https://docs.oracle.com/en-us/iaas/Content/servicechanges.htm
+    title: Service Change Announcements
+    content_sha256: 4a83ef5a7b93ba539bfef76054da699033574dc94a85a1b0a57e09d4c3291518
+  - url: https://www.oracle.com/business-continuity/business-continuity-disaster-recovery/
+    title: What Is Business Continuity and Disaster Recovery (BCDR)?
+    content_sha256: ebd19b3a649a07834b98095263a16f6140d6d0137e8bf15ac8234ceff3b2f896
+  - url: https://www.oracle.com/corporate/security-practices/testing/faq/
+    title: FAQs | Security Testing Policy | Oracle
+    content_sha256: 37a71e7da370121193822c81ee4bd818595b6067bc99d0ee0b462b2de8d48a72
+  - url: https://www.oracle.com/legal/privacy/services-privacy-policy/
+    title: https://www.oracle.com/legal/privacy/services-privacy-policy/
+    content_sha256: 7ccc9f0ffb687e6d1c8abeec609ada50da6a82f4f0544b023dc6a2d0058542a4
+  - url: https://www.oracle.com/corporate/security-practices/corporate/security-incident-response/
+    title: Information Security Incident Response | Oracle
+    content_sha256: a7f1eb8dab6e4c487a12af649dc696d0d0136a5cc02c37fe6e433601a696e8e5
+  - url: https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/article_11140441968.html
+    title: NetSuite Applications Suite - Viewing the Oracle Cloud Services Strategic
+      Subcontractor List
+    content_sha256: 4487a97f888eef758dd35072d2a1dceb990103ca7d159c20cbcc69084e433223
+  - url: https://www.oracle.com/corporate/security-practices/corporate/resilience-management/disaster-recovery/
+    title: Disaster Recovery | Risk Management Resiliency Program | Oracle
+    content_sha256: 7cc76538aecb114f3e0bd6273456993f9828c376ce9f49fb96415bea28e0ba9c
+  - url: https://www.oracle.com/security-alerts/cpujul2026.html
+    title: Oracle Critical Patch Update Advisory - July 2026
+    content_sha256: 38f49eb9662889bb6dac21f6fd14c91bb1121609ea91825c6f65cf1594bb0ff2
+  - url: https://www.oracle.com/security-alerts/cspusep2026.html
+    title: Oracle Critical Security Patch Update Advisory - September 2026
+    content_sha256: 21827d953f381397b7e9a0e1097a893cd20a23e6da521c417c0c6c31e5104aa6
+  - url: https://docs.oracle.com/en-us/iaas/Content/access-governance/whats-new.htm
+    title: What's New in Oracle Access Governance
+    content_sha256: e3ec8e7988457c399a9ad8b949db8be59e3f6cbd8e923c0cfb31cc8d6d9dbe9c
+  - url: https://docs.oracle.com/en/cloud/saas/netsuite/ns-online-help/article_34140437468.html
+    title: NetSuite Applications Suite - Viewing the Oracle NetSuite Subprocessors
+      List
+    content_sha256: 542151a51937f8dcd0fc36eec387fab0a12821a71579ea9149d259c4301d758b
+  - url: https://www.oracle.com/corporate/security-practices/assurance/vulnerability/reporting/
+    title: How to Report Security Vulnerabilities to Oracle | Oracle
+    content_sha256: 1a7127eeab217feaa453d7104be9b9cce1e790d95c965bed7d3416ac072021ac
+  - url: https://www.oracle.com/corporate/cloud-compliance/
+    title: Cloud Compliance | Oracle
+    content_sha256: a46ced1bd3d8ab3abc5dfb7a6af23c1afe6f087df6983a4621b028d59172a490

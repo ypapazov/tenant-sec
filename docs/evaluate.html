@@ -324,7 +324,7 @@
 </nav>
 
 <div class="rc-warning" role="alert">
-  <strong>1.0-RC2 — AI-assisted provisional assessments.</strong>
+  <strong>1.0-RC3 — AI-assisted provisional assessments.</strong>
   These recommendations have not completed human review. Do not use them as
   the sole basis for security, compliance, or procurement decisions.
 </div>
@@ -347,8 +347,8 @@
     <div>
       <div class="section-label">Comparison cohort</div>
       <select id="cohortSelect" onchange="onCohortChange()">
-        <option value="hyperscaler" selected>hyperscaler — AWS, Azure, GCP</option>
-        <option value="eu-public">eu-public — Scaleway, OVHcloud</option>
+        <option value="hyperscaler" selected>hyperscaler — AWS, Azure, GCP, OCI</option>
+        <option value="eu-public">eu-public — Scaleway, OVHcloud, STACKIT, IONOS</option>
         <option value="cost-focused">cost-focused — Hetzner Cloud</option>
       </select>
     </div>
@@ -419,7 +419,7 @@
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
 
 <script type="module">
-  import { scoreProviders } from './scoring-engine.js?v=1.0.0rc2';
+  import { scoreProviders } from './scoring-engine.js?v=1.0.0rc3';
   window._scoreProviders = scoreProviders;
 </script>
 
@@ -467,7 +467,10 @@ async function init() {
   }
 
   // Try to detect available providers by attempting known filenames
-  const knownProviders = ['aws', 'gcp', 'azure', 'scaleway', 'hetzner', 'ovhcloud'];
+  const knownProviders = [
+    'aws', 'gcp', 'azure', 'oci', 'scaleway', 'hetzner', 'ovhcloud',
+    'stackit', 'ionos'
+  ];
   const providerResults = await Promise.allSettled(
     knownProviders.map(id => fetchYaml('providers/' + id + '.yaml'))
   );

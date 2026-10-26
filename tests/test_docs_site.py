@@ -35,7 +35,7 @@ def test_pages_link_favicon_and_logo_mark(page: str):
     assert 'class="logo"' in html
     assert "tenant<span>-sec</span>" in html
     assert "rc-warning" in html
-    assert "1.0-RC2" in html
+    assert "1.0-RC3" in html
 
 
 def test_controls_explorer_drops_per_provider_warning_glyph():
@@ -52,6 +52,14 @@ def test_evaluate_drops_per_card_review_badge_but_keeps_data_field():
     assert "review_status" in html  # still exported / present in data plumbing
     engine = (DOCS / "scoring-engine.js").read_text(encoding="utf-8")
     assert "review_status" in engine
+
+
+def test_rc3_provider_expansion_is_available_in_both_tools():
+    controls = (DOCS / "controls.html").read_text(encoding="utf-8")
+    evaluate = (DOCS / "evaluate.html").read_text(encoding="utf-8")
+    for provider in ("oci", "stackit", "ionos"):
+        assert f"'{provider}'" in controls
+        assert f"'{provider}'" in evaluate
 
 
 def test_controls_detail_report_and_excerpt_controls():

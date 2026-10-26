@@ -327,7 +327,7 @@
 </nav>
 
 <div class="rc-warning" role="alert">
-  <strong>1.0-RC2 — AI-assisted provisional assessments.</strong>
+  <strong>1.0-RC3 — AI-assisted provisional assessments.</strong>
   These recommendations have not completed human review. Do not use them as
   the sole basis for security, compliance, or procurement decisions.
 </div>
@@ -367,11 +367,11 @@
 <section id="preview">
   <a href="controls.html" class="preview-frame" style="padding:2.5rem;text-decoration:none;background:var(--surface)">
     <div style="font-size:1.5rem;font-weight:700;color:var(--text)">Controls Explorer</div>
-    <div style="margin-top:.75rem;color:var(--muted)">71 controls · 9 domains · 6 provisional provider assessments</div>
+    <div style="margin-top:.75rem;color:var(--muted)">71 controls · 9 domains · 9 provisional provider assessments</div>
     <div style="margin-top:1rem;color:var(--accent2)">Open the live data explorer →</div>
   </a>
   <p class="preview-caption">
-    71 controls. 9 domains. Six provisional provider assessments at a glance.
+    71 controls. 9 domains. Nine provisional provider assessments at a glance.
     <a href="controls.html">Open the Controls Explorer →</a>
   </p>
 </section>
@@ -476,7 +476,7 @@
     <div class="label">Provisional RC output</div>
     <h2 style="font-size:1.25rem">EU Regulated Fintech profile — hyperscaler cohort</h2>
     <p style="font-size:.85rem">
-      Current 1.0-RC2 results. The heuristic index is not a certification or
+      Current 1.0-RC3 results. The heuristic index is not a certification or
       security verdict, and the underlying recommendations are awaiting human review.
     </p>
     <div class="cmp-wrap">
@@ -487,13 +487,15 @@
             <th>Google Cloud</th>
             <th>Amazon Web Services</th>
             <th>Microsoft Azure</th>
+            <th>Oracle Cloud Infrastructure</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td><strong>Catalog completeness</strong></td><td>90%</td><td>84%</td><td>84%</td></tr>
-          <tr><td><strong>Technical must-haves</strong></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td></tr>
-          <tr><td><strong>Heuristic index</strong></td><td>81.6 / 100</td><td>80.7 / 100</td><td>75.5 / 100</td></tr>
-          <tr><td><strong>Human review</strong></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td></tr>
+          <tr><td><strong>Catalog completeness</strong></td><td>90%</td><td>84%</td><td>84%</td><td>84%</td></tr>
+          <tr><td><strong>Profile eligibility</strong></td><td><span class="tag-l3">ELIGIBLE</span></td><td><span class="tag-l3">ELIGIBLE</span></td><td><span class="tag-l3">ELIGIBLE</span></td><td><span class="tag-l1">INELIGIBLE</span></td></tr>
+          <tr><td><strong>Technical must-haves</strong></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l3">PASS</span></td><td><span class="tag-l1">FAIL (1)</span></td></tr>
+          <tr><td><strong>Heuristic index</strong></td><td>82 / 100</td><td>81 / 100</td><td>76 / 100</td><td>66 / 100</td></tr>
+          <tr><td><strong>Human review</strong></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td><td><span class="tag-l1">PENDING</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -601,12 +603,13 @@
 <pre><span class="cmt"># Score and rank providers against your scoring profile</span>
 <span class="cmd">tenant-sec score</span> \
   <span class="flag">--profile</span> <span class="path">profiles/eu-regulated-fintech.yaml</span> \
-  <span class="flag">--providers</span> aws,gcp,scaleway
+  <span class="flag">--providers</span> aws,gcp,azure,oci
 
-<span class="cmt">Rank  Provider              Overall  IAM   Enc   Net   ...  Must-Haves</span>
-<span class="cmt">   1  Google Cloud           98.9   100   98.3  100   ...  PASS</span>
-<span class="cmt">   2  Amazon Web Services    98.1   100   95.8  100   ...  PASS</span>
-<span class="cmt">   3  Scaleway               34.2    41.7  24.2  40.8  ...  FAIL (4)</span>
+<span class="cmt">Rank  Provider                     Index  Complete  Must-Haves  Eligible  Publish</span>
+<span class="cmt">   1  Google Cloud Platform           82       90%  PASS        yes       no</span>
+<span class="cmt">   2  Amazon Web Services             81       84%  PASS        yes       no</span>
+<span class="cmt">   3  Microsoft Azure                 76       84%  PASS        yes       no</span>
+<span class="cmt">   —  Oracle Cloud Infrastructure     66       84%  FAIL (1)    no        no</span>
 
 <span class="cmt"># JSON and CSV output also available</span>
 <span class="cmd">tenant-sec score</span> <span class="flag">--profile</span> <span class="path">profiles/eu-regulated-fintech.yaml</span> <span class="flag">--format json</span></pre>
@@ -619,9 +622,10 @@
 <span class="cmt">── ENCRYPTION ──────────────────────────────────</span>
 <span class="cmt">  enc.encryption-at-rest-default    MIXED  Encryption at rest — Default</span>
 <span class="cmt">    s3            L3   S3 encrypts all objects ...</span>
-<span class="cmt">    ebs           L3   EBS default encryption ...</span>
-<span class="cmt">    rds           L2   Must be enabled at creation ...</span>
-<span class="cmt">  enc.cmk                           MIXED  Customer-Managed Keys</span>
+<span class="cmt">    dynamodb      L3   DynamoDB encrypts all user data ...</span>
+<span class="cmt">    ebs           L1   EBS default encryption must be enabled ...</span>
+<span class="cmt">    ec2           L1   EC2 relies on EBS encryption settings ...</span>
+<span class="cmt">  enc.cmk                           L3     Customer-Managed Keys</span>
 <span class="cmt">  enc.byok                          L3     Bring Your Own Key</span>
 <span class="cmt">  enc.external-key-management       L3     External KMS (XKS)</span></pre>
     </div>
@@ -629,15 +633,15 @@
     <div id="cmd-compare" class="cmd-block">
 <pre><span class="cmt"># Side-by-side comparison</span>
 <span class="cmd">tenant-sec compare</span> \
-  <span class="flag">--providers</span> aws,gcp,scaleway \
+  <span class="flag">--providers</span> aws,gcp,azure \
   <span class="flag">--domain</span> iam
 
 <span class="cmt">── IAM ───────────────────────────────────────────</span>
-<span class="cmt">Control                       AWS      GCP      Scaleway</span>
-<span class="cmt">iam.external-idp-federation   L3       L3       L2</span>
-<span class="cmt">iam.privileged-access         L3       L3       L0</span>
-<span class="cmt">iam.abac                      L3       L3       L1</span>
-<span class="cmt">iam.permission-boundaries     L3       L3       L0</span>
+<span class="cmt">Control                       AWS            GCP      Azure</span>
+<span class="cmt">iam.external-idp-federation   L3             L3       L3</span>
+<span class="cmt">iam.privileged-access         L1             L3       L2</span>
+<span class="cmt">iam.abac                      9×L3/7×L2      L2       3×L2/12×L0</span>
+<span class="cmt">iam.permission-boundaries     L3             L1       L1</span>
 <span class="cmt">...</span></pre>
     </div>
 
@@ -815,8 +819,11 @@ mixed_aggregation: "p20"</pre>
 │   ├── azure.yaml             <span class="note"># 62 tenant controls</span>
 │   ├── gcp.yaml               <span class="note"># 62 tenant controls</span>
 │   ├── hetzner.yaml           <span class="note"># 62 tenant controls</span>
+│   ├── ionos.yaml             <span class="note"># 62 tenant controls</span>
+│   ├── oci.yaml               <span class="note"># 62 tenant controls</span>
 │   ├── ovhcloud.yaml          <span class="note"># 62 tenant controls</span>
-│   └── scaleway.yaml          <span class="note"># 62 tenant controls</span>
+│   ├── scaleway.yaml          <span class="note"># 62 tenant controls</span>
+│   └── stackit.yaml           <span class="note"># 62 tenant controls</span>
 │
 ├── <span class="dir">mappings/</span>
 │   ├── ccm-v4.1.yaml
