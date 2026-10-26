@@ -22,8 +22,11 @@ categories:
       azure: ["virtual-machines"]
       gcp: ["compute-engine"]
       hetzner: ["cloud-servers"]
+      ionos: ["vcpu-servers"]
+      oci: ["compute"]
       ovhcloud: ["instances"]
       scaleway: ["instances"]
+      stackit: ["compute-engine"]
 
   compute.containers:
     name: "Container Orchestration"
@@ -32,8 +35,11 @@ categories:
       azure: ["aks"]
       gcp: ["gke"]
       hetzner: []
+      ionos: ["managed-kubernetes"]
+      oci: ["oke"]
       ovhcloud: ["managed-kubernetes-service"]
       scaleway: ["kapsule"]
+      stackit: ["kubernetes-engine"]
 
   compute.serverless:
     name: "Serverless Functions"
@@ -41,6 +47,7 @@ categories:
       aws: ["lambda"]
       azure: ["functions"]
       gcp: ["cloud-functions", "cloud-run"]
+      oci: ["functions"]
       scaleway: ["functions", "containers"]
 
   compute.batch:
@@ -59,8 +66,11 @@ categories:
       azure: ["blob-storage"]
       gcp: ["cloud-storage"]
       hetzner: ["object-storage"]
+      ionos: ["object-storage"]
+      oci: ["object-storage"]
       ovhcloud: ["object-storage"]
       scaleway: ["object-storage"]
+      stackit: ["object-storage"]
 
   storage.block:
     name: "Block Storage"
@@ -69,8 +79,11 @@ categories:
       azure: ["managed-disks"]
       gcp: ["persistent-disk"]
       hetzner: ["volumes"]
+      ionos: ["block-storage"]
+      oci: ["block-volume"]
       ovhcloud: ["block-storage"]
       scaleway: ["block-storage"]
+      stackit: ["block-storage"]
 
   storage.file:
     name: "Managed File Storage"
@@ -78,6 +91,8 @@ categories:
       aws: ["efs", "fsx"]
       azure: ["files"]
       gcp: ["filestore"]
+      ionos: ["network-file-storage"]
+      oci: ["file-storage"]
       scaleway: []
 
   storage.archive:
@@ -96,8 +111,11 @@ categories:
       azure: ["sql-database", "postgresql", "mysql"]
       gcp: ["cloud-sql", "alloydb"]
       hetzner: []
+      ionos: ["postgresql"]
+      oci: ["base-database"]
       ovhcloud: ["postgresql"]
       scaleway: ["rdb"]
+      stackit: ["postgresql-flex"]
 
   database.nosql:
     name: "Managed NoSQL / Document Database"
@@ -105,7 +123,10 @@ categories:
       aws: ["dynamodb"]
       azure: ["cosmos-db"]
       gcp: ["firestore", "bigtable"]
+      ionos: ["mongodb"]
+      oci: ["nosql-database"]
       scaleway: ["document-db"]
+      stackit: ["mongodb-flex"]
 
   database.cache:
     name: "Managed Cache / In-Memory Store"
@@ -114,6 +135,7 @@ categories:
       azure: ["cache-for-redis"]
       gcp: ["memorystore"]
       scaleway: []
+      stackit: ["redis"]
 
   database.warehouse:
     name: "Data Warehouse / Analytics"
@@ -121,6 +143,7 @@ categories:
       aws: ["redshift"]
       azure: ["synapse"]
       gcp: ["bigquery"]
+      oci: ["autonomous-data-warehouse"]
       scaleway: []
 
   # ── Networking ────────────────────────────────────────────────────────────
@@ -131,8 +154,11 @@ categories:
       azure: ["virtual-network"]
       gcp: ["vpc"]
       hetzner: ["networks"]
+      ionos: ["virtual-data-center"]
+      oci: ["vcn"]
       ovhcloud: ["private-network"]
       scaleway: ["vpc"]
+      stackit: ["network"]
 
   network.loadbalancer:
     name: "Load Balancer"
@@ -141,8 +167,11 @@ categories:
       azure: ["load-balancer", "application-gateway"]
       gcp: ["cloud-load-balancing"]
       hetzner: ["load-balancers"]
+      ionos: ["application-load-balancer"]
+      oci: ["load-balancer"]
       ovhcloud: ["load-balancer"]
       scaleway: ["load-balancer"]
+      stackit: ["application-load-balancer"]
 
   network.cdn:
     name: "Content Delivery Network"
@@ -159,8 +188,11 @@ categories:
       azure: ["dns", "private-dns"]
       gcp: ["cloud-dns"]
       hetzner: ["dns"]
+      ionos: ["cloud-dns"]
+      oci: ["dns"]
       ovhcloud: []
       scaleway: ["dns"]
+      stackit: ["dns"]
 
   network.vpn:
     name: "VPN / Private Connectivity"
@@ -195,8 +227,10 @@ categories:
       azure: ["key-vault"]
       gcp: ["cloud-kms"]
       hetzner: []
+      oci: ["vault"]
       ovhcloud: ["key-management-service"]
       scaleway: ["secret-manager"]
+      stackit: ["kms"]
 
   security.secrets:
     name: "Secrets Manager"
@@ -205,8 +239,10 @@ categories:
       azure: ["key-vault"]
       gcp: ["secret-manager"]
       hetzner: []
+      oci: ["secrets"]
       ovhcloud: ["secret-manager"]
       scaleway: ["secret-manager"]
+      stackit: ["secrets-manager"]
 
   security.waf:
     name: "Web Application Firewall"
@@ -214,6 +250,7 @@ categories:
       aws: ["waf"]
       azure: ["web-application-firewall"]
       gcp: ["cloud-armor"]
+      oci: ["waf"]
       scaleway: []
 
   # ── AI / ML ───────────────────────────────────────────────────────────────
@@ -233,5 +270,8 @@ categories:
       azure: ["entra-id", "active-directory"]
       gcp: ["iam"]
       hetzner: ["project-access"]
+      ionos: ["iam"]
+      oci: ["iam"]
       ovhcloud: ["iam"]
       scaleway: ["iam"]
+      stackit: ["iam"]
