@@ -402,6 +402,97 @@
     letter-spacing: .04em; margin-bottom: .35rem;
   }
   .pa-no-refs { font-size: .78rem; color: var(--muted); font-style: italic; }
+  .assessment-trace {
+    margin-top: .75rem; border: 1px solid var(--border);
+    border-radius: 6px; background: var(--surface2); overflow: hidden;
+  }
+  .provider-score-card > .assessment-trace { margin: .65rem .85rem .85rem; }
+  .assessment-trace > summary {
+    display: flex; align-items: center; gap: .6rem; cursor: pointer;
+    padding: .65rem .75rem; color: var(--accent2); font-size: .8rem;
+    font-weight: 700; list-style: none; user-select: none;
+  }
+  .assessment-trace > summary::-webkit-details-marker { display: none; }
+  .assessment-trace > summary::before {
+    content: '\25B6'; color: var(--muted); font-size: .65rem;
+    transition: transform .15s;
+  }
+  .assessment-trace[open] > summary::before { transform: rotate(90deg); }
+  .trace-counts {
+    margin-left: auto; color: var(--muted); font-size: .68rem;
+    font-weight: 500; text-align: right;
+  }
+  .trace-body { border-top: 1px solid var(--border); padding: .75rem; }
+  .trace-note {
+    margin-bottom: .8rem; padding: .55rem .65rem; border-left: 3px solid var(--accent2);
+    background: var(--l2-bg); color: var(--muted); font-size: .72rem; line-height: 1.5;
+  }
+  .trace-heading {
+    margin: .8rem 0 .45rem; color: var(--muted); font-size: .67rem;
+    font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  }
+  .trace-criterion, .trace-claim {
+    margin-bottom: .45rem; padding: .6rem .65rem; border: 1px solid var(--border);
+    border-radius: 5px; background: var(--surface);
+  }
+  .trace-row { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+  .trace-level {
+    min-width: 29px; padding: .08rem .3rem; border-radius: 3px;
+    color: #000; font-size: .68rem; font-weight: 800; text-align: center;
+  }
+  .trace-result {
+    padding: .08rem .38rem; border-radius: 10px; font-size: .64rem;
+    font-weight: 700; text-transform: uppercase; letter-spacing: .03em;
+  }
+  .trace-result-met, .trace-result-supported {
+    color: var(--accent); background: var(--l3-bg);
+  }
+  .trace-result-not-met, .trace-result-unsupported {
+    color: var(--warn); background: var(--l1-bg);
+  }
+  .trace-result-contradicted {
+    color: var(--danger); background: var(--l0-bg);
+  }
+  .trace-reasoning, .trace-assertion {
+    margin-top: .4rem; color: var(--text); font-size: .76rem; line-height: 1.55;
+    white-space: pre-wrap;
+  }
+  .trace-claim-id {
+    color: var(--muted); font: .64rem/1.4 'Fira Code', monospace;
+  }
+  .trace-claim-links { margin-top: .4rem; display: flex; flex-wrap: wrap; gap: .25rem; }
+  .trace-claim-link {
+    padding: .08rem .3rem; border: 1px solid var(--border); border-radius: 3px;
+    color: var(--muted); font: .62rem/1.35 'Fira Code', monospace;
+  }
+  .trace-evidence {
+    margin-top: .4rem; border-left: 2px solid var(--border); padding-left: .55rem;
+  }
+  .trace-evidence > summary {
+    display: flex; align-items: center; gap: .4rem; cursor: pointer;
+    color: var(--accent2); font-size: .71rem; line-height: 1.4;
+  }
+  .trace-source-class {
+    margin-left: auto; color: var(--muted); font-size: .6rem;
+    text-transform: uppercase; letter-spacing: .03em;
+  }
+  .trace-evidence-body { padding: .45rem 0 .2rem; }
+  .trace-quote {
+    margin: 0 0 .4rem; padding: .5rem .6rem; border-left: 3px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: .72rem;
+    line-height: 1.5; white-space: pre-wrap;
+  }
+  .trace-meta {
+    display: flex; flex-wrap: wrap; gap: .25rem .65rem;
+    color: var(--muted); font-size: .64rem; line-height: 1.4;
+  }
+  .trace-source-link { color: var(--accent2); text-decoration: none; }
+  .trace-source-link:hover { text-decoration: underline; }
+  .trace-hash {
+    display: block; margin-top: .35rem; color: var(--muted); font-size: .58rem;
+    white-space: normal; overflow-wrap: anywhere;
+  }
+  .trace-empty { color: var(--muted); font-size: .72rem; font-style: italic; }
   .ref-link {
     display: flex; align-items: center; gap: .4rem; font-size: .78rem;
     color: var(--accent2); text-decoration: none; padding: .15rem 0;
@@ -1184,6 +1275,7 @@ function renderFocusedProvider(pid, ctrlId) {
       ${verified}
     </div>
     ${bodyHtml}
+    ${renderAssessmentTrace(ctrl)}
     <div class="pa-refs-section">
       <div class="pa-refs-label">Documentation references</div>
       ${refsHtml}
@@ -1259,7 +1351,100 @@ function renderProviderCard(pid, prov, ctrlId) {
       <span class="psc-score score-badge-${cls}">${label}</span>
     </div>
     ${body}
+    ${renderAssessmentTrace(ctrl)}
   </div>`;
+}
+
+function renderAssessmentTrace(ctrl) {
+  const criteria = Array.isArray(ctrl?.criteria_results)
+    ? [...ctrl.criteria_results].sort((a, b) => Number(a.level) - Number(b.level))
+    : [];
+  const claims = Array.isArray(ctrl?.claims) ? ctrl.claims : [];
+  const evidence = Array.isArray(ctrl?.evidence_items) ? ctrl.evidence_items : [];
+  if (!criteria.length && !claims.length && !evidence.length) return '';
+
+  const evidenceById = new Map(evidence.map(item => [item.id, item]));
+  const claimById = new Map(claims.map(claim => [claim.id, claim]));
+
+  const criteriaHtml = criteria.map(result => {
+    const level = Number(result.level);
+    const cls = scoreClass(level);
+    const met = result.met === true;
+    const linkedClaims = (result.claim_ids || []).map(id => {
+      const claim = claimById.get(id);
+      const title = claim?.assertion ? ` title="${escHtml(claim.assertion)}"` : '';
+      return `<span class="trace-claim-link"${title}>${escHtml(id)}</span>`;
+    }).join('');
+    return `<div class="trace-criterion">
+      <div class="trace-row">
+        <span class="trace-level" style="background:var(--${cls})">L${escHtml(String(level))}</span>
+        <span class="trace-result trace-result-${met ? 'met' : 'not-met'}">${met ? 'Met' : 'Not met'}</span>
+      </div>
+      <div class="trace-reasoning">${escHtml(result.reasoning || '')}</div>
+      ${linkedClaims ? `<div class="trace-claim-links">${linkedClaims}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  const claimsHtml = claims.map(claim => {
+    const result = ['supported', 'unsupported', 'contradicted'].includes(claim.result)
+      ? claim.result : 'unsupported';
+    const records = (claim.evidence_item_ids || []).map(id => {
+      const item = evidenceById.get(id);
+      return item
+        ? renderTraceEvidence(item)
+        : `<div class="trace-empty">Evidence record ${escHtml(id)} is unavailable.</div>`;
+    }).join('');
+    return `<div class="trace-claim">
+      <div class="trace-row">
+        <span class="trace-result trace-result-${result}">${escHtml(result)}</span>
+        <span class="trace-claim-id">${escHtml(claim.id || '')}</span>
+      </div>
+      <div class="trace-assertion">${escHtml(claim.assertion || '')}</div>
+      ${records || '<div class="trace-empty">No linked evidence records.</div>'}
+    </div>`;
+  }).join('');
+
+  return `<details class="assessment-trace">
+    <summary>
+      <span>Evidence &amp; rationale</span>
+      <span class="trace-counts">${criteria.length} criteria &middot; ${claims.length} claims &middot; ${evidence.length} evidence records</span>
+    </summary>
+    <div class="trace-body">
+      <div class="trace-note">Published decision trace: rubric decisions, claims, and cited evidence. Raw model chain-of-thought is not published.</div>
+      ${criteriaHtml ? `<div class="trace-heading">Rubric decision</div>${criteriaHtml}` : ''}
+      ${claimsHtml ? `<div class="trace-heading">Claims and supporting evidence</div>${claimsHtml}` : ''}
+    </div>
+  </details>`;
+}
+
+function renderTraceEvidence(item) {
+  const applicability = item.applicability || {};
+  const sourceUrl = safeExternalUrl(item.url);
+  const scope = [
+    applicability.offering ? `Offering: ${applicability.offering}` : '',
+    applicability.regions?.length ? `Regions: ${applicability.regions.join(', ')}` : '',
+    applicability.services?.length ? `Services: ${applicability.services.join(', ')}` : '',
+    applicability.edition ? `Edition: ${applicability.edition}` : '',
+  ].filter(Boolean);
+  const dates = [
+    item.retrieved_at ? `Retrieved: ${item.retrieved_at}` : '',
+    item.updated_at ? `Updated: ${item.updated_at}` : '',
+  ].filter(Boolean);
+  return `<details class="trace-evidence">
+    <summary>
+      <span>${escHtml(item.title || item.id || 'Evidence record')}</span>
+      ${item.source_class ? `<span class="trace-source-class">${escHtml(item.source_class)}</span>` : ''}
+    </summary>
+    <div class="trace-evidence-body">
+      <blockquote class="trace-quote">${escHtml(item.quote || '')}</blockquote>
+      <div class="trace-meta">
+        ${dates.map(value => `<span>${escHtml(value)}</span>`).join('')}
+        ${scope.map(value => `<span>${escHtml(value)}</span>`).join('')}
+        ${sourceUrl ? `<a class="trace-source-link" href="${escHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer">Open source &#x2197;</a>` : ''}
+      </div>
+      ${item.content_hash ? `<code class="trace-hash">${escHtml(item.content_hash)}</code>` : ''}
+    </div>
+  </details>`;
 }
 
 function buildCriteriaHtml(def) {
@@ -1287,9 +1472,21 @@ function buildMappingsHtml(def) {
 
 function renderRefs(refs) {
   if (!refs || !refs.length) return '';
-  return refs.map(r =>
-    `<a class="ref-link" href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.title || r.url)}</a>`
-  ).join('');
+  return refs.map(r => {
+    const url = safeExternalUrl(r.url);
+    return url
+      ? `<a class="ref-link" href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${escHtml(r.title || r.url)}</a>`
+      : '';
+  }).join('');
+}
+
+function safeExternalUrl(value) {
+  try {
+    const url = new URL(String(value || ''));
+    return ['http:', 'https:'].includes(url.protocol) ? url.href : '';
+  } catch {
+    return '';
+  }
 }
 
 function toggleServiceExpand(svcId) {

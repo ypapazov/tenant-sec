@@ -83,6 +83,28 @@ def test_controls_detail_report_and_excerpt_controls():
     assert "${escHtml(ctrlId)}" in html
 
 
+def test_controls_exposes_published_evidence_and_rationale():
+    html = (DOCS / "controls.html").read_text(encoding="utf-8")
+    assert "function renderAssessmentTrace(ctrl)" in html
+    assert "function renderTraceEvidence(item)" in html
+    assert "Evidence &amp; rationale" in html
+    assert "Published decision trace" in html
+    assert "Rubric decision" in html
+    assert "Claims and supporting evidence" in html
+    assert "ctrl?.criteria_results" in html
+    assert "ctrl?.claims" in html
+    assert "ctrl?.evidence_items" in html
+    assert "claim.evidence_item_ids" in html
+    assert "result.reasoning" in html
+    assert "item.content_hash" in html
+    assert "item.applicability" in html
+    assert "${escHtml(claim.assertion || '')}" in html
+    assert "${escHtml(item.quote || '')}" in html
+    assert html.count("${renderAssessmentTrace(ctrl)}") == 2
+    assert "function safeExternalUrl(value)" in html
+    assert "['http:', 'https:'].includes(url.protocol)" in html
+
+
 def test_report_issue_url_encoding_with_node():
     """Exercise the URL builder logic without a browser."""
     import subprocess
